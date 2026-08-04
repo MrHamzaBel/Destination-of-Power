@@ -6,6 +6,7 @@ extends Control
 @onready var health_bar: ProgressBar = %HealthBar
 @onready var resource_bar: ProgressBar = %ResourceBar
 @onready var resource_label: Label = %ResourceLabel
+@onready var exp_bar: ProgressBar = %ExpBar
 @onready var level_gold_label: Label = %LevelGoldLabel
 @onready var objective_label: Label = %ObjectiveLabel
 @onready var prompt_label: Label = %PromptLabel
@@ -39,6 +40,9 @@ func refresh_stats() -> void:
 	var class_def := RunManager.get_class_def()
 	resource_label.text = (class_def.resource_label if class_def != null else "Resource")
 	level_gold_label.text = "Level %d   Gold: %d" % [RunManager.run.level, RunManager.run.currency]
+
+	exp_bar.max_value = max(1, RunManager.exp_required_for_level(RunManager.run.level))
+	exp_bar.value = RunManager.run.current_exp
 
 func set_objective(text: String) -> void:
 	objective_label.text = text

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="GuildRankDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/GuildRankDefinition.gd" id="1_rank"]
+
+[resource]
+script = ExtResource("1_rank")
+id = "C"
+order = 3
+display_name = "C-Rank Adventurer"
+description = "Trusted enough for the guild's back lounge and its private shop."
+upgrade_cost = 45
+tax_discount_percent = 20.0
+free_potion_per_mission = true
+unlocks_lounge = true
+unlocks_special_missions = false

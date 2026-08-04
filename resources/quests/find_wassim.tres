@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/QuestDefinition.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "find_wassim"
+display_name = "Find Wassim"
+description = "A traveling adventurer's brother, Wassim, headed to the Adventure Centrum to submit a bounty and never returned."
+objective_text = "Explore the Adventure Centrum."
+reward_gold = 15
+reward_exp = 20
+reward_stat_points = 1
+reward_item_ids = Array[String](["minor_healing_potion"])
+reward_artifact_id = ""

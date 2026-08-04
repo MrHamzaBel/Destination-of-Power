@@ -5,7 +5,9 @@ extends Control
 ## to - it has no gameplay logic of its own.
 
 @onready var player_health_bar: ProgressBar = %PlayerHealthBar
+@onready var player_health_value_label: Label = %PlayerHealthValueLabel
 @onready var player_resource_bar: ProgressBar = %PlayerResourceBar
+@onready var player_resource_value_label: Label = %PlayerResourceValueLabel
 @onready var player_resource_label: Label = %PlayerResourceLabel
 @onready var enemy_target_list: VBoxContainer = %EnemyTargetList
 @onready var ally_list: VBoxContainer = %AllyList
@@ -61,8 +63,10 @@ func _refresh_bars() -> void:
 		return
 	player_health_bar.max_value = max(1, _combat.player_unit.max_health)
 	player_health_bar.value = _combat.player_unit.current_health
+	player_health_value_label.text = "%d/%d" % [_combat.player_unit.current_health, _combat.player_unit.max_health]
 	player_resource_bar.max_value = max(1, _combat.player_unit.max_resource)
 	player_resource_bar.value = _combat.player_unit.current_resource
+	player_resource_value_label.text = "%d/%d" % [_combat.player_unit.current_resource, _combat.player_unit.max_resource]
 	player_resource_label.text = _combat.resource_name()
 
 	_refresh_enemy_target_list()

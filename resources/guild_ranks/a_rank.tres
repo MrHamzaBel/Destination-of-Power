@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="GuildRankDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/GuildRankDefinition.gd" id="1_rank"]
+
+[resource]
+script = ExtResource("1_rank")
+id = "A"
+order = 5
+display_name = "A-Rank Adventurer"
+description = "Among the guild's elite. Tax and lounge prices both cut by more than a third."
+upgrade_cost = 90
+tax_discount_percent = 35.0
+free_potion_per_mission = true
+unlocks_lounge = true
+unlocks_special_missions = true

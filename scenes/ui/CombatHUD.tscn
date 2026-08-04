@@ -1,7 +1,21 @@
-[gd_scene load_steps=3 format=3 uid="uid://bcombathud01"]
+[gd_scene load_steps=5 format=3 uid="uid://bcombathud01"]
 
 [ext_resource type="Script" path="res://scripts/ui/CombatHUD.gd" id="1_script"]
 [ext_resource type="Theme" path="res://resources/ui/nerax_theme.tres" id="2_theme"]
+
+[sub_resource type="StyleBoxFlat" id="SubResource_health"]
+bg_color = Color(0.75, 0.2, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SubResource_resource"]
+bg_color = Color(0.25, 0.45, 0.85, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [node name="CombatHUD" type="Control"]
 layout_mode = 3
@@ -42,6 +56,15 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 show_percentage = false
+theme_override_styles/fill = SubResource("SubResource_health")
+
+[node name="PlayerHealthValueLabel" type="Label" parent="TopBar/PlayerPanel/PlayerVBox/PlayerHealthRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(70, 0)
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.9, 0.55, 0.55, 1)
+text = "0/0"
 
 [node name="PlayerResourceRow" type="HBoxContainer" parent="TopBar/PlayerPanel/PlayerVBox"]
 layout_mode = 2
@@ -57,6 +80,15 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 show_percentage = false
+theme_override_styles/fill = SubResource("SubResource_resource")
+
+[node name="PlayerResourceValueLabel" type="Label" parent="TopBar/PlayerPanel/PlayerVBox/PlayerResourceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(70, 0)
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.55, 0.7, 0.95, 1)
+text = "0/0"
 
 [node name="TurnLabel" type="Label" parent="TopBar"]
 unique_name_in_owner = true

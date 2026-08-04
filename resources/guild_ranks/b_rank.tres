@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="GuildRankDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/GuildRankDefinition.gd" id="1_rank"]
+
+[resource]
+script = ExtResource("1_rank")
+id = "B"
+order = 4
+display_name = "B-Rank Adventurer"
+description = "Cleared for special missions and special guild requests, with a steeper discount on both guild tax and lounge expenses."
+upgrade_cost = 65
+tax_discount_percent = 25.0
+free_potion_per_mission = true
+unlocks_lounge = true
+unlocks_special_missions = true

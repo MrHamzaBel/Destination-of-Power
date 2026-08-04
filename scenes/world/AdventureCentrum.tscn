@@ -1,0 +1,168 @@
+[gd_scene load_steps=12 format=3 uid="uid://badventurecentrum01"]
+
+[ext_resource type="Script" path="res://scripts/world/AdventureCentrum.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(720, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVShort"]
+size = Vector2(20, 140)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVFull"]
+size = Vector2(20, 460)
+
+[sub_resource type="RectangleShape2D" id="PropShape"]
+size = Vector2(36, 20)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 36.0
+
+[node name="AdventureCentrum" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.24, 0.18, 0.12, 1)
+polygon = PackedVector2Array(-350, -220, 350, -220, 350, 220, -350, 220)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.32, 0.24, 0.16, 1)
+polygon = PackedVector2Array(-340, -210, 340, -210, 340, 210, -340, 210)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -220)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.15, 0.11, 0.08, 1)
+polygon = PackedVector2Array(-360, -10, 360, -10, 360, 10, -360, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, 220)
+
+[node name="Visual" type="Polygon2D" parent="WallBottom"]
+color = Color(0.15, 0.11, 0.08, 1)
+polygon = PackedVector2Array(-360, -10, 360, -10, 360, 10, -360, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottom"]
+shape = SubResource("WallShapeH")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(350, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.15, 0.11, 0.08, 1)
+polygon = PackedVector2Array(-10, -230, 10, -230, 10, 230, -10, 230)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeVFull")
+
+[node name="WallLeftTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-350, -145)
+
+[node name="Visual" type="Polygon2D" parent="WallLeftTop"]
+color = Color(0.15, 0.11, 0.08, 1)
+polygon = PackedVector2Array(-10, -75, 10, -75, 10, 75, -10, 75)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeftTop"]
+shape = SubResource("WallShapeVShort")
+
+[node name="WallLeftBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-350, 145)
+
+[node name="Visual" type="Polygon2D" parent="WallLeftBottom"]
+color = Color(0.15, 0.11, 0.08, 1)
+polygon = PackedVector2Array(-10, -75, 10, -75, 10, 75, -10, 75)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeftBottom"]
+shape = SubResource("WallShapeVShort")
+
+[node name="QuestBoard" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -130)
+
+[node name="Visual" type="Polygon2D" parent="QuestBoard"]
+color = Color(0.45, 0.35, 0.22, 1)
+polygon = PackedVector2Array(-18, -10, 18, -10, 18, 10, -18, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="QuestBoard"]
+shape = SubResource("PropShape")
+
+[node name="QuestBoardInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, -95)
+script = ExtResource("6_interactable")
+display_name = "Quest Board"
+kind = 0
+message = "Notices cover every inch of the board - hunts, deliveries, escorts. Most are stamped with bounties far above what you could handle right now. One slip, half-torn, mentions a 'Wassim' who never picked up his payment."
+
+[node name="Shape" type="CollisionShape2D" parent="QuestBoardInteract"]
+shape = SubResource("InteractShape")
+
+[node name="Desk" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(180, 130)
+
+[node name="Visual" type="Polygon2D" parent="Desk"]
+color = Color(0.4, 0.3, 0.2, 1)
+polygon = PackedVector2Array(-30, -16, 30, -16, 30, 16, -30, 16)
+
+[node name="Shape" type="CollisionShape2D" parent="Desk"]
+shape = SubResource("PropShape")
+
+[node name="ExitToPlaza" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-350, 0)
+script = ExtResource("6_interactable")
+display_name = "Back to the Plaza"
+kind = 2
+exit_target_scene = "res://scenes/world/Plaza.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToPlaza"]
+shape = SubResource("WallShapeVShort")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToPlaza"]
+color = Color(0.85, 0.75, 0.35, 0.5)
+polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(-280, 0)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -370
+limit_top = -240
+limit_right = 370
+limit_bottom = 240
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true

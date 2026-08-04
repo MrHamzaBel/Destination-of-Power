@@ -11,6 +11,10 @@ const ENCOUNTER_SCREEN: String = "res://scenes/world/EncounterScreen.tscn"
 const COMBAT_SCENE: String = "res://scenes/combat/CombatScene.tscn"
 const RUN_SUMMARY: String = "res://scenes/ui/RunSummary.tscn"
 const CITY_GUARD_ARRIVAL: String = "res://scenes/world/CityGuardArrival.tscn"
+const CITY_GUARD_FAREWELL: String = "res://scenes/world/CityGuardFarewell.tscn"
+const TWO_WAY_ALLEY: String = "res://scenes/world/TwoWayAlley.tscn"
+const PLAZA: String = "res://scenes/world/Plaza.tscn"
+const ADVENTURE_CENTRUM: String = "res://scenes/world/AdventureCentrum.tscn"
 
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect

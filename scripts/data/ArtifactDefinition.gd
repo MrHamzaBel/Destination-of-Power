@@ -15,3 +15,21 @@ enum Rarity { COMMON, UNCOMMON, RARE, EPIC, LEGENDARY }
 @export var effect_values: Dictionary = {} ## Free-form tuning values read by the effect class.
 @export var stacking_allowed: bool = false
 @export var class_restrictions: Array[String] = [] ## Empty = usable by any class.
+
+static func rarity_name(rarity: Rarity) -> String:
+	match rarity:
+		Rarity.COMMON: return "Common"
+		Rarity.UNCOMMON: return "Uncommon"
+		Rarity.RARE: return "Rare"
+		Rarity.EPIC: return "Epic"
+		Rarity.LEGENDARY: return "Legendary"
+	return "Rare"
+
+static func rarity_color(rarity: Rarity) -> Color:
+	match rarity:
+		Rarity.COMMON: return Color(0.8, 0.8, 0.8)
+		Rarity.UNCOMMON: return Color(0.35, 0.85, 0.35)
+		Rarity.RARE: return Color(0.35, 0.55, 0.95)
+		Rarity.EPIC: return Color(0.7, 0.35, 0.9)
+		Rarity.LEGENDARY: return Color(0.95, 0.65, 0.15)
+	return Color.WHITE

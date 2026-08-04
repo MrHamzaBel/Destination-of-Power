@@ -4,4 +4,4 @@
 
 [resource]
 script = ExtResource("1_lore")
-sections = Array[String](["The world of Nerax has always been a place where survival of the strongest was enforced.", "Kingdoms still rise and fall. Factions fight for power, while corruption spreads through royal courts and forgotten streets.", "Yet love, loyalty, and hope still survive beside cruelty, ambition, and evil.", "Every warrior, criminal, ruler, and wanderer must choose their own path.", "In this world, where will you lead yourself?"])
+sections = Array[String](["The world of Hamia has always been a place where survival of the strongest was enforced.", "Kingdoms still rise and fall. Nerax, capital of Hamia, sits at the heart of it all - factions fight for power, while corruption spreads through royal courts and forgotten streets.", "Yet love, loyalty, and hope still survive beside cruelty, ambition, and evil.", "Every warrior, criminal, ruler, and wanderer must choose their own path.", "In this world, where will you lead yourself?"])

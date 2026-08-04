@@ -3,7 +3,7 @@ extends Resource
 ## Persistent state for a single active roguelike run. Saved to its own slot so it
 ## can be removed on death/victory without touching the character profile.
 
-const SAVE_VERSION: int = 2 ## v2 adds the level/experience/stat-point fields.
+const SAVE_VERSION: int = 4 ## v4 adds the guild rank.
 
 @export var save_version: int = SAVE_VERSION
 @export var run_seed: int = 0
@@ -24,6 +24,9 @@ const SAVE_VERSION: int = 2 ## v2 adds the level/experience/stat-point fields.
 @export var current_scene_path: String = ""
 @export var is_active: bool = false
 @export var story_flags: Dictionary = {} ## flag_id(String) -> bool, tracks one-shot narrative beats.
+@export var active_quests: Array[String] = [] ## Quest ids accepted but not yet completed.
+@export var completed_quests: Array[String] = [] ## Quest ids already rewarded.
+@export var guild_rank: String = "" ## "" = not enrolled, else "F".."S" (see GuildRegistry).
 
 func to_dict() -> Dictionary:
 	return {
@@ -46,6 +49,9 @@ func to_dict() -> Dictionary:
 		"current_scene_path": current_scene_path,
 		"is_active": is_active,
 		"story_flags": story_flags,
+		"active_quests": active_quests,
+		"completed_quests": completed_quests,
+		"guild_rank": guild_rank,
 	}
 
 static func from_dict(data: Dictionary) -> RunData:
@@ -69,6 +75,8 @@ static func from_dict(data: Dictionary) -> RunData:
 	run.current_scene_path = data.get("current_scene_path", "")
 	run.is_active = data.get("is_active", false)
 	run.story_flags = data.get("story_flags", {})
+	run.active_quests.assign(data.get("active_quests", []))
+	run.completed_quests.assign(data.get("completed_quests", []))
 	return run
 
 func add_item(item_id: String, quantity: int = 1) -> void:

@@ -20,7 +20,15 @@ const EQUIP_SLOTS: Array[String] = ["weapon", "offhand", "armor"]
 @onready var close_button: Button = %CloseButton
 @onready var capacity_label: Label = %CapacityLabel
 
+@onready var artifact_list: VBoxContainer = %ArtifactList
+@onready var artifact_count_label: Label = %ArtifactCountLabel
+@onready var artifact_detail_name: Label = %ArtifactDetailName
+@onready var artifact_detail_rarity: Label = %ArtifactDetailRarity
+@onready var artifact_detail_desc: Label = %ArtifactDetailDesc
+@onready var artifact_detail_info: Label = %ArtifactDetailInfo
+
 var _selected_item_id: String = ""
+var _selected_artifact_id: String = ""
 
 func _ready() -> void:
 	close_button.pressed.connect(func(): closed.emit())
@@ -33,6 +41,8 @@ func refresh() -> void:
 	_populate_equipped()
 	_populate_inventory()
 	_select_item("")
+	_populate_artifacts()
+	_select_artifact("")
 
 func _populate_equipped() -> void:
 	for child in equipped_list.get_children():
@@ -188,3 +198,53 @@ func _on_drop_pressed() -> void:
 	EventBus.inventory_changed.emit()
 	RunManager.save_current_run()
 	refresh()
+
+# --- Artifacts tab ------------------------------------------------------------
+
+func _populate_artifacts() -> void:
+	for child in artifact_list.get_children():
+		child.queue_free()
+	if RunManager.run == null:
+		artifact_count_label.text = "0 artifacts"
+		return
+	for artifact_id in RunManager.run.artifacts.keys():
+		var artifact_def := ArtifactRegistry.get_artifact(artifact_id)
+		if artifact_def == null:
+			continue
+		var stacks: int = int(RunManager.run.artifacts[artifact_id])
+		artifact_list.add_child(_build_artifact_row(artifact_def, stacks))
+	artifact_count_label.text = "%d artifact%s" % [RunManager.run.artifacts.size(), "" if RunManager.run.artifacts.size() == 1 else "s"]
+
+func _build_artifact_row(artifact_def: ArtifactDefinition, stacks: int) -> Button:
+	var btn := Button.new()
+	btn.text = "%s%s" % [artifact_def.display_name, (" x%d" % stacks if stacks > 1 else "")]
+	btn.focus_mode = Control.FOCUS_ALL
+	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	btn.add_theme_color_override("font_color", ArtifactDefinition.rarity_color(artifact_def.rarity))
+	btn.pressed.connect(_select_artifact.bind(artifact_def.id))
+	return btn
+
+func _select_artifact(artifact_id: String) -> void:
+	_selected_artifact_id = artifact_id
+	var artifact_def := ArtifactRegistry.get_artifact(artifact_id) if artifact_id != "" else null
+	if artifact_def == null:
+		artifact_detail_name.text = "Select an artifact"
+		artifact_detail_rarity.text = ""
+		artifact_detail_desc.text = ""
+		artifact_detail_info.text = ""
+		return
+
+	artifact_detail_name.text = artifact_def.display_name
+	artifact_detail_rarity.text = "Rarity: %s" % ArtifactDefinition.rarity_name(artifact_def.rarity)
+	artifact_detail_rarity.add_theme_color_override("font_color", ArtifactDefinition.rarity_color(artifact_def.rarity))
+	artifact_detail_desc.text = artifact_def.description
+
+	var info_lines: Array[String] = []
+	var stacks: int = int(RunManager.run.artifacts.get(artifact_id, 1)) if RunManager.run != null else 1
+	if artifact_def.stacking_allowed:
+		info_lines.append("Stacks: %d (effects grow with each copy)" % stacks)
+	else:
+		info_lines.append("Does not stack.")
+	if not artifact_def.class_restrictions.is_empty():
+		info_lines.append("Class restricted: %s" % ", ".join(artifact_def.class_restrictions))
+	artifact_detail_info.text = "\n".join(info_lines)

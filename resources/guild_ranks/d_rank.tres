@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="GuildRankDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/GuildRankDefinition.gd" id="1_rank"]
+
+[resource]
+script = ExtResource("1_rank")
+id = "D"
+order = 2
+display_name = "D-Rank Adventurer"
+description = "The guild starts sending a Minor Healing Potion along with every mission."
+upgrade_cost = 30
+tax_discount_percent = 15.0
+free_potion_per_mission = true
+unlocks_lounge = false
+unlocks_special_missions = false

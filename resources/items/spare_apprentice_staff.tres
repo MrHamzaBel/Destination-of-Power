@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 0
+max_resource = 8
+attack = 0
+intelligence = 5
+defense = 0
+speed = 0
+
+[resource]
+script = ExtResource("1_item")
+id = "spare_apprentice_staff"
+display_name = "Spare Apprentice Staff"
+description = "A swordsman found this on a fallen mage and has no idea what to do with it. Better focused than a beginner's staff."
+category = 0
+rarity = 1
+icon_color = Color(0.5, 0.35, 0.7, 1)
+equip_slot = "weapon"
+is_ranged = true
+stat_modifiers = SubResource("SubResource_1")
+heal_amount = 0
+resource_amount = 0
+value = 15
+droppable = true

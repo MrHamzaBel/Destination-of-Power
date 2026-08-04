@@ -96,6 +96,18 @@ func _populate_info() -> void:
 		var artifact_def := ArtifactRegistry.get_artifact(artifact_id)
 		if artifact_def != null:
 			lines.append("  %s x%d" % [artifact_def.display_name, run.artifacts[artifact_id]])
+	lines.append("")
+	lines.append("Quests:")
+	if run.active_quests.is_empty() and run.completed_quests.is_empty():
+		lines.append("  None yet")
+	for quest_id in run.active_quests:
+		var quest_def := QuestRegistry.get_quest(quest_id)
+		if quest_def != null:
+			lines.append("  [In Progress] %s - %s" % [quest_def.display_name, quest_def.objective_text])
+	for quest_id in run.completed_quests:
+		var quest_def := QuestRegistry.get_quest(quest_id)
+		if quest_def != null:
+			lines.append("  [Complete] %s" % quest_def.display_name)
 	info_label.text = "\n".join(lines)
 
 	var unspent := run.unspent_stat_points

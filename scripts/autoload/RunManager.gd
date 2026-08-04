@@ -189,3 +189,44 @@ func allocate_stat_point(stat_name: String) -> bool:
 	run.allocated_stats[stat_name] = int(run.allocated_stats.get(stat_name, 0)) + 1
 	save_current_run()
 	return true
+
+# --- Quests -----------------------------------------------------------------
+
+func is_quest_active(quest_id: String) -> bool:
+	return run != null and run.active_quests.has(quest_id)
+
+func is_quest_completed(quest_id: String) -> bool:
+	return run != null and run.completed_quests.has(quest_id)
+
+func start_quest(quest_id: String) -> void:
+	if run == null or is_quest_active(quest_id) or is_quest_completed(quest_id):
+		return
+	run.active_quests.append(quest_id)
+	save_current_run()
+
+## Grants a quest's reward (any combination of gold/exp/stat points/items/an
+## artifact - see QuestDefinition) and moves it from active to completed.
+## Returns the list of levels gained (same shape as grant_experience()) so
+## a level-up from quest exp can still be reported to the player.
+func complete_quest(quest_id: String) -> Array[int]:
+	var levels_gained: Array[int] = []
+	if run == null or not run.active_quests.has(quest_id):
+		return levels_gained
+	var quest_def := QuestRegistry.get_quest(quest_id)
+	if quest_def == null:
+		return levels_gained
+
+	run.active_quests.erase(quest_id)
+	run.completed_quests.append(quest_id)
+
+	run.currency += quest_def.reward_gold
+	run.unspent_stat_points += quest_def.reward_stat_points
+	for item_id in quest_def.reward_item_ids:
+		run.add_item(item_id, 1)
+	if quest_def.reward_artifact_id != "":
+		run.add_artifact(quest_def.reward_artifact_id)
+	if quest_def.reward_exp > 0:
+		levels_gained = grant_experience(quest_def.reward_exp)
+
+	save_current_run()
+	return levels_gained

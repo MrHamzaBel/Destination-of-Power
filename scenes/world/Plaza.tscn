@@ -1,0 +1,311 @@
+[gd_scene load_steps=14 format=3 uid="uid://bplazanerax01"]
+
+[ext_resource type="Script" path="res://scripts/world/Plaza.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueChoicePopup.tscn" id="7_dialogue"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(1040, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVTall"]
+size = Vector2(20, 210)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVShort"]
+size = Vector2(20, 140)
+
+[sub_resource type="RectangleShape2D" id="PropShape"]
+size = Vector2(30, 30)
+
+[sub_resource type="CircleShape2D" id="FountainShape"]
+radius = 46.0
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 36.0
+
+[node name="Plaza" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.302, 0.29, 0.27, 1)
+polygon = PackedVector2Array(-500, -280, 500, -280, 500, 280, -500, 280)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.38, 0.365, 0.34, 1)
+polygon = PackedVector2Array(-490, -270, 490, -270, 490, 270, -490, 270)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -280)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.16, 0.14, 0.13, 1)
+polygon = PackedVector2Array(-520, -10, 520, -10, 520, 10, -520, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, 280)
+
+[node name="Visual" type="Polygon2D" parent="WallBottom"]
+color = Color(0.16, 0.14, 0.13, 1)
+polygon = PackedVector2Array(-520, -10, 520, -10, 520, 10, -520, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottom"]
+shape = SubResource("WallShapeH")
+
+[node name="WallLeftTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-500, -175)
+
+[node name="Visual" type="Polygon2D" parent="WallLeftTop"]
+color = Color(0.16, 0.14, 0.13, 1)
+polygon = PackedVector2Array(-10, -105, 10, -105, 10, 105, -10, 105)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeftTop"]
+shape = SubResource("WallShapeVTall")
+
+[node name="WallLeftBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-500, 175)
+
+[node name="Visual" type="Polygon2D" parent="WallLeftBottom"]
+color = Color(0.16, 0.14, 0.13, 1)
+polygon = PackedVector2Array(-10, -105, 10, -105, 10, 105, -10, 105)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeftBottom"]
+shape = SubResource("WallShapeVTall")
+
+[node name="WallRightTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(500, -175)
+
+[node name="Visual" type="Polygon2D" parent="WallRightTop"]
+color = Color(0.16, 0.14, 0.13, 1)
+polygon = PackedVector2Array(-10, -105, 10, -105, 10, 105, -10, 105)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRightTop"]
+shape = SubResource("WallShapeVTall")
+
+[node name="WallRightBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(500, 175)
+
+[node name="Visual" type="Polygon2D" parent="WallRightBottom"]
+color = Color(0.16, 0.14, 0.13, 1)
+polygon = PackedVector2Array(-10, -105, 10, -105, 10, 105, -10, 105)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRightBottom"]
+shape = SubResource("WallShapeVTall")
+
+[node name="Fountain" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -30)
+
+[node name="Rim" type="Polygon2D" parent="Fountain"]
+color = Color(0.55, 0.53, 0.5, 1)
+polygon = PackedVector2Array(48, 0, 33.9, 33.9, 0, 48, -33.9, 33.9, -48, 0, -33.9, -33.9, 0, -48, 33.9, -33.9)
+
+[node name="Water" type="Polygon2D" parent="Fountain"]
+color = Color(0.3, 0.5, 0.65, 0.9)
+polygon = PackedVector2Array(36, 0, 25.5, 25.5, 0, 36, -25.5, 25.5, -36, 0, -25.5, -25.5, 0, -36, 25.5, -25.5)
+
+[node name="Shape" type="CollisionShape2D" parent="Fountain"]
+shape = SubResource("FountainShape")
+
+[node name="Stall1" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-280, 150)
+
+[node name="Visual" type="Polygon2D" parent="Stall1"]
+color = Color(0.55, 0.24, 0.2, 1)
+polygon = PackedVector2Array(-18, -14, 18, -14, 18, 14, -18, 14)
+
+[node name="Shape" type="CollisionShape2D" parent="Stall1"]
+shape = SubResource("PropShape")
+
+[node name="Stall2" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(280, 150)
+
+[node name="Visual" type="Polygon2D" parent="Stall2"]
+color = Color(0.24, 0.42, 0.4, 1)
+polygon = PackedVector2Array(-18, -14, 18, -14, 18, 14, -18, 14)
+
+[node name="Shape" type="CollisionShape2D" parent="Stall2"]
+shape = SubResource("PropShape")
+
+[node name="Lamp1" type="Polygon2D" parent="."]
+position = Vector2(-450, -240)
+color = Color(0.9, 0.78, 0.35, 0.85)
+polygon = PackedVector2Array(-5, -5, 5, -5, 5, 5, -5, 5)
+
+[node name="Lamp2" type="Polygon2D" parent="."]
+position = Vector2(450, 240)
+color = Color(0.9, 0.78, 0.35, 0.85)
+polygon = PackedVector2Array(-5, -5, 5, -5, 5, 5, -5, 5)
+
+[node name="NoticeBoardInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-180, -220)
+script = ExtResource("6_interactable")
+display_name = "Notice Board"
+kind = 0
+message = "A weathered notice board lists town proclamations. Beneath faded ink, one banner still holds: \"NERAX - Jewel of Hamia, Seat of the Crown.\""
+
+[node name="Shape" type="CollisionShape2D" parent="NoticeBoardInteract"]
+shape = SubResource("InteractShape")
+
+[node name="NoticeBoardVisual" type="Polygon2D" parent="NoticeBoardInteract"]
+color = Color(0.4, 0.3, 0.2, 1)
+polygon = PackedVector2Array(-16, -12, 16, -12, 16, 12, -16, 12)
+
+[node name="ExitToTwoWayAlley" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-500, 0)
+script = ExtResource("6_interactable")
+display_name = "Back to the Alleys"
+kind = 2
+exit_target_scene = "res://scenes/world/TwoWayAlley.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToTwoWayAlley"]
+shape = SubResource("WallShapeVShort")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToTwoWayAlley"]
+color = Color(0.85, 0.75, 0.35, 0.5)
+polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
+
+[node name="CityGate" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(500, 0)
+script = ExtResource("6_interactable")
+display_name = "City Streets"
+kind = 2
+exit_target_scene = "res://scenes/world/EncounterScreen.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="CityGate"]
+shape = SubResource("WallShapeVShort")
+
+[node name="ExitVisual" type="Polygon2D" parent="CityGate"]
+color = Color(0.75, 0.85, 0.55, 0.5)
+polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
+
+[node name="FoodVendorInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-150, 60)
+script = ExtResource("6_interactable")
+display_name = "Food Vendor"
+kind = 5
+trade_item_id = "meat_pie"
+trade_price = 3
+
+[node name="Shape" type="CollisionShape2D" parent="FoodVendorInteract"]
+shape = SubResource("InteractShape")
+
+[node name="FoodVendorVisual" type="Polygon2D" parent="FoodVendorInteract"]
+color = Color(0.65, 0.45, 0.2, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="SwindlerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(150, 60)
+script = ExtResource("6_interactable")
+display_name = "Shifty Peddler"
+kind = 5
+trade_item_id = "minor_healing_potion"
+trade_price = 12
+trade_flavor_text = "\"Extra effects, guaranteed!\" the peddler swears, already pocketing your coin."
+
+[node name="Shape" type="CollisionShape2D" parent="SwindlerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="SwindlerVisual" type="Polygon2D" parent="SwindlerInteract"]
+color = Color(0.35, 0.3, 0.4, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="AdventurerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 190)
+script = ExtResource("6_interactable")
+display_name = "Traveling Adventurer"
+kind = 6
+dialogue_prompt = "\"You look like you can handle yourself out there,\" the traveler says, eyeing your gear. \"Are you an adventurer?\""
+dialogue_yes_text = "\"Perfect - then maybe you can help. My brother Wassim headed to the Adventure Centrum to submit a bounty and never came back. That's where most quests and missions get posted. Could you check on him?\" You agree to look into it."
+dialogue_no_text = "\"Not yet? You should think about it,\" he says. \"Registered adventurers get bigger cuts on missions and quests - and the recognition doesn't hurt either.\""
+dialogue_decline_text = "\"Fair enough,\" he says, raising his hands. \"None of my business. Apologies for prying.\""
+dialogue_quest_active_text = "\"Any word on Wassim? The Adventure Centrum is east, past the plaza gate.\""
+dialogue_quest_done_text = "\"Thank you again for looking into my brother,\" he says warmly."
+quest_id = "find_wassim"
+
+[node name="Shape" type="CollisionShape2D" parent="AdventurerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="AdventurerVisual" type="Polygon2D" parent="AdventurerInteract"]
+color = Color(0.3, 0.45, 0.32, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="GuildHallFacade" type="Polygon2D" parent="."]
+position = Vector2(300, -240)
+color = Color(0.38, 0.3, 0.22, 1)
+polygon = PackedVector2Array(-60, -30, 60, -30, 60, 30, -60, 30)
+
+[node name="GuildHallDoor" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(300, -195)
+script = ExtResource("6_interactable")
+display_name = "Adventure Centrum"
+kind = 2
+exit_target_scene = "res://scenes/world/AdventureCentrum.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="GuildHallDoor"]
+shape = SubResource("InteractShape")
+
+[node name="GuildHallDoorVisual" type="Polygon2D" parent="GuildHallDoor"]
+color = Color(0.5, 0.38, 0.24, 1)
+polygon = PackedVector2Array(-14, -18, 14, -18, 14, 18, -14, 18)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(-450, 0)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -520
+limit_top = -300
+limit_right = 520
+limit_bottom = 300
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true
+
+[node name="DialoguePopup" parent="UILayer" instance=ExtResource("7_dialogue")]
+unique_name_in_owner = true

@@ -1,6 +1,6 @@
 # Destination of Power
 
-A top-down 2D roguelike adventure MVP set in the world of **Nerax**, built in **Godot 4** with **GDScript**. Character creation, class selection, a skippable lore intro, top-down exploration, turn-based combat, equipment/inventory, an event-driven artifact system, and a randomized encounter run structure — all backed by data files so new content can be added without touching the code that renders it.
+A top-down 2D roguelike adventure MVP set in **Nerax**, capital city of the world of **Hamia**, built in **Godot 4** with **GDScript**. Character creation, class selection, a skippable lore intro, top-down exploration, turn-based combat, equipment/inventory, an event-driven artifact system, and a randomized encounter run structure — all backed by data files so new content can be added without touching the code that renders it.
 
 All visuals are procedural placeholder shapes (`Polygon2D`/`ColorRect`, solid colors) built from data. No external art or paid assets are used, and everything is designed to be swapped for real art later without changing any game logic.
 
@@ -74,21 +74,29 @@ scenes/ui/SettingsMenu.tscn
 scenes/ui/CharacterCreator.tscn
 scenes/ui/ClassSelection.tscn
 scenes/ui/LoreIntro.tscn
-scenes/ui/ExplorationHUD.tscn    - instanced inside BackAlley
-scenes/ui/PauseMenu.tscn         - instanced inside BackAlley/EncounterScreen
-scenes/ui/InventoryScreen.tscn   - instanced inside BackAlley/EncounterScreen
+scenes/ui/ExplorationHUD.tscn    - instanced inside every exploration area
+scenes/ui/PauseMenu.tscn         - instanced inside every exploration area
+scenes/ui/InventoryScreen.tscn   - instanced inside every exploration area
 scenes/ui/CombatHUD.tscn         - instanced inside CombatScene
 scenes/ui/RunSummary.tscn
-scenes/world/BackAlley.tscn      - starting exploration area
+scenes/ui/DialogueChoicePopup.tscn - Yes/No/decline NPC prompt; instanced only where used (Plaza)
+scenes/world/BackAlley.tscn      - starting exploration area (dead end, one way out)
+scenes/world/TwoWayAlley.tscn    - junction alley: Back Alley <-> Plaza, has a trader
+scenes/world/Plaza.tscn          - Nerax's central plaza: food vendor, swindler, adventurer NPC, guild hall door
+scenes/world/AdventureCentrum.tscn  - guild hall; resolves the Find Wassim quest on arrival
+scenes/world/CityGuardArrival.tscn  - story beat: guard arrives, revenge thugs incoming
+scenes/world/CityGuardFarewell.tscn - story beat: guard asks where you live, assumes Southside
 scenes/world/EncounterScreen.tscn- hub for the randomized run sequence
 scenes/combat/CombatScene.tscn
 scenes/entities/PlayerCharacter.tscn
 scenes/entities/EnemyCharacter.tscn
 ```
 
+`scripts/world/ExplorationArea.gd` is the shared base class behind every walkable area (`BackAlley`, `TwoWayAlley`, `Plaza`) - it owns the player/HUD/pause/inventory wiring and all `Interactable` handling (message, combat, exit, heal, item, trade). A concrete area is typically a `.tscn` plus a script that's just `extends ExplorationArea` and overrides `get_scene_path()`/`get_objective_text()` (and optionally `_on_area_ready()` for one-time setup like an intro notification) - see `BackAlley.gd` for the smallest example.
+
 ## Save data
 
-Three independent JSON files under `user://saves/` (on Windows: `%APPDATA%/Godot/app_userdata/Nerax/saves/`):
+Three independent JSON files under `user://saves/` (on Windows: `%APPDATA%/Godot/app_userdata/Destination of Power/saves/`):
 
 - `character_profile.json` - name + appearance. Survives runs and app restarts; only overwritten by **Save Character** in the creator.
 - `active_run.json` - class, stats, inventory, equipped items, artifacts, currency, encounter progress, run seed. Deleted when a run ends (victory, defeat, or is explicitly abandoned).
@@ -135,11 +143,37 @@ Combat supports any number of enemies and allies simultaneously (each gets its o
 
 Allies are AI-controlled party members defined the same data-driven way as everything else: a new `AllyDefinition` `.tres` in `resources/allies/` (`id`, `display_name`, `stats`, `body_color`, `shape_points`) picked up automatically by `AllyRegistry`. They always auto-attack whichever enemy is currently targeted - there's no ally ability/action UI (see Known Limitations). Pass ally ids as the fourth argument to `SceneManager.start_combat(enemy_ids, return_scene, advances_encounter, ally_ids)` (or directly to `CombatManager.start(enemy_ids, ally_ids)`) to bring one into a fight; an ally being defeated doesn't end the combat, only the player dying does.
 
+### The Southside map
+
+Exploration is now a small connected map, not a single room:
+
+```
+BackAlley (dead end, spawn point)
+    <-- one exit -->
+TwoWayAlley (junction; has the alley trader)
+    <-- one exit -->                    <-- other exit -->
+  (back to BackAlley)                 Plaza (Nerax's central plaza; food vendor, swindler, adventurer NPC)
+                                           <-- city gate -->        <-- guild hall door -->
+                                EncounterScreen (randomized run)   AdventureCentrum (resolves the Find Wassim quest)
+```
+
+Every `Interactable` of kind `EXIT` carries its own `exit_target_scene`, so the map graph is just data sitting in each scene file - there's no separate "level graph" resource to keep in sync. Add a new area by making a new `.tscn` + a two-line `ExplorationArea` subclass (see above) and pointing an `EXIT` interactable at it.
+
 ### Story beats & the Back Alley Thug scenario
 
-The back alley has a second, one-time combat encounter (in addition to the Alley Rat) that kicks off a short scripted sequence: beating the **Back Alley Thug** interactable there routes (via `Interactable.victory_return_scene`) to `scenes/world/CityGuardArrival.tscn` instead of back into the alley. That scene plays a short LoreIntro-style beat (text in `resources/lore/city_guard_arrival.tres`) - a City Guard of Nerax arrives, and more thugs show up looking for revenge - then starts a second fight (`["back_alley_thug", "back_alley_thug"]`) with the Guard fighting alongside the player as an ally, before returning to the alley for good.
+The back alley has a second, one-time combat encounter (in addition to the Alley Rat) that kicks off a short scripted sequence: beating the **Back Alley Thug** interactable there routes (via `Interactable.victory_return_scene`) to `scenes/world/CityGuardArrival.tscn` instead of back into the alley. That scene plays a short LoreIntro-style beat (text in `resources/lore/city_guard_arrival.tres`) - a City Guard of Nerax arrives, and more thugs show up looking for revenge - then starts a second fight (`["back_alley_thug", "back_alley_thug"]`) with the Guard fighting alongside the player as an ally. Winning that routes to `scenes/world/CityGuardFarewell.tscn` (text in `resources/lore/city_guard_farewell.tres`), a short beat where she asks where you live and assumes Southside before you can answer, before finally returning to the Back Alley for good.
 
-This whole sequence only fires once per run: `Interactable.story_flag_id` ("back_alley_thug_defeated" here) is checked/set against `RunData.story_flags` (a generic `flag_id -> bool` bag, persisted with the run) the moment the interactable is triggered, and `BackAlley.gd` hides/disables any interactable whose flag is already set on future visits. The same `story_flag_id` mechanism is reusable for any future one-shot story beat - it isn't specific to this scenario.
+This whole sequence only fires once per run: `Interactable.story_flag_id` ("back_alley_thug_defeated" here) is checked/set against `RunData.story_flags` (a generic `flag_id -> bool` bag, persisted with the run) the moment the interactable is triggered, and `ExplorationArea._connect_interactables()` hides/disables any interactable whose flag is already set on future visits. The same `story_flag_id` mechanism is reusable for any future one-shot story beat - it isn't specific to this scenario.
+
+### Trading
+
+Both the Two-Way Alley (the "Back-Alley Trader") and the Plaza (a legitimate Food Vendor, and a "Shifty Peddler" reselling the same potion at a markup) have repeatable `Interactable`s of kind `TRADE` that sell `trade_item_id` for `trade_price` gold - `ExplorationArea._handle_trade()` checks the player has enough `RunData.currency`, then deducts it and adds the item. If the player holds the Thorned Coin artifact, its price is bumped by `ThornedCoinEffect.get_shop_price_multiplier()` - a hook that artifact always defined but that nothing called until these traders existed. An optional `trade_flavor_text` is appended to the purchase notification (the peddler's "extra effects, guaranteed" line is just flavor text - mechanically it sells the exact same `minor_healing_potion` the honest vendors do, just overpriced). Add a new vendor by dropping a `TRADE`-kind `Interactable` anywhere with `trade_item_id`/`trade_price` set.
+
+### Dialogue & quests
+
+The Plaza's "Traveling Adventurer" is an `Interactable` of kind `DIALOGUE`: interacting opens `DialogueChoicePopup` (`scenes/ui/DialogueChoicePopup.tscn`, added once per scene that needs it) with a fixed Yes / No / "Mind your own business" choice. `ExplorationArea._on_dialogue_choice()` shows the matching `dialogue_yes_text`/`dialogue_no_text`/`dialogue_decline_text`, and - only on Yes, and only if `quest_id` is set - starts that quest via `RunManager.start_quest()`. Talking again while the quest is active or after it's done shows `dialogue_quest_active_text`/`dialogue_quest_done_text` instead of repeating the pitch.
+
+Quests are `QuestDefinition` resources (`resources/quests/*.tres`, loaded by `QuestRegistry`) tracked per-run in `RunData.active_quests`/`completed_quests`. `RunManager.complete_quest(quest_id)` grants any combination of `reward_gold`, `reward_exp`, `reward_stat_points`, `reward_item_ids` and a single `reward_artifact_id` - unset fields just grant nothing, so a reward can be as small or as combined as the quest needs. The one shipped example, **Find Wassim**, is completed by simply arriving in `AdventureCentrum.tscn` while it's active (`AdventureCentrum._on_area_ready()` calls `complete_quest()` and shows a resolution notification) - "explore this place" is a valid quest objective without needing any special turn-in NPC or item. Active/completed quests are listed on the pause menu's Character Info screen.
 
 ### Leveling & experience
 
@@ -149,7 +183,7 @@ This whole sequence only fires once per run: `Interactable.story_flag_id` ("back
 
 ### Gold
 
-`RunData.currency` is the run's gold - enemies drop it (`EnemyDefinition.currency_reward`, boosted by the Thorned Coin artifact), treasure/event encounters grant or occasionally cost some, and it's shown on the exploration HUD, the encounter screen, and the pause menu's Character Info panel. There's no shop yet to spend it in (see Known Limitations).
+`RunData.currency` is the run's gold - enemies drop it (`EnemyDefinition.currency_reward`, boosted by the Thorned Coin artifact), treasure/event encounters grant or occasionally cost some, quests can reward it, and traders (see Trading, below) spend it. It's shown on the exploration HUD, the encounter screen, and the pause menu's Character Info panel.
 
 ### Add a class
 
@@ -190,7 +224,8 @@ This is an MVP: the systems are real and reusable, but scope was intentionally k
 - **No ability/item targeting beyond the current enemy target.** Every player and ally action goes through `CombatManager.get_current_target()`; there's no way to target, say, an ally with a heal, or hit "all enemies" even though `AbilityDefinition.TargetType.ALL_ENEMIES` exists as an enum value - it isn't wired up to any resolution logic yet.
 - **Linear encounter sequence**, not a branching dungeon/map. `EncounterRegistry` already separates "what kinds of encounters exist" from "how the sequence is generated," so swapping in a graph/room-based generator later doesn't require touching the encounter resources.
 - **No audio.** `AudioManager` and the settings UI are wired up; no sound assets are included.
-- **No shops**, though Thorned Coin's price-multiplier hook is already implemented in anticipation of one.
+- **Trading has no dedicated shop UI.** Buying is instant on interact (no browse/confirm screen) - fine for a single-item vendor, but a multi-item shop would want a proper menu.
+- **Quests have no in-progress tracking beyond the pause menu list**, no quest markers/waypoints, and completion is currently always "arrive somewhere" or "talk to someone" - there's no generic "kill N enemies" or "collect N items" objective type yet, though `RunManager.complete_quest()` doesn't care *how* a quest gets marked active/complete, so adding one is mostly about calling `start_quest()`/`complete_quest()` from the right place.
 - **No controller/touch input yet.** All input goes through the Input Map actions (`move_*`, `interact`, `pause_menu`, `inventory_toggle`, `ui_advance`), so adding a controller or on-screen touch layer means adding new bindings to those actions, not new code.
 - **Basic AI.** Enemy behaviour is a simple probability roll (attack vs. defend) based on `behavior_type`; no positioning, focus-fire, or multi-turn planning.
 - **Save migration is scaffolded but untested** - every save resource has a `save_version` field and the loaders already tolerate missing/corrupt files, but no old-format migration path exists yet (`RunData` is currently at v2; nothing reads v1 data specially, it just falls back to field defaults).

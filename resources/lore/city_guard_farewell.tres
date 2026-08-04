@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="LoreScript" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/LoreScript.gd" id="1_lore"]
+
+[resource]
+script = ExtResource("1_lore")
+sections = Array[String](["With the last of them fled or fallen, the alley falls quiet. The City Guard sheathes her blade and studies you for a moment.", "\"You handled yourself well, for someone caught in an alley brawl,\" she says. \"Where do you live, in Nerax?\"", "You open your mouth to answer, but she waves it off before you can. \"No matter - this is the Southside. Rough, poor, and forgotten by the crown. If you're standing here, it's home enough.\"", "\"Watch yourself out there,\" she adds, already turning back toward the main streets. \"Nerax doesn't forgive the careless.\""])
