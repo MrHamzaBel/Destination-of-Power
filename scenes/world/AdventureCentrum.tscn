@@ -111,9 +111,14 @@ collision_layer = 2
 collision_mask = 0
 position = Vector2(0, -95)
 script = ExtResource("6_interactable")
-display_name = "Quest Board"
-kind = 0
-message = "Notices cover every inch of the board - hunts, deliveries, escorts. Most are stamped with bounties far above what you could handle right now. One slip, half-torn, mentions a 'Wassim' who never picked up his payment."
+display_name = "Mission Board"
+kind = 6
+dialogue_prompt = "A bounty notice, freshly pinned: \"Bees beyond the southern gate have been harassing travelers on the outskirts road. Cull nine and report back for payment.\" Will you take the job?"
+dialogue_yes_text = "You pocket the bounty slip. Nine bees, then - south through the Market, past the gate, into the forest by the old tree."
+dialogue_no_text = "You leave the notice pinned to the board. Maybe another time."
+dialogue_decline_text = "Fair enough. The board's not going anywhere."
+dialogue_quest_active_text = "The bounty slip is still in your pocket - finish culling the bees first."
+quest_id = "kill_the_bees"
 
 [node name="Shape" type="CollisionShape2D" parent="QuestBoardInteract"]
 shape = SubResource("InteractShape")

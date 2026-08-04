@@ -1,0 +1,231 @@
+[gd_scene load_steps=14 format=3 uid="uid://bneraxoutskirts01"]
+
+[ext_resource type="Script" path="res://scripts/world/NeraxOutskirts.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/entities/EnemyCharacter.tscn" id="7_enemy"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeHSeg"]
+size = Vector2(285, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeV"]
+size = Vector2(20, 520)
+
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(180, 20)
+
+[sub_resource type="RectangleShape2D" id="LakeShape"]
+size = Vector2(220, 200)
+
+[sub_resource type="RectangleShape2D" id="TreeShape"]
+size = Vector2(30, 30)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 40.0
+
+[node name="NeraxOutskirts" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.22, 0.28, 0.16, 1)
+polygon = PackedVector2Array(-450, -250, 450, -250, 450, 250, -450, 250)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.27, 0.33, 0.19, 1)
+polygon = PackedVector2Array(-440, -240, 440, -240, 440, 240, -440, 240)
+
+[node name="ForestZone" type="Polygon2D" parent="."]
+color = Color(0.16, 0.24, 0.14, 1)
+polygon = PackedVector2Array(120, -240, 440, -240, 440, 240, 120, 240)
+
+[node name="WallTopLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-255, -250)
+
+[node name="Visual" type="Polygon2D" parent="WallTopLeft"]
+color = Color(0.1, 0.09, 0.08, 1)
+polygon = PackedVector2Array(-142, -10, 142, -10, 142, 10, -142, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTopLeft"]
+shape = SubResource("WallShapeHSeg")
+
+[node name="WallTopRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(255, -250)
+
+[node name="Visual" type="Polygon2D" parent="WallTopRight"]
+color = Color(0.1, 0.09, 0.08, 1)
+polygon = PackedVector2Array(-142, -10, 142, -10, 142, 10, -142, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTopRight"]
+shape = SubResource("WallShapeHSeg")
+
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-255, 250)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
+color = Color(0.1, 0.09, 0.08, 1)
+polygon = PackedVector2Array(-142, -10, 142, -10, 142, 10, -142, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeHSeg")
+
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(255, 250)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+color = Color(0.1, 0.09, 0.08, 1)
+polygon = PackedVector2Array(-142, -10, 142, -10, 142, 10, -142, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeHSeg")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-450, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallLeft"]
+color = Color(0.1, 0.09, 0.08, 1)
+polygon = PackedVector2Array(-10, -260, 10, -260, 10, 260, -10, 260)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WallShapeV")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(450, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.1, 0.09, 0.08, 1)
+polygon = PackedVector2Array(-10, -260, 10, -260, 10, 260, -10, 260)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeV")
+
+[node name="Lake" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-280, 0)
+
+[node name="Visual" type="Polygon2D" parent="Lake"]
+color = Color(0.22, 0.4, 0.55, 0.92)
+polygon = PackedVector2Array(-110, 0, -78, -78, 0, -100, 78, -78, 110, 0, 78, 78, 0, 100, -78, 78)
+
+[node name="Shore" type="Polygon2D" parent="Lake"]
+color = Color(0.35, 0.5, 0.65, 0.5)
+polygon = PackedVector2Array(-125, 0, -89, -89, 0, -114, 89, -89, 125, 0, 89, 89, 0, 114, -89, 89)
+z_index = -1
+
+[node name="Shape" type="CollisionShape2D" parent="Lake"]
+shape = SubResource("LakeShape")
+
+[node name="OldTree" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(280, -60)
+
+[node name="Trunk" type="Polygon2D" parent="OldTree"]
+color = Color(0.32, 0.22, 0.14, 1)
+polygon = PackedVector2Array(-8, 30, 8, 30, 8, -10, -8, -10)
+
+[node name="Canopy" type="Polygon2D" parent="OldTree"]
+color = Color(0.18, 0.32, 0.14, 1)
+polygon = PackedVector2Array(0, -60, 36, -30, 24, 10, -24, 10, -36, -30)
+
+[node name="Shape" type="CollisionShape2D" parent="OldTree"]
+shape = SubResource("TreeShape")
+
+[node name="Tree2" type="Polygon2D" parent="."]
+position = Vector2(180, 130)
+color = Color(0.16, 0.28, 0.13, 1)
+polygon = PackedVector2Array(0, -30, 20, -12, 12, 14, -12, 14, -20, -12)
+
+[node name="Tree3" type="Polygon2D" parent="."]
+position = Vector2(370, 110)
+color = Color(0.17, 0.3, 0.14, 1)
+polygon = PackedVector2Array(0, -30, 20, -12, 12, 14, -12, 14, -20, -12)
+
+[node name="Tree4" type="Polygon2D" parent="."]
+position = Vector2(360, -160)
+color = Color(0.16, 0.27, 0.13, 1)
+polygon = PackedVector2Array(0, -30, 20, -12, 12, 14, -12, 14, -20, -12)
+
+[node name="BeeSwarmInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(280, 20)
+script = ExtResource("6_interactable")
+display_name = "Bees"
+kind = 1
+enemy_ids = Array[String](["forest_bee", "forest_bee", "forest_bee"])
+
+[node name="Shape" type="CollisionShape2D" parent="BeeSwarmInteract"]
+shape = SubResource("InteractShape")
+
+[node name="EnemyVisual" parent="BeeSwarmInteract" instance=ExtResource("7_enemy")]
+scale = Vector2(0.8, 0.8)
+
+[node name="ExitToMarket" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, -250)
+script = ExtResource("6_interactable")
+display_name = "Back Through the Gate"
+kind = 2
+exit_target_scene = "res://scenes/world/Market.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToMarket"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToMarket"]
+color = Color(0.75, 0.85, 0.55, 0.5)
+polygon = PackedVector2Array(-90, -10, 90, -10, 90, 10, -90, 10)
+
+[node name="ExitToFarReaches" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 250)
+script = ExtResource("6_interactable")
+display_name = "The Path South"
+kind = 2
+exit_target_scene = "res://scenes/world/FarReaches.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToFarReaches"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToFarReaches"]
+color = Color(0.6, 0.55, 0.4, 0.5)
+polygon = PackedVector2Array(-90, -10, 90, -10, 90, 10, -90, 10)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(0, -210)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -460
+limit_top = -260
+limit_right = 460
+limit_bottom = 260
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true

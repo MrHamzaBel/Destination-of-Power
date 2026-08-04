@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bplazanerax01"]
+[gd_scene load_steps=16 format=3 uid="uid://bplazanerax01"]
 
 [ext_resource type="Script" path="res://scripts/world/Plaza.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
@@ -16,6 +16,12 @@ size = Vector2(20, 210)
 
 [sub_resource type="RectangleShape2D" id="WallShapeVShort"]
 size = Vector2(20, 140)
+
+[sub_resource type="RectangleShape2D" id="WallShapeBottomSeg"]
+size = Vector2(420, 20)
+
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(160, 20)
 
 [sub_resource type="RectangleShape2D" id="PropShape"]
 size = Vector2(30, 30)
@@ -49,17 +55,29 @@ polygon = PackedVector2Array(-520, -10, 520, -10, 520, 10, -520, 10)
 [node name="Shape" type="CollisionShape2D" parent="WallTop"]
 shape = SubResource("WallShapeH")
 
-[node name="WallBottom" type="StaticBody2D" parent="."]
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(0, 280)
+position = Vector2(-300, 280)
 
-[node name="Visual" type="Polygon2D" parent="WallBottom"]
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
 color = Color(0.16, 0.14, 0.13, 1)
-polygon = PackedVector2Array(-520, -10, 520, -10, 520, 10, -520, 10)
+polygon = PackedVector2Array(-210, -10, 210, -10, 210, 10, -210, 10)
 
-[node name="Shape" type="CollisionShape2D" parent="WallBottom"]
-shape = SubResource("WallShapeH")
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(300, 280)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+color = Color(0.16, 0.14, 0.13, 1)
+polygon = PackedVector2Array(-210, -10, 210, -10, 210, 10, -210, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeBottomSeg")
 
 [node name="WallLeftTop" type="StaticBody2D" parent="."]
 collision_layer = 1
@@ -284,6 +302,22 @@ shape = SubResource("InteractShape")
 [node name="GuildHallDoorVisual" type="Polygon2D" parent="GuildHallDoor"]
 color = Color(0.5, 0.38, 0.24, 1)
 polygon = PackedVector2Array(-14, -18, 14, -18, 14, 18, -14, 18)
+
+[node name="ExitToMarket" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 280)
+script = ExtResource("6_interactable")
+display_name = "Southside Market"
+kind = 2
+exit_target_scene = "res://scenes/world/Market.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToMarket"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToMarket"]
+color = Color(0.75, 0.6, 0.3, 0.5)
+polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 unique_name_in_owner = true

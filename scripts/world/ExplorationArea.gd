@@ -184,12 +184,19 @@ func _handle_guild_receptionist(_interactable: Interactable) -> void:
 			"\"Looking to join the Adventurers' Guild? Enrollment is %d gold. It gets you F-Rank and a standing discount on guild tax for every mission you take.\"" % next_rank.upgrade_cost,
 			"Enroll (%d gold)" % next_rank.upgrade_cost, "Not right now", ""
 		)
-	else:
-		dialogue_popup.show_prompt(
-			"\"You're %s-Rank right now. Ready to test for %s-Rank? It'll cost %d gold.\"" % [current_rank, next_rank.id, next_rank.upgrade_cost],
-			"Upgrade (%d gold)" % next_rank.upgrade_cost, "Not yet", ""
-		)
-	dialogue_popup.choice_made.connect(_on_guild_choice.bind(next_rank, current_rank == ""), CONNECT_ONE_SHOT)
+		dialogue_popup.choice_made.connect(_on_guild_choice.bind(next_rank, true), CONNECT_ONE_SHOT)
+		return
+
+	var required := RunManager.guild_progress_required(next_rank.order)
+	if RunManager.run.guild_progress < required:
+		hud.show_notification("\"You're %s-Rank right now,\" she says, checking your standing. \"%d/%d - not quite enough to test for %s-Rank yet. Take on some guild missions.\"" % [current_rank, RunManager.run.guild_progress, required, next_rank.id])
+		return
+
+	dialogue_popup.show_prompt(
+		"\"You're %s-Rank right now. Ready to test for %s-Rank? It'll cost %d gold.\"" % [current_rank, next_rank.id, next_rank.upgrade_cost],
+		"Upgrade (%d gold)" % next_rank.upgrade_cost, "Not yet", ""
+	)
+	dialogue_popup.choice_made.connect(_on_guild_choice.bind(next_rank, false), CONNECT_ONE_SHOT)
 
 func _on_guild_choice(choice_index: int, next_rank: GuildRankDefinition, is_enrolling: bool) -> void:
 	if choice_index != 0 or RunManager.run == null:
@@ -202,6 +209,9 @@ func _on_guild_choice(choice_index: int, next_rank: GuildRankDefinition, is_enro
 	RunManager.run.guild_rank = next_rank.id
 	if is_enrolling:
 		RunManager.run.add_item("guild_membership_badge", 1)
+	else:
+		# Carry any overflow standing forward, same as exp does past a level-up.
+		RunManager.run.guild_progress -= RunManager.guild_progress_required(next_rank.order)
 	RunManager.save_current_run()
 	hud.refresh_stats()
 

@@ -83,10 +83,15 @@ scenes/ui/DialogueChoicePopup.tscn - Yes/No/decline NPC prompt; instanced only w
 scenes/world/BackAlley.tscn      - starting exploration area (dead end, one way out)
 scenes/world/TwoWayAlley.tscn    - junction alley: Back Alley <-> Plaza, has a trader
 scenes/world/Plaza.tscn          - Nerax's central plaza: food vendor, swindler, adventurer NPC, guild hall door
-scenes/world/AdventureCentrum.tscn  - guild hall; resolves the Find Wassim quest on arrival, loot sellers, receptionist
+scenes/world/AdventureCentrum.tscn  - guild hall; resolves the Find Wassim quest on arrival, loot sellers, receptionist, mission board
 scenes/world/GuildLounge.tscn        - C-Rank+ only; member-discounted shop
 scenes/world/CityGuardArrival.tscn  - story beat: guard arrives, revenge thugs incoming
 scenes/world/CityGuardFarewell.tscn - story beat: guard asks where you live, assumes Southside
+scenes/world/DeeperAlley.tscn        - the alley's other path; the Sticky-Fingered Thug ambushes here
+scenes/world/UndergroundNerax.tscn  - minimal stub beneath the Deeper Alley, not built out yet
+scenes/world/Market.tscn             - Southside's long market street, Plaza <-> the southern gate
+scenes/world/NeraxOutskirts.tscn    - beyond the gate: forest (bees) east, lake west
+scenes/world/FarReaches.tscn         - minimal stub south of the outskirts, not built out yet
 scenes/world/EncounterScreen.tscn- hub for the randomized run sequence
 scenes/combat/CombatScene.tscn
 scenes/entities/PlayerCharacter.tscn
@@ -156,10 +161,15 @@ BackAlley (spawn point) -------------^                        UndergroundNerax (
 TwoWayAlley (junction; has the alley trader)
     <-- one exit -->                    <-- other exit -->
   (back to BackAlley)                 Plaza (Nerax's central plaza; food vendor, swindler, adventurer NPC)
-                                           <-- city gate -->        <-- guild hall door -->
-                                EncounterScreen (randomized run)   AdventureCentrum (loot sellers, receptionist)
-                                                                        <-- lounge door (C-Rank+) -->
-                                                                    GuildLounge (member-priced shop)
+                                           <-- city gate -->        <-- guild hall door -->             <-- market exit -->
+                                EncounterScreen (randomized run)   AdventureCentrum (loot sellers,     Market (long street, houses)
+                                                                     receptionist, mission board)              |
+                                                                        <-- lounge door (C-Rank+) -->    <-- southern gate -->
+                                                                    GuildLounge (member-priced shop)   NeraxOutskirts (forest w/ bees
+                                                                                                         east, lake west)
+                                                                                                                |
+                                                                                                          <-- open path -->
+                                                                                                        FarReaches (minimal stub)
 ```
 
 Every `Interactable` of kind `EXIT` carries its own `exit_target_scene`, so the map graph is just data sitting in each scene file - there's no separate "level graph" resource to keep in sync. Add a new area by making a new `.tscn` + a two-line `ExplorationArea` subclass (see above) and pointing an `EXIT` interactable at it.
@@ -196,6 +206,14 @@ The boss fight itself exercises two new, fully generic `EnemyDefinition` minibos
 
 `EnemyDefinition.intro_quote` (logged once, before the usual "Combat begins against..." line, if any enemy in the fight has one set) is what plays the Rat Boss's angry entrance line. `EnemyDefinition.guaranteed_artifact_id` grants a specific artifact on defeat *in addition to* the normal random 35% drop roll (tracked separately in `CombatManager.last_rewards["guaranteed_artifacts"]` so it never collides with the single-slot random `"artifact"` key) - the Rat Boss guarantees **Rat King's Fang** (`resources/artifacts/rat_kings_fang.tres`), a stacking artifact (`VenomousFangEffect`) that gives every player attack a chance to poison its target using the same poison system, plus a large flat experience reward.
 
+### Southside Market, the gate, and the outskirts
+
+The Plaza has a third exit south (`ExitToMarket`) into `scenes/world/Market.tscn` - a long street lined with houses connecting the Plaza to Nerax's southern gate. Past the gate is `scenes/world/NeraxOutskirts.tscn`: forest to the east (bees nest by the old tree, near a repeatable `COMBAT` `Interactable` spawning 3 `forest_bee` at once - no escalation or respawn-chance logic like the Rat Den, just a plain always-available fight), a decorative lake to the west, and an open path south continuing to `scenes/world/FarReaches.tscn` - unlocked (no `required_guild_rank_order`), intentionally minimal for now, same "not a dead end" treatment as `UndergroundNerax.tscn`.
+
+### Dodge: a second Speed-driven combat formula
+
+Bees introduce a second stat-comparison mechanic alongside the Attack-vs-Defense damage formula: `EnemyDefinition.dodge_uses_speed` (set on `forest_bee`) makes every attack against that enemy first roll `CombatManager.dodge_chance(attacker_speed, defender_speed)` - the exact same shape as `damage_multiplier()` (half a percent of chance per 1% Speed gap, same halving convention), but comparing Speed instead of Attack/Defense, capped at `MAX_DODGE_CHANCE_PERCENT` (90%), and interpreted as a complete miss (zero damage, no defense calculation at all) instead of a damage reduction. It only ever helps the *defender* - a defender with lower Speed than its attacker never dodges, mirroring how the damage formula never lets the weaker side "win." The check lives in `CombatManager._rolls_dodge()`, called from both `_perform_player_attack()` and `_ally_take_single_action()` (enemies attacking the player never check it, since only `enemy_def`-bearing units can hold the flag). Because it's gated on the flag rather than applied universally, existing enemies (including the deliberately-fast Sticky-Fingered Thug) are unaffected - only enemies that opt in via `dodge_uses_speed` get this passive.
+
 ### Trading
 
 Both the Two-Way Alley (the "Back-Alley Trader") and the Plaza (a legitimate Food Vendor, and a "Shifty Peddler" reselling the same potion at a markup) have repeatable `Interactable`s of kind `TRADE` that sell `trade_item_id` for `trade_price` gold - `ExplorationArea._handle_trade()` checks the player has enough `RunData.currency`, then deducts it and adds the item. If the player holds the Thorned Coin artifact, its price is bumped by `ThornedCoinEffect.get_shop_price_multiplier()` - a hook that artifact always defined but that nothing called until these traders existed. An optional `trade_flavor_text` is appended to the purchase notification (the peddler's "extra effects, guaranteed" line is just flavor text - mechanically it sells the exact same `minor_healing_potion` the honest vendors do, just overpriced). Add a new vendor by dropping a `TRADE`-kind `Interactable` anywhere with `trade_item_id`/`trade_price` set.
@@ -204,7 +222,11 @@ Both the Two-Way Alley (the "Back-Alley Trader") and the Plaza (a legitimate Foo
 
 The Plaza's "Traveling Adventurer" is an `Interactable` of kind `DIALOGUE`: interacting opens `DialogueChoicePopup` (`scenes/ui/DialogueChoicePopup.tscn`, added once per scene that needs it) with a fixed Yes / No / "Mind your own business" choice. `ExplorationArea._on_dialogue_choice()` shows the matching `dialogue_yes_text`/`dialogue_no_text`/`dialogue_decline_text`, and - only on Yes, and only if `quest_id` is set - starts that quest via `RunManager.start_quest()`. Talking again while the quest is active or after it's done shows `dialogue_quest_active_text`/`dialogue_quest_done_text` instead of repeating the pitch.
 
-Quests are `QuestDefinition` resources (`resources/quests/*.tres`, loaded by `QuestRegistry`) tracked per-run in `RunData.active_quests`/`completed_quests`. `RunManager.complete_quest(quest_id)` grants any combination of `reward_gold`, `reward_exp`, `reward_stat_points`, `reward_item_ids` and a single `reward_artifact_id` - unset fields just grant nothing, so a reward can be as small or as combined as the quest needs (a completed quest's gold also passes through the guild tax discount below, same as any other mission gold). The one shipped example, **Find Wassim**, is completed by simply arriving in `AdventureCentrum.tscn` while it's active (`AdventureCentrum._on_area_ready()` calls `complete_quest()` and shows a resolution notification) - "explore this place" is a valid quest objective without needing any special turn-in NPC or item. Active/completed quests are listed on the pause menu's Character Info screen.
+Quests are `QuestDefinition` resources (`resources/quests/*.tres`, loaded by `QuestRegistry`) tracked per-run in `RunData.active_quests`/`completed_quests`. `RunManager.complete_quest(quest_id)` grants any combination of `reward_gold`, `reward_exp`, `reward_stat_points`, `reward_item_ids`, a single `reward_artifact_id` and `reward_guild_progress` - unset fields just grant nothing, so a reward can be as small or as combined as the quest needs (a completed quest's gold also passes through the guild tax discount below, same as any other mission gold). The one "arrive somewhere" example, **Find Wassim**, is completed by simply arriving in `AdventureCentrum.tscn` while it's active (`AdventureCentrum._on_area_ready()` calls `complete_quest()` and shows a resolution notification) - no special turn-in NPC or item needed for that objective shape.
+
+**Kill-count and repeatable quests**: `QuestDefinition.objective_enemy_id`/`objective_kill_count` describe a "kill N of this enemy" objective - `CombatManager._on_enemy_defeated()` calls `RunManager.register_enemy_kill_for_quests(enemy_id)` after every kill, which advances a per-quest counter (`RunData.counters["quest_kills_<id>"]`) for every active quest matching that enemy id and auto-completes (and logs the reward straight into the combat log) the moment the target count is hit - no separate "return to turn it in" step. `QuestDefinition.repeatable = true` means completing it clears active status without ever touching `completed_quests`, so `is_quest_completed()` stays false and the same offer (a `DIALOGUE` interactable, or the Mission Board below) can be accepted again immediately. The shipped example, **Kill the Bees** (`resources/quests/kill_the_bees.tres`), is both: repeatable, `objective_enemy_id = "forest_bee"`, `objective_kill_count = 9`.
+
+The Adventure Centrum's existing "Quest Board" prop now doubles as the **Mission Board** - it's just a `DIALOGUE`-kind `Interactable` (`quest_id = "kill_the_bees"`) sitting on a board prop instead of talking to an NPC; no new `Interactable` kind was needed. Active/completed quests are listed on the pause menu's Character Info screen.
 
 `DialogueChoicePopup.show_prompt(text, yes_label, no_label, decline_label)` accepts custom button text (pass `""` for `decline_label` to hide that button entirely) so the same popup doubles as a plain Yes/No confirmation - see the guild receptionist below for an example that isn't a conversation at all.
 
@@ -223,6 +245,8 @@ Two things read the rank ladder:
 - `ExplorationArea._handle_trade()` applies the same `tax_discount_percent` as a price cut on any `TRADE` interactable with `lounge_pricing = true` (used by the two vendors in `GuildLounge.tscn`).
 
 The **Lounge Door** in the Adventure Centrum is a normal `EXIT` interactable with `required_guild_rank_order` set to C-Rank's `order` (3) - `ExplorationArea` checks `RunManager.get_guild_rank_def()` before allowing the transition and shows `locked_message` instead if the requirement isn't met. `GuildLounge.tscn` sells a member-discounted potion and an exclusive `guild_reserve_longsword`. B-Rank's `unlocks_special_missions` flag is tracked but has no content behind it yet - see Known Limitations.
+
+**Guild standing.** Testing for the next rank isn't just a gold cost anymore - it now also requires `RunData.guild_progress` (a second, separate accumulator, distinct from player exp/level) to have reached `RunManager.guild_progress_required(order)`, which mirrors `exp_required_for_level()`'s shape (`GUILD_PROGRESS_BASE * GUILD_PROGRESS_GROWTH^order`) but compounds 25% per rank instead of 10% per level. Enrollment (F-Rank, order 0) never requires standing - there's nothing to have proven yet. `ExplorationArea._handle_guild_receptionist()` checks this before even showing the paid-upgrade prompt, and reports current/required standing in a locked-style message if it's not met yet; on a successful upgrade the required amount is subtracted from `guild_progress` (overflow carries forward, same as exp past a level-up), not reset to zero. The only way to earn standing is `QuestDefinition.reward_guild_progress` - completing **Kill the Bees** grants 5 ("very low," and it's repeatable, so it's the intended grind for standing between the existing gold-cost upgrades).
 
 ### Leveling & experience
 
@@ -249,6 +273,7 @@ To give the class new abilities, add `AbilityDefinition` `.tres` files to `resou
 3. It's now selectable by `EnemyRegistry.get_random_id()` (used by randomized combat encounters) and can be referenced by id from any `Interactable` with `kind = COMBAT` in an exploration scene.
 4. Optional miniboss fields (all default to "off" for a plain enemy): `intro_quote` (a taunt logged once combat starts), `guaranteed_artifact_id` (a specific artifact granted on top of the normal random drop), `can_summon_minions`/`summon_minion_id` (revives a same-id fallen ally instead of attacking, when one is dead), and `poison_attack_chance`/`poison_damage_per_turn`/`poison_duration_turns` (a chance to poison its target for residual damage instead of a normal hit). See "The Rat Den & the Rat Boss" above for the shipped example of all four.
 5. Optional fleeing-enemy fields: `flees_after_turns` (bolts instead of acting once it's taken this many of its own turns; 0 = never flees) and `flee_steal_percent` (fraction of the player's current gold stolen on a successful flee), plus the generic `on_defeat_story_flag_id` (set true in `RunData.story_flags` the moment this specific enemy is actually defeated, not fled). See "Rushing enemies & the Deeper Alley" above for the shipped example.
+6. Optional `dodge_uses_speed` (every attack against this enemy rolls a Speed-based dodge chance instead of the normal damage formula - see "Dodge: a second Speed-driven combat formula" above).
 
 ### Add an artifact
 
@@ -282,4 +307,4 @@ This is an MVP: the systems are real and reusable, but scope was intentionally k
 - **Guild rank never goes down and can't be re-tested at a lower rank** other than starting a new run - there's no mechanic (missed payments, demotion, etc.) that would lower it.
 - **No controller/touch input yet.** All input goes through the Input Map actions (`move_*`, `interact`, `pause_menu`, `inventory_toggle`, `ui_advance`), so adding a controller or on-screen touch layer means adding new bindings to those actions, not new code.
 - **Basic AI.** Enemy behaviour is a simple probability roll (attack vs. defend) based on `behavior_type`; no positioning, focus-fire, or multi-turn planning.
-- **Save migration is scaffolded but untested** - every save resource has a `save_version` field and the loaders already tolerate missing/corrupt files, but no old-format migration path exists yet (`RunData` is currently at v5; nothing reads older data specially, it just falls back to field defaults).
+- **Save migration is scaffolded but untested** - every save resource has a `save_version` field and the loaders already tolerate missing/corrupt files, but no old-format migration path exists yet (`RunData` is currently at v6; nothing reads older data specially, it just falls back to field defaults).

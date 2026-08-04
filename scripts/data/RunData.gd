@@ -55,6 +55,7 @@ func to_dict() -> Dictionary:
 		"completed_quests": completed_quests,
 		"guild_rank": guild_rank,
 		"counters": counters,
+		"guild_progress": guild_progress,
 	}
 
 static func from_dict(data: Dictionary) -> RunData:
@@ -82,6 +83,7 @@ static func from_dict(data: Dictionary) -> RunData:
 	run.completed_quests.assign(data.get("completed_quests", []))
 	run.guild_rank = data.get("guild_rank", "")
 	run.counters = data.get("counters", {})
+	run.guild_progress = data.get("guild_progress", 0)
 	return run
 
 func add_item(item_id: String, quantity: int = 1) -> void:

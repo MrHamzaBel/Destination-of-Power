@@ -1,0 +1,129 @@
+[gd_scene load_steps=11 format=3 uid="uid://bfarreaches01"]
+
+[ext_resource type="Script" path="res://scripts/world/FarReaches.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(420, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeHSeg"]
+size = Vector2(140, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeV"]
+size = Vector2(20, 320)
+
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(120, 20)
+
+[node name="FarReaches" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.2, 0.24, 0.15, 1)
+polygon = PackedVector2Array(-200, -150, 200, -150, 200, 150, -200, 150)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.25, 0.29, 0.19, 1)
+polygon = PackedVector2Array(-190, -140, 190, -140, 190, 140, -190, 140)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -150)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.12, 0.14, 0.09, 1)
+polygon = PackedVector2Array(-210, -10, 210, -10, 210, 10, -210, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-130, 150)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
+color = Color(0.12, 0.14, 0.09, 1)
+polygon = PackedVector2Array(-70, -10, 70, -10, 70, 10, -70, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeHSeg")
+
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(130, 150)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+color = Color(0.12, 0.14, 0.09, 1)
+polygon = PackedVector2Array(-70, -10, 70, -10, 70, 10, -70, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeHSeg")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-200, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallLeft"]
+color = Color(0.12, 0.14, 0.09, 1)
+polygon = PackedVector2Array(-10, -160, 10, -160, 10, 160, -10, 160)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WallShapeV")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(200, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.12, 0.14, 0.09, 1)
+polygon = PackedVector2Array(-10, -160, 10, -160, 10, 160, -10, 160)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeV")
+
+[node name="ExitToOutskirts" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, -150)
+script = ExtResource("6_interactable")
+display_name = "Back North"
+kind = 2
+exit_target_scene = "res://scenes/world/NeraxOutskirts.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToOutskirts"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToOutskirts"]
+color = Color(0.85, 0.75, 0.35, 0.5)
+polygon = PackedVector2Array(-60, -10, 60, -10, 60, 10, -60, 10)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(0, 100)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -230
+limit_top = -180
+limit_right = 230
+limit_bottom = 180
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true

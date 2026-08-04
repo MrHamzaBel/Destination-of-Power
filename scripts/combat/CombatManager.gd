@@ -27,6 +27,7 @@ const CRIT_MULTIPLIER: float = 1.5
 ## still applies on top of this in CombatUnitState.apply_damage).
 const MAX_DAMAGE_BONUS_PERCENT: float = 300.0
 const MAX_DAMAGE_REDUCTION_PERCENT: float = 90.0
+const MAX_DODGE_CHANCE_PERCENT: float = 90.0
 const MINION_SUMMON_CHANCE: float = 0.5 ## Chance a boss uses its turn to call back a fallen minion, when eligible.
 
 var player_unit: CombatUnitState
@@ -208,6 +209,29 @@ static func damage_multiplier(attacker_attack: int, defender_effective_defense: 
 func _resolve_damage_multiplier(attacker: CombatUnitState, defender: CombatUnitState) -> float:
 	return damage_multiplier(attacker.attack, defender.get_effective_defense())
 
+## Same formula shape as damage_multiplier() (half a percent of chance per 1%
+## stat gap, halving convention preserved) but for Speed vs Speed, and
+## reinterpreted as a complete-miss probability instead of a damage
+## multiplier: only the defender's Speed advantage matters, and it never
+## produces a "bonus" the other way - a slower defender simply can't dodge.
+static func dodge_chance(attacker_speed: int, defender_speed: int) -> float:
+	var atk: float = maxf(0.01, float(attacker_speed))
+	var def: float = maxf(0.0, float(defender_speed))
+	if def > atk:
+		var percent: float = (def - atk) / atk * 100.0
+		return clampf(percent / 2.0, 0.0, MAX_DODGE_CHANCE_PERCENT) / 100.0
+	return 0.0
+
+## True (and logs the miss) if `defender` has a speed-based dodge passive
+## and rolls a successful dodge against `attacker` this hit.
+func _rolls_dodge(attacker: CombatUnitState, defender: CombatUnitState) -> bool:
+	if defender.enemy_def == null or not defender.enemy_def.dodge_uses_speed:
+		return false
+	if _rng.randf() >= dodge_chance(attacker.speed, defender.speed):
+		return false
+	_log("%s is too quick - %s's attack whiffs completely!" % [defender.display_name, attacker.display_name])
+	return true
+
 # --- Internal resolution -------------------------------------------------------
 
 func _perform_player_attack(power: float, uses_intelligence: bool, is_ranged: bool) -> void:
@@ -231,6 +255,11 @@ func _perform_player_attack(power: float, uses_intelligence: bool, is_ranged: bo
 	var is_crit := crit_chance > 0.0 and _rng.randf() < crit_chance
 	if is_crit:
 		post_artifact_damage = int(round(float(post_artifact_damage) * CRIT_MULTIPLIER))
+	if _rolls_dodge(player_unit, target):
+		stats_changed.emit()
+		_finish_action()
+		return
+
 	var multiplier := _resolve_damage_multiplier(player_unit, target)
 	var final_damage := int(round(float(post_artifact_damage) * multiplier))
 	var dealt := target.apply_damage(final_damage)
@@ -388,6 +417,10 @@ func _ally_take_single_action(ally: CombatUnitState) -> void:
 	if target == null or not target.is_alive():
 		_finish_action()
 		return
+	if _rolls_dodge(ally, target):
+		stats_changed.emit()
+		_finish_action()
+		return
 	var multiplier := _resolve_damage_multiplier(ally, target)
 	var raw_damage := int(round(float(ally.attack) * multiplier))
 	var dealt := target.apply_damage(raw_damage)
@@ -535,6 +568,13 @@ func _on_enemy_defeated(enemy: CombatUnitState) -> void:
 
 	if enemy.enemy_def != null and enemy.enemy_def.on_defeat_story_flag_id != "":
 		RunManager.run.story_flags[enemy.enemy_def.on_defeat_story_flag_id] = true
+
+	if enemy.enemy_def != null:
+		var completed_quests := RunManager.register_enemy_kill_for_quests(enemy.enemy_def.id)
+		for quest_id in completed_quests:
+			var quest_def := QuestRegistry.get_quest(quest_id)
+			if quest_def != null:
+				_log("Mission complete: %s! Reward: %s." % [quest_def.display_name, quest_def.describe_reward()])
 
 	if enemy.enemy_def != null:
 		var exp_gained := RunManager.compute_exp_reward(enemy.enemy_def)

@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 12
+max_resource = 0
+attack = 4
+intelligence = 1
+defense = 1
+speed = 18
+
+[resource]
+script = ExtResource("1_enemy")
+id = "forest_bee"
+display_name = "Forest Bee"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_healing_potion",
+"chance": 0.1
+}]
+behavior_type = 2
+level = 1
+xp_reward = 4
+currency_reward = 1
+body_color = Color(0.85, 0.7, 0.15, 1)
+shape_points = PackedVector2Array(-8, 0, -4, -8, 4, -8, 8, 0, 4, 8, -4, 8)
+dodge_uses_speed = true

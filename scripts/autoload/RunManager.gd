@@ -8,6 +8,8 @@ const EXP_BASE_REQUIREMENT: int = 100
 const EXP_GROWTH_PER_LEVEL: float = 1.1 ## Each level requires 10% more exp than the previous one.
 const STAT_POINTS_PER_LEVEL: int = 2
 const MANA_PER_INTELLIGENCE: int = 10 ## Class resource pool (mana/stamina/energy) = intelligence * this.
+const GUILD_PROGRESS_BASE: float = 20.0
+const GUILD_PROGRESS_GROWTH: float = 1.25 ## Each guild rank needs 25% more standing than the previous one.
 
 var character_profile: CharacterProfile = null
 var run: RunData = null
@@ -202,6 +204,9 @@ func start_quest(quest_id: String) -> void:
 	if run == null or is_quest_active(quest_id) or is_quest_completed(quest_id):
 		return
 	run.active_quests.append(quest_id)
+	var quest_def := QuestRegistry.get_quest(quest_id)
+	if quest_def != null and quest_def.objective_enemy_id != "":
+		run.counters["quest_kills_%s" % quest_id] = 0
 	save_current_run()
 
 ## Grants a quest's reward (any combination of gold/exp/stat points/items/an
@@ -217,7 +222,10 @@ func complete_quest(quest_id: String) -> Array[int]:
 		return levels_gained
 
 	run.active_quests.erase(quest_id)
-	run.completed_quests.append(quest_id)
+	if quest_def.repeatable:
+		run.counters.erase("quest_kills_%s" % quest_id)
+	else:
+		run.completed_quests.append(quest_id)
 
 	# Guild members pay less "guild tax" on mission gold - i.e. they keep a
 	# rank-scaled bonus percentage of it - and higher ranks add a free potion.
@@ -234,11 +242,33 @@ func complete_quest(quest_id: String) -> Array[int]:
 		run.add_item(item_id, 1)
 	if quest_def.reward_artifact_id != "":
 		run.add_artifact(quest_def.reward_artifact_id)
+	if quest_def.reward_guild_progress > 0:
+		run.guild_progress += quest_def.reward_guild_progress
 	if quest_def.reward_exp > 0:
 		levels_gained = grant_experience(quest_def.reward_exp)
 
 	save_current_run()
 	return levels_gained
+
+## Call whenever an enemy is defeated in combat. Advances the kill-count
+## progress of every active quest whose objective_enemy_id matches, and
+## auto-completes any that just hit their target - a "kill 9 bees" mission
+## needs no separate turn-in step. Returns the ids of quests that just
+## completed (possibly empty) so the caller can report rewards.
+func register_enemy_kill_for_quests(enemy_id: String) -> Array[String]:
+	var completed: Array[String] = []
+	if run == null or enemy_id == "":
+		return completed
+	for quest_id in run.active_quests.duplicate():
+		var quest_def := QuestRegistry.get_quest(quest_id)
+		if quest_def == null or quest_def.objective_enemy_id != enemy_id:
+			continue
+		var counter_key := "quest_kills_%s" % quest_id
+		var kills := increment_counter(counter_key)
+		if kills >= quest_def.objective_kill_count:
+			complete_quest(quest_id)
+			completed.append(quest_id)
+	return completed
 
 # --- Adventurers' Guild --------------------------------------------------------
 
@@ -246,6 +276,16 @@ func get_guild_rank_def() -> GuildRankDefinition:
 	if run == null or run.guild_rank == "":
 		return null
 	return GuildRegistry.get_rank(run.guild_rank)
+
+## Guild standing (RunData.guild_progress) needed to be eligible to test for
+## the rank at ladder position `order`, mirroring exp_required_for_level()'s
+## shape but compounding 25% per rank instead of 10% per level. Enrollment
+## (order 0, i.e. F-Rank) never requires standing - there's nothing to have
+## proven yet.
+func guild_progress_required(order: int) -> int:
+	if order <= 0:
+		return 0
+	return int(round(GUILD_PROGRESS_BASE * pow(GUILD_PROGRESS_GROWTH, order)))
 
 # --- Generic run counters -----------------------------------------------------
 

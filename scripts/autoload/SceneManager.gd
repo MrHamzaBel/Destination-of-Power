@@ -18,6 +18,9 @@ const ADVENTURE_CENTRUM: String = "res://scenes/world/AdventureCentrum.tscn"
 const GUILD_LOUNGE: String = "res://scenes/world/GuildLounge.tscn"
 const DEEPER_ALLEY: String = "res://scenes/world/DeeperAlley.tscn"
 const UNDERGROUND_NERAX: String = "res://scenes/world/UndergroundNerax.tscn"
+const MARKET: String = "res://scenes/world/Market.tscn"
+const NERAX_OUTSKIRTS: String = "res://scenes/world/NeraxOutskirts.tscn"
+const FAR_REACHES: String = "res://scenes/world/FarReaches.tscn"
 
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect

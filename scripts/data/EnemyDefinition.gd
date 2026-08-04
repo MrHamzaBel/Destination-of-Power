@@ -37,3 +37,9 @@ enum BehaviorType { AGGRESSIVE, DEFENSIVE, RANDOM }
 ## enemy is defeated (not fled) - lets an exploration scene react to "this
 ## specific enemy is dead for good" without any pending-state bookkeeping.
 @export var on_defeat_story_flag_id: String = ""
+
+## If true, every attack against this enemy first rolls a dodge chance based
+## on its Speed vs the attacker's Speed (see CombatManager.dodge_chance()) -
+## the same attack-vs-defense formula shape, just Speed instead of
+## Attack/Defense, and a complete miss instead of a damage reduction.
+@export var dodge_uses_speed: bool = false
