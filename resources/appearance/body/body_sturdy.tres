@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AppearanceOption" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/AppearanceOption.gd" id="1_a1b2c"]
+
+[resource]
+script = ExtResource("1_a1b2c")
+id = "sturdy"
+display_name = "Sturdy Build"
+shape_points = PackedVector2Array(0, -40, 6, -38, 10, -30, 10, -18, 12, -2, 10, 14, 10, 34, 3, 34, 3, 17, -3, 17, -3, 34, -10, 34, -10, 14, -12, -2, -10, -18, -10, -30, -6, -38)
+tint_color = Color(1, 1, 1, 1)
+uses_skin_color = true
+uses_hair_color = false

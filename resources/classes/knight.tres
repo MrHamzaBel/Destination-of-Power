@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ClassDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ClassDefinition.gd" id="1_class"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 100
+max_resource = 0
+attack = 5
+intelligence = 5
+defense = 5
+speed = 5
+
+[resource]
+script = ExtResource("1_class")
+id = "knight"
+display_name = "Knight"
+description = "A stalwart front-line fighter, trained to shrug off blows and answer with steel."
+base_stats = SubResource("SubResource_1")
+impact_stat = "HP"
+resource_label = "Stamina"
+starting_equipment = Array[String](["minor_healing_potion", "minor_healing_potion"])
+starting_equipped = {
+"weapon": "worn_sword",
+"offhand": "wooden_shield"
+}
+abilities = Array[String](["slash", "guard"])
+strengths = Array[String](["Exceptional health pool", "Sturdy melee fighter"])
+weaknesses = Array[String](["No bonus to Attack, Defense, Speed or Intelligence", "Few ranged options"])
+portrait_color = Color(0.5, 0.52, 0.62, 1)

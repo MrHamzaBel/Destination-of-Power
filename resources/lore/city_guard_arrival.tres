@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="LoreScript" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/LoreScript.gd" id="1_lore"]
+
+[resource]
+script = ExtResource("1_lore")
+sections = Array[String](["As the thug crumples to the ground, heavy footsteps echo off the alley walls. A City Guard of Nerax rounds the corner, blade already drawn, eyes scanning the shadows.", "\"I heard the commotion,\" she says, planting herself beside you. \"Are you hurt? Whatever did this, I doubt it's finished.\"", "Before you can answer, more figures spill out from the far end of the alley - the thug's friends, drawn by word of their fallen comrade and looking for revenge.", "The City Guard raises her blade. \"Stay close. We fight together.\""])

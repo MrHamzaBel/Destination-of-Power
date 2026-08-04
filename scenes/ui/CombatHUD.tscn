@@ -1,0 +1,316 @@
+[gd_scene load_steps=3 format=3 uid="uid://bcombathud01"]
+
+[ext_resource type="Script" path="res://scripts/ui/CombatHUD.gd" id="1_script"]
+[ext_resource type="Theme" path="res://resources/ui/nerax_theme.tres" id="2_theme"]
+
+[node name="CombatHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="TopBar" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 20.0
+offset_top = 16.0
+offset_right = -320.0
+offset_bottom = 90.0
+theme_override_constants/separation = 20
+
+[node name="PlayerPanel" type="PanelContainer" parent="TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PlayerVBox" type="VBoxContainer" parent="TopBar/PlayerPanel"]
+layout_mode = 2
+
+[node name="PlayerHealthRow" type="HBoxContainer" parent="TopBar/PlayerPanel/PlayerVBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TopBar/PlayerPanel/PlayerVBox/PlayerHealthRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(50, 0)
+text = "HP"
+
+[node name="PlayerHealthBar" type="ProgressBar" parent="TopBar/PlayerPanel/PlayerVBox/PlayerHealthRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+show_percentage = false
+
+[node name="PlayerResourceRow" type="HBoxContainer" parent="TopBar/PlayerPanel/PlayerVBox"]
+layout_mode = 2
+
+[node name="PlayerResourceLabel" type="Label" parent="TopBar/PlayerPanel/PlayerVBox/PlayerResourceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(50, 0)
+text = "MP"
+
+[node name="PlayerResourceBar" type="ProgressBar" parent="TopBar/PlayerPanel/PlayerVBox/PlayerResourceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+show_percentage = false
+
+[node name="TurnLabel" type="Label" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(180, 0)
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(0.85, 0.75, 0.4, 1)
+theme_override_font_sizes/font_size = 20
+text = "Combat"
+
+[node name="EnemyTargetPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_top = 16.0
+offset_right = -20.0
+offset_bottom = 150.0
+
+[node name="EnemyTargetVBox" type="VBoxContainer" parent="EnemyTargetPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="EnemyTargetTitle" type="Label" parent="EnemyTargetPanel/EnemyTargetVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.65, 0.62, 0.72, 1)
+text = "Target (click to switch)"
+
+[node name="EnemyTargetScroll" type="ScrollContainer" parent="EnemyTargetPanel/EnemyTargetVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EnemyTargetList" type="VBoxContainer" parent="EnemyTargetPanel/EnemyTargetVBox/EnemyTargetScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="AllyPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_top = 156.0
+offset_right = -20.0
+offset_bottom = 226.0
+visible = false
+
+[node name="AllyVBox" type="VBoxContainer" parent="AllyPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="AllyTitle" type="Label" parent="AllyPanel/AllyVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.6, 0.7, 0.85, 1)
+text = "Allies"
+
+[node name="AllyList" type="VBoxContainer" parent="AllyPanel/AllyVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="LogPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -230.0
+offset_right = -20.0
+offset_bottom = -90.0
+
+[node name="LogScroll" type="ScrollContainer" parent="LogPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LogLabel" type="RichTextLabel" parent="LogPanel/LogScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = false
+fit_content = true
+scroll_active = false
+
+[node name="ActionRow" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -76.0
+offset_right = -20.0
+offset_bottom = -16.0
+theme_override_constants/separation = 10
+
+[node name="AttackButton" type="Button" parent="ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Attack with your equipped weapon."
+text = "Attack"
+
+[node name="AbilitiesButton" type="Button" parent="ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Use a class ability."
+text = "Abilities"
+
+[node name="ItemsButton" type="Button" parent="ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Use a consumable item."
+text = "Items"
+
+[node name="DefendButton" type="Button" parent="ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Reduce incoming damage until your next turn."
+text = "Defend"
+
+[node name="EndTurnButton" type="Button" parent="ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Pass your turn without acting."
+text = "End Turn"
+
+[node name="AbilitiesPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -160.0
+offset_right = 180.0
+offset_bottom = 160.0
+
+[node name="AbilitiesVBox" type="VBoxContainer" parent="AbilitiesPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="AbilitiesPanel/AbilitiesVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Abilities"
+
+[node name="AbilitiesScroll" type="ScrollContainer" parent="AbilitiesPanel/AbilitiesVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AbilitiesList" type="VBoxContainer" parent="AbilitiesPanel/AbilitiesVBox/AbilitiesScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="AbilitiesClose" type="Button" parent="AbilitiesPanel/AbilitiesVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Close"
+
+[node name="ItemsPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -160.0
+offset_right = 180.0
+offset_bottom = 160.0
+
+[node name="ItemsVBox" type="VBoxContainer" parent="ItemsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="ItemsPanel/ItemsVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Items"
+
+[node name="ItemsScroll" type="ScrollContainer" parent="ItemsPanel/ItemsVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemsList" type="VBoxContainer" parent="ItemsPanel/ItemsVBox/ItemsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="ItemsClose" type="Button" parent="ItemsPanel/ItemsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Close"
+
+[node name="ResultPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -140.0
+offset_right = 200.0
+offset_bottom = 140.0
+
+[node name="ResultVBox" type="VBoxContainer" parent="ResultPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ResultTitle" type="Label" parent="ResultPanel/ResultVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 30
+text = "Victory!"
+
+[node name="ResultSummary" type="Label" parent="ResultPanel/ResultVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+horizontal_alignment = 1
+text = ""
+
+[node name="ResultButton" type="Button" parent="ResultPanel/ResultVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Continue"

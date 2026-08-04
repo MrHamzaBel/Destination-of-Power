@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AllyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/AllyDefinition.gd" id="1_ally"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 60
+max_resource = 0
+attack = 6
+intelligence = 3
+defense = 6
+speed = 5
+
+[resource]
+script = ExtResource("1_ally")
+id = "city_guard"
+display_name = "City Guard"
+description = "A guard of Nerax, drawn to the alley by the noise. Fights alongside you until the threat is dealt with."
+stats = SubResource("SubResource_1")
+body_color = Color(0.28, 0.36, 0.55, 1)
+shape_points = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)

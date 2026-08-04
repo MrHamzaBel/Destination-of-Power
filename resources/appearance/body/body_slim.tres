@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AppearanceOption" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/AppearanceOption.gd" id="1_a1b2c"]
+
+[resource]
+script = ExtResource("1_a1b2c")
+id = "slim"
+display_name = "Slim Build"
+shape_points = PackedVector2Array(0, -40, 5, -38, 8, -30, 8, -18, 9, -2, 8, 14, 8, 34, 3, 34, 3, 18, -3, 18, -3, 34, -8, 34, -8, 14, -9, -2, -8, -18, -8, -30, -5, -38)
+tint_color = Color(1, 1, 1, 1)
+uses_skin_color = true
+uses_hair_color = false

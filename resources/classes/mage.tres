@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ClassDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ClassDefinition.gd" id="1_class"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 50
+max_resource = 0
+attack = 5
+intelligence = 10
+defense = 5
+speed = 5
+
+[resource]
+script = ExtResource("1_class")
+id = "mage"
+display_name = "Mage"
+description = "A spellcaster who channels devastating arcane power through raw intelligence."
+base_stats = SubResource("SubResource_1")
+impact_stat = "Intelligence"
+resource_label = "Mana"
+starting_equipment = Array[String](["minor_healing_potion"])
+starting_equipped = {
+"weapon": "apprentice_staff",
+"armor": "apprentice_robes"
+}
+abilities = Array[String](["arcane_bolt", "focus"])
+strengths = Array[String](["Devastating magic damage", "Mana sustain via Focus"])
+weaknesses = Array[String](["No bonus to Attack, Defense or Speed", "Must manage Mana carefully"])
+portrait_color = Color(0.42, 0.32, 0.62, 1)

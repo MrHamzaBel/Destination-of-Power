@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 0
+max_resource = 0
+attack = 0
+intelligence = 0
+defense = 2
+speed = 0
+
+[resource]
+script = ExtResource("1_item")
+id = "torn_leather_armor"
+display_name = "Torn Leather Armor"
+description = "Cracked and stitched leather armor. Offers modest protection."
+category = 1
+rarity = 0
+icon_color = Color(0.45, 0.32, 0.2, 1)
+equip_slot = "armor"
+is_ranged = false
+stat_modifiers = SubResource("SubResource_1")
+heal_amount = 0
+resource_amount = 0
+value = 10
+droppable = true

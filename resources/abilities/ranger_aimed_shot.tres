@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AbilityDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/AbilityDefinition.gd" id="1_a1b2c"]
+
+[resource]
+script = ExtResource("1_a1b2c")
+id = "aimed_shot"
+display_name = "Aimed Shot"
+description = "A carefully aimed arrow that deals heavy ranged damage."
+resource_cost = 15
+cooldown = 0
+power = 1.6
+ability_type = 0
+target_type = 0
+uses_intelligence = false
+is_ranged = true
+defense_bonus_percent = 0.0
+resource_restore_amount = 0
+heal_amount = 0

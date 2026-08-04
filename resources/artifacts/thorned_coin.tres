@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "thorned_coin"
+display_name = "Thorned Coin"
+description = "A coin wrapped in thorny vines. You gain more gold, but shop prices rise too."
+rarity = 1
+icon_color = Color(0.8, 0.65, 0.2, 1)
+effect_id = "thorned_coin"
+effect_values = {
+"gold_bonus_percent": 0.25,
+"price_increase_percent": 0.15
+}
+stacking_allowed = true
+class_restrictions = Array[String]([])

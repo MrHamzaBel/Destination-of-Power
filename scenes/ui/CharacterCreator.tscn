@@ -1,0 +1,278 @@
+[gd_scene load_steps=3 format=3 uid="uid://bcharcreator01"]
+
+[ext_resource type="Script" path="res://scripts/ui/CharacterCreator.gd" id="1_script"]
+[ext_resource type="Theme" path="res://resources/ui/nerax_theme.tres" id="2_theme"]
+
+[node name="CharacterCreator" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.075, 0.063, 0.098, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="HBox" type="HBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="LeftPanel" type="VBoxContainer" parent="Margin/HBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(380, 0)
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="Margin/HBox/LeftPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Create Your Character"
+
+[node name="NameRow" type="HBoxContainer" parent="Margin/HBox/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NameLabel" type="Label" parent="Margin/HBox/LeftPanel/NameRow"]
+layout_mode = 2
+text = "Name:"
+
+[node name="NameEdit" type="LineEdit" parent="Margin/HBox/LeftPanel/NameRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Enter a character name"
+max_length = 24
+
+[node name="NameErrorLabel" type="Label" parent="Margin/HBox/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+theme_override_colors/font_color = Color(0.9, 0.3, 0.3, 1)
+text = "Please enter a character name before saving."
+
+[node name="Tabs" type="TabContainer" parent="Margin/HBox/LeftPanel"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 260)
+size_flags_vertical = 3
+
+[node name="Body" type="VBoxContainer" parent="Margin/HBox/LeftPanel/Tabs"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Row" type="HBoxContainer" parent="Margin/HBox/LeftPanel/Tabs/Body"]
+layout_mode = 2
+
+[node name="BodyPrev" type="Button" parent="Margin/HBox/LeftPanel/Tabs/Body/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "<"
+
+[node name="BodyLabel" type="Label" parent="Margin/HBox/LeftPanel/Tabs/Body/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+text = "Body Type"
+
+[node name="BodyNext" type="Button" parent="Margin/HBox/LeftPanel/Tabs/Body/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = ">"
+
+[node name="SkinColorLabel" type="Label" parent="Margin/HBox/LeftPanel/Tabs/Body"]
+layout_mode = 2
+text = "Skin Color"
+
+[node name="SkinColorRow" type="HBoxContainer" parent="Margin/HBox/LeftPanel/Tabs/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Hair" type="VBoxContainer" parent="Margin/HBox/LeftPanel/Tabs"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Row" type="HBoxContainer" parent="Margin/HBox/LeftPanel/Tabs/Hair"]
+layout_mode = 2
+
+[node name="HairPrev" type="Button" parent="Margin/HBox/LeftPanel/Tabs/Hair/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "<"
+
+[node name="HairLabel" type="Label" parent="Margin/HBox/LeftPanel/Tabs/Hair/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+text = "Hairstyle"
+
+[node name="HairNext" type="Button" parent="Margin/HBox/LeftPanel/Tabs/Hair/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = ">"
+
+[node name="HairColorLabel" type="Label" parent="Margin/HBox/LeftPanel/Tabs/Hair"]
+layout_mode = 2
+text = "Hair Color"
+
+[node name="HairColorRow" type="HBoxContainer" parent="Margin/HBox/LeftPanel/Tabs/Hair"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Shirt" type="VBoxContainer" parent="Margin/HBox/LeftPanel/Tabs"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Row" type="HBoxContainer" parent="Margin/HBox/LeftPanel/Tabs/Shirt"]
+layout_mode = 2
+
+[node name="ShirtPrev" type="Button" parent="Margin/HBox/LeftPanel/Tabs/Shirt/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "<"
+
+[node name="ShirtLabel" type="Label" parent="Margin/HBox/LeftPanel/Tabs/Shirt/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+text = "Upper Clothing"
+
+[node name="ShirtNext" type="Button" parent="Margin/HBox/LeftPanel/Tabs/Shirt/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = ">"
+
+[node name="Pants" type="VBoxContainer" parent="Margin/HBox/LeftPanel/Tabs"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Row" type="HBoxContainer" parent="Margin/HBox/LeftPanel/Tabs/Pants"]
+layout_mode = 2
+
+[node name="PantsPrev" type="Button" parent="Margin/HBox/LeftPanel/Tabs/Pants/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "<"
+
+[node name="PantsLabel" type="Label" parent="Margin/HBox/LeftPanel/Tabs/Pants/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+text = "Lower Clothing"
+
+[node name="PantsNext" type="Button" parent="Margin/HBox/LeftPanel/Tabs/Pants/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = ">"
+
+[node name="Footwear" type="VBoxContainer" parent="Margin/HBox/LeftPanel/Tabs"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Row" type="HBoxContainer" parent="Margin/HBox/LeftPanel/Tabs/Footwear"]
+layout_mode = 2
+
+[node name="FootwearPrev" type="Button" parent="Margin/HBox/LeftPanel/Tabs/Footwear/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "<"
+
+[node name="FootwearLabel" type="Label" parent="Margin/HBox/LeftPanel/Tabs/Footwear/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+text = "Footwear"
+
+[node name="FootwearNext" type="Button" parent="Margin/HBox/LeftPanel/Tabs/Footwear/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = ">"
+
+[node name="ButtonSpacer" type="Control" parent="Margin/HBox/LeftPanel"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+
+[node name="UtilityRow" type="HBoxContainer" parent="Margin/HBox/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RandomizeButton" type="Button" parent="Margin/HBox/LeftPanel/UtilityRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+text = "Randomize"
+
+[node name="ResetButton" type="Button" parent="Margin/HBox/LeftPanel/UtilityRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+text = "Reset"
+
+[node name="SaveButton" type="Button" parent="Margin/HBox/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Save Character"
+
+[node name="BackButton" type="Button" parent="Margin/HBox/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Back to Menu"
+
+[node name="RightPanel" type="PanelContainer" parent="Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PreviewCenter" type="CenterContainer" parent="Margin/HBox/RightPanel"]
+layout_mode = 2
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="Margin/HBox/RightPanel/PreviewCenter"]
+layout_mode = 2
+custom_minimum_size = Vector2(320, 420)
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="Margin/HBox/RightPanel/PreviewCenter/SubViewportContainer"]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(320, 420)
+
+[node name="PreviewRoot" type="Node2D" parent="Margin/HBox/RightPanel/PreviewCenter/SubViewportContainer/SubViewport"]
+unique_name_in_owner = true
+position = Vector2(160, 230)
+scale = Vector2(3, 3)

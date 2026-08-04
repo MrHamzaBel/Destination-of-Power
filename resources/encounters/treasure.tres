@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EncounterEntry" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EncounterEntry.gd" id="1_enc"]
+
+[resource]
+script = ExtResource("1_enc")
+kind = 1
+weight = 1.5
+display_name = "Treasure"
+flavor_text = "A dusty stash lies half-hidden in the rubble."

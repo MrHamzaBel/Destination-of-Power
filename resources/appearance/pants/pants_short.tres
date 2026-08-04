@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AppearanceOption" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/AppearanceOption.gd" id="1_a1b2c"]
+
+[resource]
+script = ExtResource("1_a1b2c")
+id = "pants_short"
+display_name = "Short Pants"
+shape_points = PackedVector2Array(-9, -2, 9, -2, 9, 12, 3, 12, 3, 16, -3, 16, -3, 12, -9, 12)
+tint_color = Color(0.4, 0.36, 0.24, 1)
+uses_skin_color = false
+uses_hair_color = false

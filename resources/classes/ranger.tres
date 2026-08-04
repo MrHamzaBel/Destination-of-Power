@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ClassDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ClassDefinition.gd" id="1_class"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 50
+max_resource = 0
+attack = 5
+intelligence = 5
+defense = 5
+speed = 10
+
+[resource]
+script = ExtResource("1_class")
+id = "ranger"
+display_name = "Ranger"
+description = "A quick, elusive scout who strikes from range before the enemy can close the gap."
+base_stats = SubResource("SubResource_1")
+impact_stat = "Speed"
+resource_label = "Energy"
+starting_equipment = Array[String](["minor_healing_potion"])
+starting_equipped = {
+"weapon": "short_bow",
+"offhand": "basic_dagger"
+}
+abilities = Array[String](["aimed_shot", "quick_step"])
+strengths = Array[String](["Superior speed and mobility", "Strong ranged damage"])
+weaknesses = Array[String](["No bonus to Attack, Defense or Intelligence", "Average health pool"])
+portrait_color = Color(0.32, 0.55, 0.32, 1)

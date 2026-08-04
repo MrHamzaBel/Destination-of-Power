@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://bplayerchar01"]
+
+[ext_resource type="Script" path="res://scripts/entities/PlayerCharacter.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/entities/CharacterAppearanceRenderer.gd" id="2_appearance"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(20, 16)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 28.0
+
+[node name="PlayerCharacter" type="CharacterBody2D"]
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 26)
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Appearance" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_appearance")
+
+[node name="InteractionArea" type="Area2D" parent="."]
+unique_name_in_owner = true
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="InteractionShape" type="CollisionShape2D" parent="InteractionArea"]
+position = Vector2(0, 10)
+shape = SubResource("CircleShape2D_1")

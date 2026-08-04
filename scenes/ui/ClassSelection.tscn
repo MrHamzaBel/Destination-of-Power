@@ -1,0 +1,139 @@
+[gd_scene load_steps=3 format=3 uid="uid://bclassselect01"]
+
+[ext_resource type="Script" path="res://scripts/ui/ClassSelection.gd" id="1_script"]
+[ext_resource type="Theme" path="res://resources/ui/nerax_theme.tres" id="2_theme"]
+
+[node name="ClassSelection" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.075, 0.063, 0.098, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+text = "Choose Your Class"
+
+[node name="HBox" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="ClassListPanel" type="PanelContainer" parent="Margin/VBox/HBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(220, 0)
+
+[node name="ClassList" type="VBoxContainer" parent="Margin/VBox/HBox/ClassListPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DetailsPanel" type="PanelContainer" parent="Margin/VBox/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DetailsScroll" type="ScrollContainer" parent="Margin/VBox/HBox/DetailsPanel"]
+layout_mode = 2
+
+[node name="DetailsVBox" type="VBoxContainer" parent="Margin/VBox/HBox/DetailsPanel/DetailsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="TopRow" type="HBoxContainer" parent="Margin/VBox/HBox/DetailsPanel/DetailsScroll/DetailsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PortraitRect" type="ColorRect" parent="Margin/VBox/HBox/DetailsPanel/DetailsScroll/DetailsVBox/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(96, 96)
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="TitleColumn" type="VBoxContainer" parent="Margin/VBox/HBox/DetailsPanel/DetailsScroll/DetailsVBox/TopRow"]
+layout_mode = 2
+size_flags_vertical = 1
+
+[node name="NameLabel" type="Label" parent="Margin/VBox/HBox/DetailsPanel/DetailsScroll/DetailsVBox/TopRow/TitleColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Class Name"
+
+[node name="StatsLabel" type="Label" parent="Margin/VBox/HBox/DetailsPanel/DetailsScroll/DetailsVBox/TopRow/TitleColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Stats"
+
+[node name="DescriptionLabel" type="Label" parent="Margin/VBox/HBox/DetailsPanel/DetailsScroll/DetailsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+text = "Description"
+
+[node name="EquipmentLabel" type="Label" parent="Margin/VBox/HBox/DetailsPanel/DetailsScroll/DetailsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+text = "Equipment"
+
+[node name="AbilitiesLabel" type="Label" parent="Margin/VBox/HBox/DetailsPanel/DetailsScroll/DetailsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+text = "Abilities"
+
+[node name="StrengthsLabel" type="Label" parent="Margin/VBox/HBox/DetailsPanel/DetailsScroll/DetailsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.4, 0.8, 0.4, 1)
+text = "Strengths"
+
+[node name="WeaknessesLabel" type="Label" parent="Margin/VBox/HBox/DetailsPanel/DetailsScroll/DetailsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.85, 0.4, 0.4, 1)
+text = "Weaknesses"
+
+[node name="BottomRow" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BackButton" type="Button" parent="Margin/VBox/BottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Back"
+
+[node name="ConfirmButton" type="Button" parent="Margin/VBox/BottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+text = "Begin Adventure"

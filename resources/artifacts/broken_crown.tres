@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "broken_crown"
+display_name = "Broken Crown"
+description = "A shattered relic of a fallen ruler. Increases maximum health but reduces defense."
+rarity = 3
+icon_color = Color(0.7, 0.55, 0.2, 1)
+effect_id = "broken_crown"
+effect_values = {
+"health_bonus": 20,
+"defense_penalty": 4
+}
+stacking_allowed = false
+class_restrictions = Array[String]([])

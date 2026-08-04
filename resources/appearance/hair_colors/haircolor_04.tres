@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ColorSwatch" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ColorSwatch.gd" id="1_a1b2c"]
+
+[resource]
+script = ExtResource("1_a1b2c")
+id = "hair_04"
+display_name = "Fiery Red"
+color = Color(0.62, 0.2, 0.1, 1)

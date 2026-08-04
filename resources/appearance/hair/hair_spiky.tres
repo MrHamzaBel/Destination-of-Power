@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AppearanceOption" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/AppearanceOption.gd" id="1_a1b2c"]
+
+[resource]
+script = ExtResource("1_a1b2c")
+id = "spiky"
+display_name = "Spiky"
+shape_points = PackedVector2Array(-9, -33, -9, -39, -5, -46, -4, -37, -1, -48, 1, -37, 4, -48, 6, -38, 9, -44, 9, -33)
+tint_color = Color(1, 1, 1, 1)
+uses_skin_color = false
+uses_hair_color = true

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "hunters_eye"
+display_name = "Hunter's Eye"
+description = "A preserved hawk's eye. The first ranged attack in each combat has a greatly increased critical-hit chance."
+rarity = 2
+icon_color = Color(0.4, 0.7, 0.35, 1)
+effect_id = "hunters_eye"
+effect_values = {
+"crit_chance_bonus": 0.5
+}
+stacking_allowed = false
+class_restrictions = Array[String]([])

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AbilityDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/AbilityDefinition.gd" id="1_a1b2c"]
+
+[resource]
+script = ExtResource("1_a1b2c")
+id = "slash"
+display_name = "Slash"
+description = "A powerful sword strike using the Knight's weapon and raw strength."
+resource_cost = 5
+cooldown = 0
+power = 1.4
+ability_type = 0
+target_type = 0
+uses_intelligence = false
+is_ranged = false
+defense_bonus_percent = 0.0
+resource_restore_amount = 0
+heal_amount = 0

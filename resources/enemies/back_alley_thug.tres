@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 50
+max_resource = 0
+attack = 5
+intelligence = 3
+defense = 6
+speed = 3
+
+[resource]
+script = ExtResource("1_enemy")
+id = "back_alley_thug"
+display_name = "Back Alley Thug"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "worn_sword",
+"chance": 0.15
+}, {
+"item_id": "minor_healing_potion",
+"chance": 0.3
+}]
+behavior_type = 1
+level = 2
+xp_reward = 10
+currency_reward = 7
+body_color = Color(0.35, 0.3, 0.4, 1)
+shape_points = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)

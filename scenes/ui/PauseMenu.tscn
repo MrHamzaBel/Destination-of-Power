@@ -1,0 +1,152 @@
+[gd_scene load_steps=3 format=3 uid="uid://bpausemenu01"]
+
+[ext_resource type="Script" path="res://scripts/ui/PauseMenu.gd" id="1_script"]
+[ext_resource type="Theme" path="res://resources/ui/nerax_theme.tres" id="2_theme"]
+
+[node name="PauseMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.6)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(420, 0)
+
+[node name="MainView" type="VBoxContainer" parent="CenterContainer/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="CenterContainer/Panel/MainView"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+text = "Paused"
+
+[node name="ResumeButton" type="Button" parent="CenterContainer/Panel/MainView"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Resume"
+
+[node name="CharacterButton" type="Button" parent="CenterContainer/Panel/MainView"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Character Info"
+
+[node name="InventoryButton" type="Button" parent="CenterContainer/Panel/MainView"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Inventory"
+
+[node name="SettingsButton" type="Button" parent="CenterContainer/Panel/MainView"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Settings"
+
+[node name="AbandonButton" type="Button" parent="CenterContainer/Panel/MainView"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Abandon Run & Return to Menu"
+
+[node name="InfoView" type="VBoxContainer" parent="CenterContainer/Panel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="CenterContainer/Panel/InfoView"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+text = "Character Info"
+
+[node name="InfoLabel" type="Label" parent="CenterContainer/Panel/InfoView"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+text = "..."
+
+[node name="StatPointsLabel" type="Label" parent="CenterContainer/Panel/InfoView"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.85, 0.75, 0.4, 1)
+text = ""
+
+[node name="StatPointsRow" type="HBoxContainer" parent="CenterContainer/Panel/InfoView"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HpPointButton" type="Button" parent="CenterContainer/Panel/InfoView/StatPointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Spend 1 point on HP (+10 max health)"
+text = "HP +1"
+
+[node name="AttackPointButton" type="Button" parent="CenterContainer/Panel/InfoView/StatPointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Spend 1 point on Attack"
+text = "ATK +1"
+
+[node name="DefensePointButton" type="Button" parent="CenterContainer/Panel/InfoView/StatPointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Spend 1 point on Defense"
+text = "DEF +1"
+
+[node name="SpeedPointButton" type="Button" parent="CenterContainer/Panel/InfoView/StatPointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Spend 1 point on Speed"
+text = "SPD +1"
+
+[node name="IntelligencePointButton" type="Button" parent="CenterContainer/Panel/InfoView/StatPointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Spend 1 point on Intelligence (+10 max resource)"
+text = "INT +1"
+
+[node name="InfoBackButton" type="Button" parent="CenterContainer/Panel/InfoView"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Back"
+
+[node name="AbandonConfirmDialog" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+process_mode = 3
+title = "Abandon Run?"
+dialog_text = "This will end your current run and return to the main menu. Your character's appearance is kept. Continue?"

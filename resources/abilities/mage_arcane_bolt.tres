@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AbilityDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/AbilityDefinition.gd" id="1_a1b2c"]
+
+[resource]
+script = ExtResource("1_a1b2c")
+id = "arcane_bolt"
+display_name = "Arcane Bolt"
+description = "A bolt of raw arcane energy hurled at the enemy."
+resource_cost = 10
+cooldown = 0
+power = 1.7
+ability_type = 0
+target_type = 0
+uses_intelligence = true
+is_ranged = true
+defense_bonus_percent = 0.0
+resource_restore_amount = 0
+heal_amount = 0

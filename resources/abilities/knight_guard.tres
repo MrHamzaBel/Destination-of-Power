@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AbilityDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/AbilityDefinition.gd" id="1_a1b2c"]
+
+[resource]
+script = ExtResource("1_a1b2c")
+id = "guard"
+display_name = "Guard"
+description = "Raise your shield, sharply reducing incoming damage until your next turn."
+resource_cost = 0
+cooldown = 0
+power = 0.0
+ability_type = 3
+target_type = 1
+uses_intelligence = false
+is_ranged = false
+defense_bonus_percent = 0.65
+resource_restore_amount = 0
+heal_amount = 0

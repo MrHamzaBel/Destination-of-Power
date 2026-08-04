@@ -1,0 +1,47 @@
+extends Control
+## Skippable, section-by-section lore introduction. Text comes from a
+## LoreScript resource so it can be replaced without touching this script.
+
+const LORE_PATH: String = "res://resources/lore/nerax_intro.tres"
+
+@onready var text_label: Label = %TextLabel
+@onready var hint_label: Label = %HintLabel
+@onready var skip_button: Button = %SkipButton
+@onready var advance_area: Button = %AdvanceArea
+
+var _lore: LoreScript
+var _index: int = -1
+var _finished: bool = false
+
+func _ready() -> void:
+	_lore = load(LORE_PATH)
+	skip_button.pressed.connect(_on_skip_pressed)
+	advance_area.pressed.connect(_advance)
+	_advance()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_advance") or event.is_action_pressed("ui_accept"):
+		_advance()
+		get_viewport().set_input_as_handled()
+
+func _advance() -> void:
+	if _finished:
+		return
+	_index += 1
+	if _lore == null or _index >= _lore.sections.size():
+		_finish()
+		return
+	text_label.text = _lore.sections[_index]
+	text_label.modulate.a = 0.0
+	var tween := create_tween()
+	tween.tween_property(text_label, "modulate:a", 1.0, 0.4)
+	hint_label.text = "Click, press Space/Enter to continue..." if _index < _lore.sections.size() - 1 else "Click, press Space/Enter to begin..."
+
+func _on_skip_pressed() -> void:
+	_finish()
+
+func _finish() -> void:
+	if _finished:
+		return
+	_finished = true
+	SceneManager.goto_scene(SceneManager.BACK_ALLEY)

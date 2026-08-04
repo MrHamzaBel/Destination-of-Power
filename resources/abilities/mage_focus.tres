@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AbilityDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/AbilityDefinition.gd" id="1_a1b2c"]
+
+[resource]
+script = ExtResource("1_a1b2c")
+id = "focus"
+display_name = "Focus"
+description = "Steady your mind and recover a portion of your mana."
+resource_cost = 0
+cooldown = 0
+power = 0.0
+ability_type = 4
+target_type = 1
+uses_intelligence = false
+is_ranged = false
+defense_bonus_percent = 0.0
+resource_restore_amount = 18
+heal_amount = 0

@@ -1,0 +1,13 @@
+# Godot 4 editor/import cache - regenerated automatically, do not track.
+.godot/
+.import/
+export.cfg
+export_presets.cfg
+
+# Exported builds
+export/
+*.pck
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
