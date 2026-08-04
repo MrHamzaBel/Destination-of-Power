@@ -4,7 +4,7 @@ extends Area2D
 ## notification, a combat trigger, a scene exit, or a healing spot.
 ## Configure per-instance in the editor/scene file - no subclassing needed.
 
-enum Kind { MESSAGE, COMBAT, EXIT, HEAL, ITEM, TRADE, DIALOGUE }
+enum Kind { MESSAGE, COMBAT, EXIT, HEAL, ITEM, TRADE, DIALOGUE, GUILD_RECEPTIONIST }
 
 @export var display_name: String = "Object"
 @export var kind: Kind = Kind.MESSAGE
@@ -15,8 +15,11 @@ enum Kind { MESSAGE, COMBAT, EXIT, HEAL, ITEM, TRADE, DIALOGUE }
 @export var one_shot: bool = false ## If true, disables itself after one trigger.
 @export var victory_return_scene: String = "" ## COMBAT only: scene to load after victory instead of the default.
 @export var exit_target_scene: String = "" ## EXIT only: scene to load. Falls back to the encounter screen if unset.
+@export var required_guild_rank_order: int = -1 ## EXIT only: -1 = unrestricted, else minimum GuildRankDefinition.order needed.
+@export_multiline var locked_message: String = "" ## EXIT only: shown instead of transitioning when the rank requirement isn't met.
 @export var trade_item_id: String = "" ## TRADE only: item sold.
-@export var trade_price: int = 0 ## TRADE only: gold cost (before any artifact price modifiers).
+@export var trade_price: int = 0 ## TRADE only: gold cost (before any artifact/guild price modifiers).
+@export var lounge_pricing: bool = false ## TRADE only: also apply the player's guild rank discount to the price.
 @export_multiline var trade_flavor_text: String = "" ## TRADE only: optional line appended to the purchase notification.
 @export_multiline var dialogue_prompt: String = "" ## DIALOGUE only: the yes/no/decline question.
 @export_multiline var dialogue_yes_text: String = ""

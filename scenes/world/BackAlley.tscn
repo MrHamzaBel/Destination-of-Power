@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bbackalley01"]
+[gd_scene load_steps=15 format=3 uid="uid://bbackalley01"]
 
 [ext_resource type="Script" path="res://scripts/world/BackAlley.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
@@ -16,6 +16,12 @@ size = Vector2(20, 480)
 
 [sub_resource type="RectangleShape2D" id="WallShapeVShort"]
 size = Vector2(20, 140)
+
+[sub_resource type="RectangleShape2D" id="WallShapeBottomSeg"]
+size = Vector2(270, 20)
+
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(140, 20)
 
 [sub_resource type="RectangleShape2D" id="PropShape"]
 size = Vector2(30, 30)
@@ -46,17 +52,29 @@ polygon = PackedVector2Array(-340, -10, 340, -10, 340, 10, -340, 10)
 [node name="Shape" type="CollisionShape2D" parent="WallTop"]
 shape = SubResource("WallShapeH")
 
-[node name="WallBottom" type="StaticBody2D" parent="."]
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(0, 230)
+position = Vector2(-205, 230)
 
-[node name="Visual" type="Polygon2D" parent="WallBottom"]
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
 color = Color(0.11, 0.1, 0.11, 1)
-polygon = PackedVector2Array(-340, -10, 340, -10, 340, 10, -340, 10)
+polygon = PackedVector2Array(-135, -10, 135, -10, 135, 10, -135, 10)
 
-[node name="Shape" type="CollisionShape2D" parent="WallBottom"]
-shape = SubResource("WallShapeH")
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(205, 230)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+color = Color(0.11, 0.1, 0.11, 1)
+polygon = PackedVector2Array(-135, -10, 135, -10, 135, 10, -135, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeBottomSeg")
 
 [node name="WallLeft" type="StaticBody2D" parent="."]
 collision_layer = 1
@@ -233,6 +251,22 @@ shape = SubResource("WallShapeVShort")
 [node name="ExitVisual" type="Polygon2D" parent="StreetExit"]
 color = Color(0.85, 0.75, 0.35, 0.5)
 polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
+
+[node name="DeeperAlleyExit" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 230)
+script = ExtResource("7_interactable")
+display_name = "Narrow Passage"
+kind = 2
+exit_target_scene = "res://scenes/world/DeeperAlley.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="DeeperAlleyExit"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="DeeperAlleyExit"]
+color = Color(0.35, 0.25, 0.5, 0.5)
+polygon = PackedVector2Array(-70, -10, 70, -10, 70, 10, -70, 10)
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 unique_name_in_owner = true

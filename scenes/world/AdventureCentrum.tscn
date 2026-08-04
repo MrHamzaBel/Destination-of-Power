@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://badventurecentrum01"]
+[gd_scene load_steps=13 format=3 uid="uid://badventurecentrum01"]
 
 [ext_resource type="Script" path="res://scripts/world/AdventureCentrum.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
 [ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
 [ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueChoicePopup.tscn" id="7_dialogue"]
 
 [sub_resource type="RectangleShape2D" id="WallShapeH"]
 size = Vector2(720, 20)
@@ -145,6 +146,114 @@ shape = SubResource("WallShapeVShort")
 color = Color(0.85, 0.75, 0.35, 0.5)
 polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
 
+[node name="ReceptionistInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(180, 95)
+script = ExtResource("6_interactable")
+display_name = "Guild Receptionist"
+kind = 7
+
+[node name="Shape" type="CollisionShape2D" parent="ReceptionistInteract"]
+shape = SubResource("InteractShape")
+
+[node name="ReceptionistVisual" type="Polygon2D" parent="ReceptionistInteract"]
+color = Color(0.6, 0.4, 0.45, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="GuildRegularInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-220, -150)
+script = ExtResource("6_interactable")
+display_name = "Guild Regular"
+kind = 0
+message = "\"New around here? If you've got questions, talk to the receptionist up front - she handles newcomers.\""
+
+[node name="Shape" type="CollisionShape2D" parent="GuildRegularInteract"]
+shape = SubResource("InteractShape")
+
+[node name="GuildRegularVisual" type="Polygon2D" parent="GuildRegularInteract"]
+color = Color(0.4, 0.4, 0.38, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="MageLootSellerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-220, 30)
+script = ExtResource("6_interactable")
+display_name = "Traveling Mage"
+kind = 5
+trade_item_id = "travelers_blade"
+trade_price = 15
+trade_flavor_text = "\"Found it on the road, no use for it myself,\" she shrugs."
+
+[node name="Shape" type="CollisionShape2D" parent="MageLootSellerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="MageLootSellerVisual" type="Polygon2D" parent="MageLootSellerInteract"]
+color = Color(0.4, 0.3, 0.6, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="SwordsmanLootSellerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-60, 30)
+script = ExtResource("6_interactable")
+display_name = "Retired Swordsman"
+kind = 5
+trade_item_id = "spare_apprentice_staff"
+trade_price = 15
+trade_flavor_text = "\"Took it off a mage who didn't need it anymore,\" he says. \"Not my style. Yours, maybe.\""
+
+[node name="Shape" type="CollisionShape2D" parent="SwordsmanLootSellerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="SwordsmanLootSellerVisual" type="Polygon2D" parent="SwordsmanLootSellerInteract"]
+color = Color(0.5, 0.42, 0.3, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="RangerLootSellerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(100, 30)
+script = ExtResource("6_interactable")
+display_name = "Guild Ranger"
+kind = 5
+trade_item_id = "rangers_secondary_bow"
+trade_price = 22
+trade_flavor_text = "\"My spare,\" she says. \"Better than what you started with, and I don't need two.\""
+
+[node name="Shape" type="CollisionShape2D" parent="RangerLootSellerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="RangerLootSellerVisual" type="Polygon2D" parent="RangerLootSellerInteract"]
+color = Color(0.32, 0.45, 0.3, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="LoungeDoorFacade" type="Polygon2D" parent="."]
+position = Vector2(220, -190)
+color = Color(0.4, 0.3, 0.24, 1)
+polygon = PackedVector2Array(-40, -20, 40, -20, 40, 20, -40, 20)
+
+[node name="LoungeDoor" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(220, -155)
+script = ExtResource("6_interactable")
+display_name = "Lounge Door"
+kind = 2
+exit_target_scene = "res://scenes/world/GuildLounge.tscn"
+required_guild_rank_order = 3
+locked_message = "The door is staff-locked. A small sign reads: \"C-Rank and above only.\""
+
+[node name="Shape" type="CollisionShape2D" parent="LoungeDoor"]
+shape = SubResource("InteractShape")
+
+[node name="LoungeDoorVisual" type="Polygon2D" parent="LoungeDoor"]
+color = Color(0.5, 0.38, 0.24, 1)
+polygon = PackedVector2Array(-14, -18, 14, -18, 14, 18, -14, 18)
+
 [node name="Player" parent="." instance=ExtResource("2_player")]
 unique_name_in_owner = true
 position = Vector2(-280, 0)
@@ -165,4 +274,7 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 
 [node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true
+
+[node name="DialoguePopup" parent="UILayer" instance=ExtResource("7_dialogue")]
 unique_name_in_owner = true

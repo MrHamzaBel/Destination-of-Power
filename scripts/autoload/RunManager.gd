@@ -219,7 +219,16 @@ func complete_quest(quest_id: String) -> Array[int]:
 	run.active_quests.erase(quest_id)
 	run.completed_quests.append(quest_id)
 
-	run.currency += quest_def.reward_gold
+	# Guild members pay less "guild tax" on mission gold - i.e. they keep a
+	# rank-scaled bonus percentage of it - and higher ranks add a free potion.
+	var gold_reward := quest_def.reward_gold
+	var rank_def := get_guild_rank_def()
+	if rank_def != null:
+		gold_reward = int(round(float(gold_reward) * (1.0 + rank_def.tax_discount_percent / 100.0)))
+		if rank_def.free_potion_per_mission:
+			run.add_item("minor_healing_potion", 1)
+
+	run.currency += gold_reward
 	run.unspent_stat_points += quest_def.reward_stat_points
 	for item_id in quest_def.reward_item_ids:
 		run.add_item(item_id, 1)
@@ -230,3 +239,24 @@ func complete_quest(quest_id: String) -> Array[int]:
 
 	save_current_run()
 	return levels_gained
+
+# --- Adventurers' Guild --------------------------------------------------------
+
+func get_guild_rank_def() -> GuildRankDefinition:
+	if run == null or run.guild_rank == "":
+		return null
+	return GuildRegistry.get_rank(run.guild_rank)
+
+# --- Generic run counters -----------------------------------------------------
+
+func get_counter(key: String) -> int:
+	if run == null:
+		return 0
+	return int(run.counters.get(key, 0))
+
+func increment_counter(key: String, amount: int = 1) -> int:
+	if run == null:
+		return 0
+	var value := get_counter(key) + amount
+	run.counters[key] = value
+	return value

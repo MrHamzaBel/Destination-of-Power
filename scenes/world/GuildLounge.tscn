@@ -1,0 +1,167 @@
+[gd_scene load_steps=11 format=3 uid="uid://bguildlounge01"]
+
+[ext_resource type="Script" path="res://scripts/world/GuildLounge.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(620, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVFull"]
+size = Vector2(20, 420)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVShort"]
+size = Vector2(20, 130)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 36.0
+
+[node name="GuildLounge" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.22, 0.13, 0.11, 1)
+polygon = PackedVector2Array(-300, -200, 300, -200, 300, 200, -300, 200)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.3, 0.19, 0.16, 1)
+polygon = PackedVector2Array(-290, -190, 290, -190, 290, 190, -290, 190)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -200)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.13, 0.08, 0.07, 1)
+polygon = PackedVector2Array(-310, -10, 310, -10, 310, 10, -310, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, 200)
+
+[node name="Visual" type="Polygon2D" parent="WallBottom"]
+color = Color(0.13, 0.08, 0.07, 1)
+polygon = PackedVector2Array(-310, -10, 310, -10, 310, 10, -310, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottom"]
+shape = SubResource("WallShapeH")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(300, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.13, 0.08, 0.07, 1)
+polygon = PackedVector2Array(-10, -210, 10, -210, 10, 210, -10, 210)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeVFull")
+
+[node name="WallLeftTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-300, -135)
+
+[node name="Visual" type="Polygon2D" parent="WallLeftTop"]
+color = Color(0.13, 0.08, 0.07, 1)
+polygon = PackedVector2Array(-10, -65, 10, -65, 10, 65, -10, 65)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeftTop"]
+shape = SubResource("WallShapeVShort")
+
+[node name="WallLeftBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-300, 135)
+
+[node name="Visual" type="Polygon2D" parent="WallLeftBottom"]
+color = Color(0.13, 0.08, 0.07, 1)
+polygon = PackedVector2Array(-10, -65, 10, -65, 10, 65, -10, 65)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeftBottom"]
+shape = SubResource("WallShapeVShort")
+
+[node name="PotionRackInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(60, -70)
+script = ExtResource("6_interactable")
+display_name = "Lounge Potion Rack"
+kind = 5
+trade_item_id = "minor_healing_potion"
+trade_price = 5
+lounge_pricing = true
+trade_flavor_text = "Member-only stock, kept behind the bar."
+
+[node name="Shape" type="CollisionShape2D" parent="PotionRackInteract"]
+shape = SubResource("InteractShape")
+
+[node name="PotionRackVisual" type="Polygon2D" parent="PotionRackInteract"]
+color = Color(0.5, 0.36, 0.2, 1)
+polygon = PackedVector2Array(-16, -20, 16, -20, 16, 20, -16, 20)
+
+[node name="LoungeKeeperInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(60, 80)
+script = ExtResource("6_interactable")
+display_name = "Lounge Keeper"
+kind = 5
+trade_item_id = "guild_reserve_longsword"
+trade_price = 40
+lounge_pricing = true
+trade_flavor_text = "\"Careful with that one,\" the keeper says. \"It's seen more fights than you have.\""
+
+[node name="Shape" type="CollisionShape2D" parent="LoungeKeeperInteract"]
+shape = SubResource("InteractShape")
+
+[node name="LoungeKeeperVisual" type="Polygon2D" parent="LoungeKeeperInteract"]
+color = Color(0.35, 0.28, 0.22, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="ExitToCentrum" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-300, 0)
+script = ExtResource("6_interactable")
+display_name = "Back to the Centrum"
+kind = 2
+exit_target_scene = "res://scenes/world/AdventureCentrum.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToCentrum"]
+shape = SubResource("WallShapeVShort")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToCentrum"]
+color = Color(0.85, 0.75, 0.35, 0.5)
+polygon = PackedVector2Array(-10, -65, 10, -65, 10, 65, -10, 65)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(-220, 0)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -320
+limit_top = -220
+limit_right = 320
+limit_bottom = 220
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true

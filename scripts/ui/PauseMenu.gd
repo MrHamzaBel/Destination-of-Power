@@ -78,6 +78,11 @@ func _populate_info() -> void:
 	lines.append("Class: %s" % (class_def.display_name if class_def else "?"))
 	lines.append("Level: %d   Exp: %d / %d" % [run.level, run.current_exp, RunManager.exp_required_for_level(run.level)])
 	lines.append("Gold: %d" % run.currency)
+	var rank_def := RunManager.get_guild_rank_def()
+	if rank_def != null:
+		lines.append("Guild Rank: %s (%d%% off guild tax and lounge prices)" % [rank_def.id, int(rank_def.tax_discount_percent)])
+	else:
+		lines.append("Guild Rank: Not enrolled")
 	lines.append("")
 	lines.append("Health: %d / %d" % [run.current_health, stats.max_health])
 	lines.append("%s: %d / %d" % [class_def.resource_label if class_def else "Resource", run.current_resource, stats.max_resource])

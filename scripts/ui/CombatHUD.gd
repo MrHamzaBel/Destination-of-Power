@@ -194,6 +194,12 @@ func _on_combat_finished(victory: bool) -> void:
 
 	if victory:
 		var lines: Array[String] = ["You won the fight."]
+		var fled_enemies: Array = _combat.last_rewards.get("fled_enemies", [])
+		for enemy_name in fled_enemies:
+			lines.append("%s got away." % enemy_name)
+		var gold_stolen := int(_combat.last_rewards.get("gold_stolen", 0))
+		if gold_stolen > 0:
+			lines.append("They made off with %d gold." % gold_stolen)
 		var exp_gained := int(_combat.last_rewards.get("exp_gained", 0))
 		if exp_gained > 0:
 			lines.append("Experience gained: %d" % exp_gained)

@@ -30,6 +30,7 @@ func _ready() -> void:
 	inventory_screen.closed.connect(_close_inventory)
 
 	_connect_interactables()
+	_connect_rushing_enemies()
 	_on_area_ready()
 
 ## --- Overridable hooks ---------------------------------------------------
@@ -74,6 +75,11 @@ func _on_interactable_triggered(interactable: Interactable) -> void:
 			var return_scene := interactable.victory_return_scene if interactable.victory_return_scene != "" else get_scene_path()
 			SceneManager.start_combat(interactable.enemy_ids, return_scene)
 		Interactable.Kind.EXIT:
+			if interactable.required_guild_rank_order >= 0:
+				var rank_def := RunManager.get_guild_rank_def()
+				if rank_def == null or rank_def.order < interactable.required_guild_rank_order:
+					hud.show_notification(interactable.locked_message if interactable.locked_message != "" else "You don't have the rank for this yet.")
+					return
 			var target := interactable.exit_target_scene if interactable.exit_target_scene != "" else SceneManager.ENCOUNTER_SCREEN
 			SceneManager.goto_scene(target)
 		Interactable.Kind.HEAL:
@@ -93,6 +99,8 @@ func _on_interactable_triggered(interactable: Interactable) -> void:
 			_handle_trade(interactable)
 		Interactable.Kind.DIALOGUE:
 			_open_dialogue(interactable)
+		Interactable.Kind.GUILD_RECEPTIONIST:
+			_handle_guild_receptionist(interactable)
 
 ## Sells trade_item_id for trade_price gold, adjusted by Thorned Coin's price
 ## multiplier if the player holds it - exercises the multiplier hook that
@@ -111,6 +119,10 @@ func _handle_trade(interactable: Interactable) -> void:
 		if effect != null and artifact_def != null and effect.has_method("get_shop_price_multiplier"):
 			var stacks: int = int(RunManager.run.artifacts.get("thorned_coin", 1))
 			price = int(round(float(price) * effect.get_shop_price_multiplier(artifact_def, stacks)))
+	if interactable.lounge_pricing:
+		var rank_def := RunManager.get_guild_rank_def()
+		if rank_def != null:
+			price = int(round(float(price) * (1.0 - rank_def.tax_discount_percent / 100.0)))
 
 	if RunManager.run.currency < price:
 		hud.show_notification("Not enough gold - %s costs %d gold." % [item_def.display_name, price])
@@ -153,6 +165,67 @@ func _on_dialogue_choice(choice_index: int, interactable: Interactable) -> void:
 			hud.show_notification(interactable.dialogue_no_text)
 		_: # Mind your own business
 			hud.show_notification(interactable.dialogue_decline_text)
+
+## Guild receptionist: offers enrollment (if not a member) or an upgrade to
+## the next rank (if already a member and not at the top). Reuses
+## DialogueChoicePopup with a hidden third button since this is a yes/no
+## transaction, not a three-way conversation.
+func _handle_guild_receptionist(_interactable: Interactable) -> void:
+	if RunManager.run == null or dialogue_popup == null:
+		return
+	var current_rank := RunManager.run.guild_rank
+	var next_rank := GuildRegistry.get_next_rank(current_rank)
+	if next_rank == null:
+		hud.show_notification("\"You're already S-Rank,\" she says. \"That's as high as the guild goes - for now.\"")
+		return
+
+	if current_rank == "":
+		dialogue_popup.show_prompt(
+			"\"Looking to join the Adventurers' Guild? Enrollment is %d gold. It gets you F-Rank and a standing discount on guild tax for every mission you take.\"" % next_rank.upgrade_cost,
+			"Enroll (%d gold)" % next_rank.upgrade_cost, "Not right now", ""
+		)
+	else:
+		dialogue_popup.show_prompt(
+			"\"You're %s-Rank right now. Ready to test for %s-Rank? It'll cost %d gold.\"" % [current_rank, next_rank.id, next_rank.upgrade_cost],
+			"Upgrade (%d gold)" % next_rank.upgrade_cost, "Not yet", ""
+		)
+	dialogue_popup.choice_made.connect(_on_guild_choice.bind(next_rank, current_rank == ""), CONNECT_ONE_SHOT)
+
+func _on_guild_choice(choice_index: int, next_rank: GuildRankDefinition, is_enrolling: bool) -> void:
+	if choice_index != 0 or RunManager.run == null:
+		return
+	if RunManager.run.currency < next_rank.upgrade_cost:
+		hud.show_notification("\"Come back when you've got %d gold,\" she says." % next_rank.upgrade_cost)
+		return
+
+	RunManager.run.currency -= next_rank.upgrade_cost
+	RunManager.run.guild_rank = next_rank.id
+	if is_enrolling:
+		RunManager.run.add_item("guild_membership_badge", 1)
+	RunManager.save_current_run()
+	hud.refresh_stats()
+
+	if is_enrolling:
+		hud.show_notification("\"Welcome to the guild, %s-Rank!\" She hands you a membership badge. \"%d%% less guild tax on every mission from here on.\"" % [next_rank.id, int(next_rank.tax_discount_percent)])
+	else:
+		hud.show_notification("\"Congratulations, %s-Rank!\" %s" % [next_rank.id, next_rank.description])
+
+## --- Rushing enemies ---------------------------------------------------------
+
+func _connect_rushing_enemies() -> void:
+	for node in get_tree().get_nodes_in_group("rushing_enemies"):
+		if node is RushingEnemy:
+			node.setup_target(player)
+			node.aggroed.connect(_on_rush_aggroed)
+			node.rushed.connect(_on_rush_triggered)
+
+func _on_rush_aggroed(enemy: RushingEnemy) -> void:
+	if enemy.rush_notification != "":
+		hud.show_notification(enemy.rush_notification)
+
+func _on_rush_triggered(enemy: RushingEnemy) -> void:
+	var return_scene := enemy.victory_return_scene if enemy.victory_return_scene != "" else get_scene_path()
+	SceneManager.start_combat(enemy.enemy_ids, return_scene)
 
 ## --- Pause / inventory overlay ---------------------------------------------
 

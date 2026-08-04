@@ -15,6 +15,9 @@ const CITY_GUARD_FAREWELL: String = "res://scenes/world/CityGuardFarewell.tscn"
 const TWO_WAY_ALLEY: String = "res://scenes/world/TwoWayAlley.tscn"
 const PLAZA: String = "res://scenes/world/Plaza.tscn"
 const ADVENTURE_CENTRUM: String = "res://scenes/world/AdventureCentrum.tscn"
+const GUILD_LOUNGE: String = "res://scenes/world/GuildLounge.tscn"
+const DEEPER_ALLEY: String = "res://scenes/world/DeeperAlley.tscn"
+const UNDERGROUND_NERAX: String = "res://scenes/world/UndergroundNerax.tscn"
 
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect

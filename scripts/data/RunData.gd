@@ -3,7 +3,7 @@ extends Resource
 ## Persistent state for a single active roguelike run. Saved to its own slot so it
 ## can be removed on death/victory without touching the character profile.
 
-const SAVE_VERSION: int = 4 ## v4 adds the guild rank.
+const SAVE_VERSION: int = 6 ## v6 adds guild_progress.
 
 @export var save_version: int = SAVE_VERSION
 @export var run_seed: int = 0
@@ -27,6 +27,8 @@ const SAVE_VERSION: int = 4 ## v4 adds the guild rank.
 @export var active_quests: Array[String] = [] ## Quest ids accepted but not yet completed.
 @export var completed_quests: Array[String] = [] ## Quest ids already rewarded.
 @export var guild_rank: String = "" ## "" = not enrolled, else "F".."S" (see GuildRegistry).
+@export var counters: Dictionary = {} ## Generic key(String) -> int counter bag (e.g. "alley_rat_kills").
+@export var guild_progress: int = 0 ## Standing accumulated toward the next guild rank (see RunManager.guild_progress_required()).
 
 func to_dict() -> Dictionary:
 	return {
@@ -52,6 +54,7 @@ func to_dict() -> Dictionary:
 		"active_quests": active_quests,
 		"completed_quests": completed_quests,
 		"guild_rank": guild_rank,
+		"counters": counters,
 	}
 
 static func from_dict(data: Dictionary) -> RunData:
@@ -77,6 +80,8 @@ static func from_dict(data: Dictionary) -> RunData:
 	run.story_flags = data.get("story_flags", {})
 	run.active_quests.assign(data.get("active_quests", []))
 	run.completed_quests.assign(data.get("completed_quests", []))
+	run.guild_rank = data.get("guild_rank", "")
+	run.counters = data.get("counters", {})
 	return run
 
 func add_item(item_id: String, quantity: int = 1) -> void:

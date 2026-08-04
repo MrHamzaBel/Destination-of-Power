@@ -16,6 +16,8 @@ static func create(effect_id: String) -> ArtifactEffectBase:
 			return HuntersEyeEffect.new()
 		"broken_crown":
 			return BrokenCrownEffect.new()
+		"rat_kings_fang":
+			return VenomousFangEffect.new()
 		_:
 			push_warning("ArtifactEffectFactory: unknown effect_id '%s'" % effect_id)
 			return null

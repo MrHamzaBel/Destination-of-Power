@@ -83,7 +83,8 @@ scenes/ui/DialogueChoicePopup.tscn - Yes/No/decline NPC prompt; instanced only w
 scenes/world/BackAlley.tscn      - starting exploration area (dead end, one way out)
 scenes/world/TwoWayAlley.tscn    - junction alley: Back Alley <-> Plaza, has a trader
 scenes/world/Plaza.tscn          - Nerax's central plaza: food vendor, swindler, adventurer NPC, guild hall door
-scenes/world/AdventureCentrum.tscn  - guild hall; resolves the Find Wassim quest on arrival
+scenes/world/AdventureCentrum.tscn  - guild hall; resolves the Find Wassim quest on arrival, loot sellers, receptionist
+scenes/world/GuildLounge.tscn        - C-Rank+ only; member-discounted shop
 scenes/world/CityGuardArrival.tscn  - story beat: guard arrives, revenge thugs incoming
 scenes/world/CityGuardFarewell.tscn - story beat: guard asks where you live, assumes Southside
 scenes/world/EncounterScreen.tscn- hub for the randomized run sequence
@@ -148,22 +149,52 @@ Allies are AI-controlled party members defined the same data-driven way as every
 Exploration is now a small connected map, not a single room:
 
 ```
-BackAlley (dead end, spawn point)
+                                DeeperAlley (narrower, darker; the Sticky-Fingered Thug ambushes here)
+                                    <-- one exit up -->            <-- one exit down -->
+BackAlley (spawn point) -------------^                        UndergroundNerax (minimal stub, more to come)
     <-- one exit -->
 TwoWayAlley (junction; has the alley trader)
     <-- one exit -->                    <-- other exit -->
   (back to BackAlley)                 Plaza (Nerax's central plaza; food vendor, swindler, adventurer NPC)
                                            <-- city gate -->        <-- guild hall door -->
-                                EncounterScreen (randomized run)   AdventureCentrum (resolves the Find Wassim quest)
+                                EncounterScreen (randomized run)   AdventureCentrum (loot sellers, receptionist)
+                                                                        <-- lounge door (C-Rank+) -->
+                                                                    GuildLounge (member-priced shop)
 ```
 
 Every `Interactable` of kind `EXIT` carries its own `exit_target_scene`, so the map graph is just data sitting in each scene file - there's no separate "level graph" resource to keep in sync. Add a new area by making a new `.tscn` + a two-line `ExplorationArea` subclass (see above) and pointing an `EXIT` interactable at it.
+
+### Rushing enemies & the Deeper Alley
+
+The Back Alley's south wall has a second gap (`DeeperAlleyExit`) leading to `scenes/world/DeeperAlley.tscn` - a narrower, darker passage that itself continues down into `scenes/world/UndergroundNerax.tscn` (intentionally a minimal one-room stub for now, not a dead end, ready for future content).
+
+The Deeper Alley introduces a second, generic way for an exploration enemy to start a fight: `scripts/world/RushingEnemy.gd` (`class_name RushingEnemy`, a `CharacterBody2D`) is placed directly in a scene instead of an `Interactable` - it charges the player once they enter its `detection_radius` and forces combat on contact (`catch_radius`), with no interact key needed. `ExplorationArea` wires up every node in the `"rushing_enemies"` group automatically (mirroring `_connect_interactables()`/`Interactable`): `aggroed` shows `rush_notification` once, `rushed` starts combat via `enemy_ids`. Dropping a new ambush enemy into any area is just adding a `RushingEnemy` node with those fields set - no script changes.
+
+The Deeper Alley's own threat, the **Sticky-Fingered Thug** (`resources/enemies/alley_robber.tres`), also introduces a new combat mechanic: a fleeing enemy. `EnemyDefinition.flees_after_turns` (5 here) makes an enemy bolt instead of acting once it's taken that many of its own turns, handled in `CombatManager._perform_flee()` - if the player has any gold, the thug steals `flee_steal_percent` (20%) of it on the way out (0 gold = nothing stolen) and combat ends the same as any other win, just with `CombatHUD` reporting the theft instead of a kill (`last_rewards["fled_enemies"]`/`["gold_stolen"]`) and no surprise-artifact roll (that roll is now gated on at least one enemy actually being defeated, not just "combat ended in your favor"). Killing him before he flees instead sets `RunData.story_flags["deep_alley_robber_defeated"]` via the new generic `EnemyDefinition.on_defeat_story_flag_id` field (fires automatically in `_on_enemy_defeated()` - no per-scene bookkeeping needed).
+
+`DeeperAlley.gd` uses that flag directly to decide whether the thug shows up at all on each visit: guaranteed on the player's first-ever visit, a 20% chance on every visit after that as long as he's still alive (fled or never fought), and never again once `deep_alley_robber_defeated` is set.
 
 ### Story beats & the Back Alley Thug scenario
 
 The back alley has a second, one-time combat encounter (in addition to the Alley Rat) that kicks off a short scripted sequence: beating the **Back Alley Thug** interactable there routes (via `Interactable.victory_return_scene`) to `scenes/world/CityGuardArrival.tscn` instead of back into the alley. That scene plays a short LoreIntro-style beat (text in `resources/lore/city_guard_arrival.tres`) - a City Guard of Nerax arrives, and more thugs show up looking for revenge - then starts a second fight (`["back_alley_thug", "back_alley_thug"]`) with the Guard fighting alongside the player as an ally. Winning that routes to `scenes/world/CityGuardFarewell.tscn` (text in `resources/lore/city_guard_farewell.tres`), a short beat where she asks where you live and assumes Southside before you can answer, before finally returning to the Back Alley for good.
 
 This whole sequence only fires once per run: `Interactable.story_flag_id` ("back_alley_thug_defeated" here) is checked/set against `RunData.story_flags` (a generic `flag_id -> bool` bag, persisted with the run) the moment the interactable is triggered, and `ExplorationArea._connect_interactables()` hides/disables any interactable whose flag is already set on future visits. The same `story_flag_id` mechanism is reusable for any future one-shot story beat - it isn't specific to this scenario.
+
+### The Rat Den & the Rat Boss
+
+The Back Alley's `RatEncounter` interactable isn't a plain `COMBAT` trigger - `BackAlley.gd` overrides `_on_interactable_triggered()` to intercept it and computes its own enemy list each time instead of using a fixed one:
+
+- Every trigger normally sends in 1 or 2 regular Alley Rats (picked randomly).
+- `RunManager.get_counter("alley_rat_kills")` / `increment_counter()` (backed by `RunData.counters`, a generic `String -> int` bag added for exactly this kind of run-scoped tally) tracks total rats killed at this den across the whole run.
+- Once that count reaches 5, every trigger instead rolls a chance to spawn the **Rat Boss** (`resources/enemies/rat_boss.tres`) with two Alley Rat escorts: 10% at 5 kills, +10% for every additional 5 kills racked up without having fought him yet (10 → 20%, 15 → 30%, ...), capped at 100%.
+- Which fight was just sent into combat is stashed in `RunData` immediately before the scene switch (`story_flags["rat_den_pending_boss"]`, `counters["rat_den_pending_kills"]`) and resolved in `BackAlley._on_area_ready()` on return - returning to the Back Alley at all implies victory, since a loss routes to `RunSummary` instead and never comes back here. A boss win sets the permanent `story_flags["rat_boss_defeated"]` flag, after which the den stops spawning anything at all.
+
+The boss fight itself exercises two new, fully generic `EnemyDefinition` miniboss fields (any future enemy can opt into either independently):
+
+- `can_summon_minions` / `summon_minion_id`: each turn, if a minion sharing that id has died, the boss has a chance to use its action to revive it to full health instead of attacking (`CombatManager._has_defeated_minion()` / `_perform_summon_minion()`).
+- `poison_attack_chance` / `poison_damage_per_turn` / `poison_duration_turns`: each turn, the boss also has a chance to land a weaker direct hit that additionally poisons the target (`CombatManager._perform_enemy_poison_attack()`). Poison itself is generic runtime state on `CombatUnitState` (`apply_poison()` refreshes rather than stacks) and ticks for flat, defense-ignoring damage at the start of the poisoned unit's own turn (`CombatManager._apply_poison_tick()`), which can finish off and grant kill rewards for anyone, player or enemy.
+
+`EnemyDefinition.intro_quote` (logged once, before the usual "Combat begins against..." line, if any enemy in the fight has one set) is what plays the Rat Boss's angry entrance line. `EnemyDefinition.guaranteed_artifact_id` grants a specific artifact on defeat *in addition to* the normal random 35% drop roll (tracked separately in `CombatManager.last_rewards["guaranteed_artifacts"]` so it never collides with the single-slot random `"artifact"` key) - the Rat Boss guarantees **Rat King's Fang** (`resources/artifacts/rat_kings_fang.tres`), a stacking artifact (`VenomousFangEffect`) that gives every player attack a chance to poison its target using the same poison system, plus a large flat experience reward.
 
 ### Trading
 
@@ -173,7 +204,25 @@ Both the Two-Way Alley (the "Back-Alley Trader") and the Plaza (a legitimate Foo
 
 The Plaza's "Traveling Adventurer" is an `Interactable` of kind `DIALOGUE`: interacting opens `DialogueChoicePopup` (`scenes/ui/DialogueChoicePopup.tscn`, added once per scene that needs it) with a fixed Yes / No / "Mind your own business" choice. `ExplorationArea._on_dialogue_choice()` shows the matching `dialogue_yes_text`/`dialogue_no_text`/`dialogue_decline_text`, and - only on Yes, and only if `quest_id` is set - starts that quest via `RunManager.start_quest()`. Talking again while the quest is active or after it's done shows `dialogue_quest_active_text`/`dialogue_quest_done_text` instead of repeating the pitch.
 
-Quests are `QuestDefinition` resources (`resources/quests/*.tres`, loaded by `QuestRegistry`) tracked per-run in `RunData.active_quests`/`completed_quests`. `RunManager.complete_quest(quest_id)` grants any combination of `reward_gold`, `reward_exp`, `reward_stat_points`, `reward_item_ids` and a single `reward_artifact_id` - unset fields just grant nothing, so a reward can be as small or as combined as the quest needs. The one shipped example, **Find Wassim**, is completed by simply arriving in `AdventureCentrum.tscn` while it's active (`AdventureCentrum._on_area_ready()` calls `complete_quest()` and shows a resolution notification) - "explore this place" is a valid quest objective without needing any special turn-in NPC or item. Active/completed quests are listed on the pause menu's Character Info screen.
+Quests are `QuestDefinition` resources (`resources/quests/*.tres`, loaded by `QuestRegistry`) tracked per-run in `RunData.active_quests`/`completed_quests`. `RunManager.complete_quest(quest_id)` grants any combination of `reward_gold`, `reward_exp`, `reward_stat_points`, `reward_item_ids` and a single `reward_artifact_id` - unset fields just grant nothing, so a reward can be as small or as combined as the quest needs (a completed quest's gold also passes through the guild tax discount below, same as any other mission gold). The one shipped example, **Find Wassim**, is completed by simply arriving in `AdventureCentrum.tscn` while it's active (`AdventureCentrum._on_area_ready()` calls `complete_quest()` and shows a resolution notification) - "explore this place" is a valid quest objective without needing any special turn-in NPC or item. Active/completed quests are listed on the pause menu's Character Info screen.
+
+`DialogueChoicePopup.show_prompt(text, yes_label, no_label, decline_label)` accepts custom button text (pass `""` for `decline_label` to hide that button entirely) so the same popup doubles as a plain Yes/No confirmation - see the guild receptionist below for an example that isn't a conversation at all.
+
+### Adventure Centrum & the Adventurers' Guild
+
+The Adventure Centrum has its own small cast, all in `scenes/world/AdventureCentrum.tscn`:
+
+- **Three loot-seller NPCs** (a traveling mage, a retired swordsman, a guild ranger) are plain `TRADE` interactables selling a weapon upgrade each - `travelers_blade`, `spare_apprentice_staff`, `rangers_secondary_bow` - all slightly-to-clearly better than the matching class's starting weapon, priced accordingly (the ranger's is priciest, per the request that started this feature).
+- A **Guild Regular** is a `MESSAGE` interactable that just redirects newcomers to the receptionist.
+- The **Guild Receptionist** is a new `Interactable` kind, `GUILD_RECEPTIONIST`, handled by `ExplorationArea._handle_guild_receptionist()`. If the player isn't enrolled, she offers to enroll them (F-Rank) for `GuildRankDefinition.upgrade_cost` gold; if already enrolled and not at the top rank, she offers to upgrade to the next one instead. Both offers reuse `DialogueChoicePopup` as a Yes/No confirmation.
+
+The rank ladder itself is data: `GuildRankDefinition` resources under `resources/guild_ranks/` (F through S, loaded in order by `GuildRegistry`), each with `upgrade_cost`, `tax_discount_percent`, and which benefits it unlocks (`free_potion_per_mission`, `unlocks_lounge`, `unlocks_special_missions` - all cumulative, so B-Rank has everything D and C granted too). `RunData.guild_rank` holds the current rank id (`""` = not enrolled). Joining grants a `guild_membership_badge` item (a non-droppable `QUEST`-category item - proof of membership, not a mechanic by itself).
+
+Two things read the rank ladder:
+- `RunManager.complete_quest()` boosts `reward_gold` by `tax_discount_percent`, and adds a bonus Minor Healing Potion if the current rank's `free_potion_per_mission` is set ("missions" is scoped to quests for this MVP - see Known Limitations).
+- `ExplorationArea._handle_trade()` applies the same `tax_discount_percent` as a price cut on any `TRADE` interactable with `lounge_pricing = true` (used by the two vendors in `GuildLounge.tscn`).
+
+The **Lounge Door** in the Adventure Centrum is a normal `EXIT` interactable with `required_guild_rank_order` set to C-Rank's `order` (3) - `ExplorationArea` checks `RunManager.get_guild_rank_def()` before allowing the transition and shows `locked_message` instead if the requirement isn't met. `GuildLounge.tscn` sells a member-discounted potion and an exclusive `guild_reserve_longsword`. B-Rank's `unlocks_special_missions` flag is tracked but has no content behind it yet - see Known Limitations.
 
 ### Leveling & experience
 
@@ -198,6 +247,8 @@ To give the class new abilities, add `AbilityDefinition` `.tres` files to `resou
 1. Create a new `EnemyDefinition` resource in `resources/enemies/` (duplicate `resources/enemies/back_alley_thug.tres`).
 2. Set `id`, `display_name`, `stats` (a `StatBlock`), `behavior_type` (`AGGRESSIVE` / `DEFENSIVE` / `RANDOM` - controls how often it defends instead of attacking), `loot_table` (array of `{"item_id": ..., "chance": 0.0-1.0}`), `xp_reward`, `currency_reward`, `body_color`, and a `shape_points` placeholder polygon.
 3. It's now selectable by `EnemyRegistry.get_random_id()` (used by randomized combat encounters) and can be referenced by id from any `Interactable` with `kind = COMBAT` in an exploration scene.
+4. Optional miniboss fields (all default to "off" for a plain enemy): `intro_quote` (a taunt logged once combat starts), `guaranteed_artifact_id` (a specific artifact granted on top of the normal random drop), `can_summon_minions`/`summon_minion_id` (revives a same-id fallen ally instead of attacking, when one is dead), and `poison_attack_chance`/`poison_damage_per_turn`/`poison_duration_turns` (a chance to poison its target for residual damage instead of a normal hit). See "The Rat Den & the Rat Boss" above for the shipped example of all four.
+5. Optional fleeing-enemy fields: `flees_after_turns` (bolts instead of acting once it's taken this many of its own turns; 0 = never flees) and `flee_steal_percent` (fraction of the player's current gold stolen on a successful flee), plus the generic `on_defeat_story_flag_id` (set true in `RunData.story_flags` the moment this specific enemy is actually defeated, not fled). See "Rushing enemies & the Deeper Alley" above for the shipped example.
 
 ### Add an artifact
 
@@ -226,6 +277,9 @@ This is an MVP: the systems are real and reusable, but scope was intentionally k
 - **No audio.** `AudioManager` and the settings UI are wired up; no sound assets are included.
 - **Trading has no dedicated shop UI.** Buying is instant on interact (no browse/confirm screen) - fine for a single-item vendor, but a multi-item shop would want a proper menu.
 - **Quests have no in-progress tracking beyond the pause menu list**, no quest markers/waypoints, and completion is currently always "arrive somewhere" or "talk to someone" - there's no generic "kill N enemies" or "collect N items" objective type yet, though `RunManager.complete_quest()` doesn't care *how* a quest gets marked active/complete, so adding one is mostly about calling `start_quest()`/`complete_quest()` from the right place.
+- **"Guild tax" only discounts quest gold, not combat/encounter currency.** The guild rank system was built against the quest system specifically; extending the same `tax_discount_percent` to enemy `currency_reward`/encounter gold would mean applying it in `CombatManager`/`EncounterScreen` too.
+- **B-Rank's "special missions" flag exists but has no content.** `GuildRankDefinition.unlocks_special_missions` is tracked and set correctly on B/A/S, but no quest currently checks it - it's there for a future quest (or a receptionist offer) to gate on.
+- **Guild rank never goes down and can't be re-tested at a lower rank** other than starting a new run - there's no mechanic (missed payments, demotion, etc.) that would lower it.
 - **No controller/touch input yet.** All input goes through the Input Map actions (`move_*`, `interact`, `pause_menu`, `inventory_toggle`, `ui_advance`), so adding a controller or on-screen touch layer means adding new bindings to those actions, not new code.
 - **Basic AI.** Enemy behaviour is a simple probability roll (attack vs. defend) based on `behavior_type`; no positioning, focus-fire, or multi-turn planning.
-- **Save migration is scaffolded but untested** - every save resource has a `save_version` field and the loaders already tolerate missing/corrupt files, but no old-format migration path exists yet (`RunData` is currently at v2; nothing reads v1 data specially, it just falls back to field defaults).
+- **Save migration is scaffolded but untested** - every save resource has a `save_version` field and the loaders already tolerate missing/corrupt files, but no old-format migration path exists yet (`RunData` is currently at v5; nothing reads older data specially, it just falls back to field defaults).

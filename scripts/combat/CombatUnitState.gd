@@ -24,8 +24,21 @@ var is_defending: bool = false
 var defense_bonus_percent: float = 0.0 ## Active until this unit's next turn starts.
 var health_low_triggered: bool = false ## Ensures the health_low event fires once per combat.
 
+var poison_turns_remaining: int = 0
+var poison_damage_per_turn: int = 0
+var actions_taken: int = 0 ## Counts this unit's own resolved actions this combat - used by e.g. fleeing enemies.
+
 func is_alive() -> bool:
 	return current_health > 0
+
+## Refreshes (not stacks) this unit's poison - applying poison again just
+## resets the duration/damage rather than accumulating multiple instances.
+func apply_poison(damage_per_turn: int, duration_turns: int) -> void:
+	poison_damage_per_turn = damage_per_turn
+	poison_turns_remaining = duration_turns
+
+func is_poisoned() -> bool:
+	return poison_turns_remaining > 0
 
 ## Defense used for the attack-vs-defense damage formula. Defending/Guard-type
 ## abilities temporarily raise this via defense_bonus_percent until this

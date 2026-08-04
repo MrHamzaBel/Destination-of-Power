@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 140
+max_resource = 0
+attack = 9
+intelligence = 4
+defense = 6
+speed = 6
+
+[resource]
+script = ExtResource("1_enemy")
+id = "rat_boss"
+display_name = "Rat Boss"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_healing_potion",
+"chance": 0.6
+}]
+behavior_type = 0
+level = 4
+xp_reward = 60
+currency_reward = 35
+body_color = Color(0.32, 0.12, 0.14, 1)
+shape_points = PackedVector2Array(-16, 6, -19, -3, -13, -13, 0, -16, 13, -13, 19, -3, 16, 6, 16, 16, -16, 16)
+intro_quote = "So you are the one disturbing my minions. Your flesh will do well to pay back our damages."
+guaranteed_artifact_id = "rat_kings_fang"
+can_summon_minions = true
+summon_minion_id = "alley_rat"
+poison_attack_chance = 0.25
+poison_damage_per_turn = 4
+poison_duration_turns = 3

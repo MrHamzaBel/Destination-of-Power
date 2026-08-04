@@ -27,6 +27,7 @@ const CRIT_MULTIPLIER: float = 1.5
 ## still applies on top of this in CombatUnitState.apply_damage).
 const MAX_DAMAGE_BONUS_PERCENT: float = 300.0
 const MAX_DAMAGE_REDUCTION_PERCENT: float = 90.0
+const MINION_SUMMON_CHANCE: float = 0.5 ## Chance a boss uses its turn to call back a fallen minion, when eligible.
 
 var player_unit: CombatUnitState
 var enemy_units: Array[CombatUnitState] = []
@@ -49,7 +50,7 @@ func start(enemy_ids: Array[String], ally_ids: Array[String] = []) -> void:
 	ally_units.clear()
 	selected_enemy_target = null
 	_defeated_this_combat.clear()
-	last_rewards = {"items": [], "artifact": "", "exp_gained": 0, "levels_gained": []}
+	last_rewards = {"items": [], "artifact": "", "guaranteed_artifacts": [], "exp_gained": 0, "levels_gained": [], "fled_enemies": [], "gold_stolen": 0}
 
 	for id in enemy_ids:
 		var def := EnemyRegistry.get_enemy(id)
@@ -72,6 +73,11 @@ func start(enemy_ids: Array[String], ally_ids: Array[String] = []) -> void:
 		for a in ally_units:
 			ally_names.append(a.display_name)
 		intro += " %s fights at your side!" % ", ".join(ally_names)
+
+	for e in enemy_units:
+		if e.enemy_def != null and e.enemy_def.intro_quote != "":
+			_log(e.enemy_def.intro_quote)
+			break
 	_log(intro)
 	EventBus.combat_started.emit({"combat": self})
 	_begin_new_round()
@@ -109,6 +115,11 @@ func is_player_turn() -> bool:
 func resource_name() -> String:
 	var class_def := RunManager.get_class_def()
 	return class_def.resource_label if class_def != null else "Resource"
+
+## Exposed so reusable systems outside CombatManager (e.g. artifact effects)
+## can roll against this combat's own seeded RNG instead of the engine-global one.
+func get_rng() -> RandomNumberGenerator:
+	return _rng
 
 # --- Player actions ----------------------------------------------------------
 
@@ -307,6 +318,16 @@ func _advance_round_action() -> void:
 		_advance_round_action()
 		return
 
+	# Poison ticks at the start of the poisoned unit's own turn, before they act.
+	if acting_unit.is_poisoned():
+		_apply_poison_tick(acting_unit)
+		if not acting_unit.is_alive():
+			if _check_combat_end():
+				return
+			round_stage += 1
+			_advance_round_action()
+			return
+
 	current_unit = acting_unit
 	current_unit.clear_turn_effects()
 	# Set this before emitting so anything reacting to turn_changed/turn_started
@@ -338,6 +359,24 @@ func get_current_block_progress() -> Vector2i:
 	while block_end < _round_queue.size() - 1 and _round_queue[block_end + 1] == unit:
 		block_end += 1
 	return Vector2i(round_stage - block_start + 1, block_end - block_start + 1)
+
+## Deals this unit's residual poison damage (bypassing defense entirely) and
+## ticks the duration down. Grants enemy-defeat rewards if poison finishes them off.
+func _apply_poison_tick(unit: CombatUnitState) -> void:
+	var damage := unit.poison_damage_per_turn
+	unit.current_health = maxi(0, unit.current_health - damage)
+	unit.poison_turns_remaining -= 1
+	_log("%s takes %d poison damage. (%d turn%s left)" % [
+		unit.display_name, damage, unit.poison_turns_remaining,
+		"" if unit.poison_turns_remaining == 1 else "s"
+	])
+	stats_changed.emit()
+	if not unit.is_alive():
+		_log("%s succumbs to the poison!" % unit.display_name)
+		if not unit.is_player and not unit.is_ally:
+			_on_enemy_defeated(unit)
+	else:
+		_check_health_low(unit)
 
 ## Allies are always AI-controlled: they focus whatever enemy the player has
 ## targeted (see get_current_target()).
@@ -371,11 +410,33 @@ func _enemy_take_single_action(enemy: CombatUnitState) -> void:
 	if not enemy.is_alive():
 		_finish_action()
 		return
+	var def := enemy.enemy_def
+	enemy.actions_taken += 1
+
+	# Fleeing enemy: once it's used up its allotted turns, it bolts instead of
+	# acting again - takes priority over every other action type.
+	if def != null and def.flees_after_turns > 0 and enemy.actions_taken >= def.flees_after_turns:
+		_perform_flee(enemy)
+		_finish_action()
+		return
+
+	# Miniboss special: call a fallen minion back into the fight instead of attacking.
+	if def != null and def.can_summon_minions and _has_defeated_minion(def) and _rng.randf() < MINION_SUMMON_CHANCE:
+		_perform_summon_minion(enemy, def)
+		_finish_action()
+		return
+
 	var party := _get_alive_party_members()
 	if party.is_empty():
 		_finish_action()
 		return
 	var target: CombatUnitState = party[_rng.randi_range(0, party.size() - 1)]
+
+	# Miniboss special: a weaker direct hit that also poisons for residual damage.
+	if def != null and def.poison_attack_chance > 0.0 and _rng.randf() < def.poison_attack_chance:
+		_perform_enemy_poison_attack(enemy, target, def)
+		_finish_action()
+		return
 
 	if _decide_enemy_defends(enemy):
 		enemy.is_defending = true
@@ -393,6 +454,55 @@ func _enemy_take_single_action(enemy: CombatUnitState) -> void:
 		if not target.is_alive() and not target.is_player:
 			_log("%s has fallen!" % target.display_name)
 	_finish_action()
+
+## Removes a fleeing enemy from the fight without granting any of the normal
+## defeat rewards - it steals a cut of the player's current gold on the way
+## out (nothing if the player is broke) and is tracked separately in
+## last_rewards so CombatHUD can report the theft instead of a kill.
+func _perform_flee(enemy: CombatUnitState) -> void:
+	var stolen := 0
+	if enemy.enemy_def != null and RunManager.run != null and RunManager.run.currency > 0:
+		stolen = int(round(float(RunManager.run.currency) * enemy.enemy_def.flee_steal_percent))
+		if stolen > 0:
+			RunManager.run.currency -= stolen
+	enemy.current_health = 0
+	if stolen > 0:
+		_log("%s snatches %d gold and bolts away!" % [enemy.display_name, stolen])
+	else:
+		_log("%s bolts away!" % enemy.display_name)
+	var fled: Array = last_rewards.get("fled_enemies", [])
+	fled.append(enemy.display_name)
+	last_rewards["fled_enemies"] = fled
+	last_rewards["gold_stolen"] = int(last_rewards.get("gold_stolen", 0)) + stolen
+	stats_changed.emit()
+
+func _has_defeated_minion(boss_def: EnemyDefinition) -> bool:
+	for e in enemy_units:
+		if not e.is_alive() and e.enemy_def != null and e.enemy_def.id == boss_def.summon_minion_id:
+			return true
+	return false
+
+func _perform_summon_minion(boss: CombatUnitState, boss_def: EnemyDefinition) -> void:
+	for e in enemy_units:
+		if not e.is_alive() and e.enemy_def != null and e.enemy_def.id == boss_def.summon_minion_id:
+			e.current_health = e.max_health
+			e.health_low_triggered = false
+			_log("%s calls %s back into the fight!" % [boss.display_name, e.display_name])
+			stats_changed.emit()
+			return
+
+func _perform_enemy_poison_attack(attacker: CombatUnitState, target: CombatUnitState, def: EnemyDefinition) -> void:
+	var multiplier := _resolve_damage_multiplier(attacker, target)
+	var raw_damage := int(round(float(attacker.attack) * 0.6 * multiplier))
+	var dealt := target.apply_damage(raw_damage)
+	target.apply_poison(def.poison_damage_per_turn, def.poison_duration_turns)
+	_log("%s lands a venomous strike on %s for %d damage - poisoned for %d turns!" % [
+		attacker.display_name, target.display_name, dealt, def.poison_duration_turns
+	])
+	stats_changed.emit()
+	if target.is_player:
+		EventBus.player_took_damage.emit({"combat": self, "amount": dealt})
+	_check_health_low(target)
 
 func _decide_enemy_defends(enemy: CombatUnitState) -> bool:
 	var def := enemy.enemy_def
@@ -417,6 +527,14 @@ func _on_enemy_defeated(enemy: CombatUnitState) -> void:
 	var context := {"combat": self, "enemy": enemy, "currency_reward": currency_reward}
 	EventBus.enemy_defeated.emit(context)
 	RunManager.run.currency += int(context.get("currency_reward", 0))
+
+	if enemy.enemy_def != null and enemy.enemy_def.guaranteed_artifact_id != "":
+		var guaranteed_id := enemy.enemy_def.guaranteed_artifact_id
+		RunManager.run.add_artifact(guaranteed_id)
+		(last_rewards["guaranteed_artifacts"] as Array).append(guaranteed_id)
+
+	if enemy.enemy_def != null and enemy.enemy_def.on_defeat_story_flag_id != "":
+		RunManager.run.story_flags[enemy.enemy_def.on_defeat_story_flag_id] = true
 
 	if enemy.enemy_def != null:
 		var exp_gained := RunManager.compute_exp_reward(enemy.enemy_def)
@@ -473,7 +591,8 @@ func _grant_rewards() -> void:
 				if item_id != "":
 					RunManager.run.add_item(item_id, 1)
 					(last_rewards["items"] as Array).append(item_id)
-	if _rng.randf() < 0.35:
+	# Nothing was actually defeated (e.g. every enemy fled) - no surprise loot either.
+	if not _defeated_this_combat.is_empty() and _rng.randf() < 0.35:
 		var artifact := ArtifactRegistry.get_random(_rng, RunManager.run.class_id)
 		if artifact != null and (artifact.stacking_allowed or not RunManager.run.has_artifact(artifact.id)):
 			RunManager.run.add_artifact(artifact.id)

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "rat_kings_fang"
+display_name = "Rat King's Fang"
+description = "A jagged incisor torn from the Rat Boss. Your attacks have a chance to poison enemies, dealing residual damage over several turns."
+rarity = 3
+icon_color = Color(0.55, 0.15, 0.65, 1)
+effect_id = "rat_kings_fang"
+effect_values = {
+"poison_chance": 0.1,
+"poison_damage": 5,
+"poison_duration": 3
+}
+stacking_allowed = true
+class_restrictions = Array[String]([])
