@@ -76,7 +76,10 @@ func save_current_run() -> void:
 	if run != null:
 		SaveManager.save_run(run)
 
-func end_run(victory: bool) -> void:
+## death_info (only meaningful when victory is false) is CombatManager's
+## last_death_info - {"attacker_name", "attacker_level", "attack_label"} for
+## whichever hit actually finished the player off, read by RunSummary.
+func end_run(victory: bool, death_info: Dictionary = {}) -> void:
 	if run == null:
 		return
 	last_run_summary = {
@@ -87,6 +90,7 @@ func end_run(victory: bool) -> void:
 		"artifacts": run.artifacts.duplicate(),
 		"currency": run.currency,
 		"encounters_completed": run.current_encounter_index,
+		"death_info": death_info.duplicate(),
 	}
 	run.is_active = false
 	SaveManager.delete_run()

@@ -43,6 +43,8 @@ func get_random(rng: RandomNumberGenerator, class_id: String = "") -> ArtifactDe
 	var eligible: Array = []
 	for artifact in _by_id.values():
 		var def: ArtifactDefinition = artifact
+		if not def.random_drop_eligible:
+			continue
 		if def.class_restrictions.is_empty() or class_id == "" or def.class_restrictions.has(class_id):
 			eligible.append(def)
 	if eligible.is_empty():

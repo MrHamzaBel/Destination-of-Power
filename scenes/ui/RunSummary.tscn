@@ -18,6 +18,15 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0.05, 0.045, 0.07, 1)
 
+[node name="ImpactFlash" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.5, 0.05, 0.05, 0)
+
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -25,24 +34,57 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="Panel" type="PanelContainer" parent="CenterContainer"]
+unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(480, 0)
+custom_minimum_size = Vector2(520, 0)
 
 [node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel"]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 16
 
 [node name="TitleLabel" type="Label" parent="CenterContainer/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 40
 text = "Run Complete"
 
-[node name="SummaryLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+[node name="KilledByPanel" type="PanelContainer" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="KilledByVBox" type="VBoxContainer" parent="CenterContainer/Panel/VBox/KilledByPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="KilledByLabel" type="Label" parent="CenterContainer/Panel/VBox/KilledByPanel/KilledByVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 20
+text = "Slain by ..."
+
+[node name="KilledByDetailLabel" type="Label" parent="CenterContainer/Panel/VBox/KilledByPanel/KilledByVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.75, 0.68, 0.7, 1)
+text = "..."
+
+[node name="StatsLabel" type="Label" parent="CenterContainer/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
+text = "..."
+
+[node name="ArtifactsLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
 text = "..."
 
 [node name="ReturnButton" type="Button" parent="CenterContainer/Panel/VBox"]

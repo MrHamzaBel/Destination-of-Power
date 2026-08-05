@@ -233,5 +233,5 @@ func _on_result_confirmed(victory: bool) -> void:
 			RunManager.save_current_run()
 		SceneManager.goto_scene(SceneManager.return_scene_after_combat)
 	else:
-		RunManager.end_run(false)
+		RunManager.end_run(false, _combat.last_death_info)
 		SceneManager.goto_scene(SceneManager.RUN_SUMMARY)

@@ -319,6 +319,16 @@ Create a new `ItemDefinition` `.tres` in `resources/items/` with `category` (`WE
 
 Encounter kinds live in `resources/encounters/` (`EncounterEntry` resources: `kind`, `weight`, `display_name`, `flavor_text`) and are picked by weighted random roll in `EncounterRegistry.generate_sequence()`. Lore and other one-off dialogue text (the intro, the back-alley wake-up notification) live in `resources/lore/` as `LoreScript` resources (`sections: Array[String]`) - edit the array to change the words, no script changes.
 
+### The defeat screen
+
+`RunSummary.tscn` (shown after any run ends) now tracks the specific hit that killed the player, not just win/loss. `CombatManager.last_death_info` (`{"attacker_name", "attacker_level", "attack_label"}`) is overwritten on every hit the player takes - a normal attack, an enemy's poison attack, or a poison tick (which reads `CombatUnitState.poison_source_name`/`poison_source_level`, set when `apply_poison()` is called, so a delayed-DOT kill still credits whoever actually poisoned the player) - so whichever hit turns out to be fatal is always the most recent entry. `CombatHUD._on_result_confirmed()` passes it to `RunManager.end_run(false, death_info)`, which threads it into `last_run_summary` for the summary screen to read.
+
+On defeat, the screen now shows a distinct red-bordered "Slain by X (Level N) - Killed with Y" card above the stats instead of folding that into a wall of text, "Enemies defeated" is a single number (not the full name list - the artifact list is unchanged), and there's a brief red screen-flash on load plus a slow ongoing pulse on the title while defeated (both skipped on victory, which keeps its plain fade-in).
+
+### Artifact drop tuning
+
+Two related changes, both prompted by Rat King's Fang (the Rat Boss's guaranteed reward) also being obtainable as a random drop from any old kill, which undercut it being a boss-specific prize: `ArtifactDefinition.random_drop_eligible` (default `true`) lets an artifact opt out of `ArtifactRegistry.get_random()` entirely while remaining reachable through a guaranteed source like `EnemyDefinition.guaranteed_artifact_id` - Rat King's Fang sets it to `false`. Separately, the flat chance for a random artifact on any victory (`CombatManager._grant_rewards()`) was lowered from 35% to 20%, making artifacts feel rarer across the board.
+
 ## Known limitations & suggested next steps
 
 This is an MVP: the systems are real and reusable, but scope was intentionally kept small.

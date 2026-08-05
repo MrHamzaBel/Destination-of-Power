@@ -36,6 +36,7 @@ var ally_units: Array[CombatUnitState] = [] ## AI-controlled allies fighting on 
 var current_unit: CombatUnitState = null
 var awaiting_player_input: bool = false
 var last_rewards: Dictionary = {}
+var last_death_info: Dictionary = {} ## {"attacker_name", "attacker_level", "attack_label"} - the most recent hit the player took, shown on the defeat screen if it turns out to be the killing blow.
 var selected_enemy_target: CombatUnitState = null ## Set via set_target(); used by player attacks/abilities.
 
 var _rng: RandomNumberGenerator
@@ -52,6 +53,7 @@ func start(enemy_ids: Array[String], ally_ids: Array[String] = []) -> void:
 	selected_enemy_target = null
 	_defeated_this_combat.clear()
 	last_rewards = {"items": [], "artifact": "", "guaranteed_artifacts": [], "exp_gained": 0, "levels_gained": [], "fled_enemies": [], "gold_stolen": 0}
+	last_death_info = {}
 
 	for id in enemy_ids:
 		var def := EnemyRegistry.get_enemy(id)
@@ -232,6 +234,17 @@ func _rolls_dodge(attacker: CombatUnitState, defender: CombatUnitState) -> bool:
 	_log("%s is too quick - %s's attack whiffs completely!" % [defender.display_name, attacker.display_name])
 	return true
 
+## Records the most recent hit the player took - not necessarily fatal, but
+## if it turns out to be, this is exactly the info the defeat screen wants
+## (who, what level, what kind of attack). Cheap to overwrite every hit
+## rather than track "was this the killing blow" explicitly.
+func _record_death_info(attacker_name: String, attacker_level: int, attack_label: String) -> void:
+	last_death_info = {
+		"attacker_name": attacker_name,
+		"attacker_level": attacker_level,
+		"attack_label": attack_label,
+	}
+
 # --- Internal resolution -------------------------------------------------------
 
 func _perform_player_attack(power: float, uses_intelligence: bool, is_ranged: bool) -> void:
@@ -400,6 +413,8 @@ func _apply_poison_tick(unit: CombatUnitState) -> void:
 		"" if unit.poison_turns_remaining == 1 else "s"
 	])
 	stats_changed.emit()
+	if unit.is_player and unit.poison_source_name != "":
+		_record_death_info(unit.poison_source_name, unit.poison_source_level, "poison")
 	if not unit.is_alive():
 		_log("%s succumbs to the poison!" % unit.display_name)
 		if not unit.is_player and not unit.is_ally:
@@ -483,6 +498,7 @@ func _enemy_take_single_action(enemy: CombatUnitState) -> void:
 		stats_changed.emit()
 		if target.is_player:
 			EventBus.player_took_damage.emit({"combat": self, "amount": dealt})
+			_record_death_info(enemy.display_name, enemy.enemy_def.level if enemy.enemy_def != null else 1, "a basic attack")
 		_check_health_low(target)
 		if not target.is_alive() and not target.is_player:
 			_log("%s has fallen!" % target.display_name)
@@ -528,13 +544,14 @@ func _perform_enemy_poison_attack(attacker: CombatUnitState, target: CombatUnitS
 	var multiplier := _resolve_damage_multiplier(attacker, target)
 	var raw_damage := int(round(float(attacker.attack) * 0.6 * multiplier))
 	var dealt := target.apply_damage(raw_damage)
-	target.apply_poison(def.poison_damage_per_turn, def.poison_duration_turns)
+	target.apply_poison(def.poison_damage_per_turn, def.poison_duration_turns, attacker.display_name, def.level)
 	_log("%s lands a venomous strike on %s for %d damage - poisoned for %d turns!" % [
 		attacker.display_name, target.display_name, dealt, def.poison_duration_turns
 	])
 	stats_changed.emit()
 	if target.is_player:
 		EventBus.player_took_damage.emit({"combat": self, "amount": dealt})
+		_record_death_info(attacker.display_name, def.level, "a venomous strike")
 	_check_health_low(target)
 
 func _decide_enemy_defends(enemy: CombatUnitState) -> bool:
@@ -632,7 +649,7 @@ func _grant_rewards() -> void:
 					RunManager.run.add_item(item_id, 1)
 					(last_rewards["items"] as Array).append(item_id)
 	# Nothing was actually defeated (e.g. every enemy fled) - no surprise loot either.
-	if not _defeated_this_combat.is_empty() and _rng.randf() < 0.35:
+	if not _defeated_this_combat.is_empty() and _rng.randf() < 0.20:
 		var artifact := ArtifactRegistry.get_random(_rng, RunManager.run.class_id)
 		if artifact != null and (artifact.stacking_allowed or not RunManager.run.has_artifact(artifact.id)):
 			RunManager.run.add_artifact(artifact.id)

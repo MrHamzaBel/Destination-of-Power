@@ -26,6 +26,8 @@ var health_low_triggered: bool = false ## Ensures the health_low event fires onc
 
 var poison_turns_remaining: int = 0
 var poison_damage_per_turn: int = 0
+var poison_source_name: String = "" ## Who inflicted the active poison - used to credit poison-tick deaths correctly.
+var poison_source_level: int = 0
 var actions_taken: int = 0 ## Counts this unit's own resolved actions this combat - used by e.g. fleeing enemies.
 
 func is_alive() -> bool:
@@ -33,9 +35,11 @@ func is_alive() -> bool:
 
 ## Refreshes (not stacks) this unit's poison - applying poison again just
 ## resets the duration/damage rather than accumulating multiple instances.
-func apply_poison(damage_per_turn: int, duration_turns: int) -> void:
+func apply_poison(damage_per_turn: int, duration_turns: int, source_name: String = "", source_level: int = 0) -> void:
 	poison_damage_per_turn = damage_per_turn
 	poison_turns_remaining = duration_turns
+	poison_source_name = source_name
+	poison_source_level = source_level
 
 func is_poisoned() -> bool:
 	return poison_turns_remaining > 0

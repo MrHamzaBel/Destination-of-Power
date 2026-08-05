@@ -15,6 +15,7 @@ enum Rarity { COMMON, UNCOMMON, RARE, EPIC, LEGENDARY }
 @export var effect_values: Dictionary = {} ## Free-form tuning values read by the effect class.
 @export var stacking_allowed: bool = false
 @export var class_restrictions: Array[String] = [] ## Empty = usable by any class.
+@export var random_drop_eligible: bool = true ## False = never granted by the normal post-victory random-artifact roll (ArtifactRegistry.get_random()) - reserved for a specific guaranteed source instead (e.g. EnemyDefinition.guaranteed_artifact_id).
 
 static func rarity_name(rarity: Rarity) -> String:
 	match rarity:

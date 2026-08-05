@@ -17,3 +17,4 @@ effect_values = {
 }
 stacking_allowed = true
 class_restrictions = Array[String]([])
+random_drop_eligible = false
