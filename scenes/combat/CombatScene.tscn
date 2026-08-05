@@ -16,19 +16,22 @@ position = Vector2(0, 60)
 color = Color(0.16, 0.14, 0.18, 1)
 polygon = PackedVector2Array(-500, -20, 500, -20, 500, 220, -500, 220)
 
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(0, 0)
+
 [node name="PlayerAppearanceRoot" type="Node2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(-260, 120)
-scale = Vector2(3, 3)
+position = Vector2(-260, 40)
+scale = Vector2(2.2, 2.2)
 
 [node name="AllyContainer" type="Node2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(-60, 120)
+position = Vector2(-60, 40)
 scale = Vector2(1.6, 1.6)
 
 [node name="EnemyContainer" type="Node2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(220, 60)
+position = Vector2(220, 40)
 scale = Vector2(1.6, 1.6)
 
 [node name="CombatManager" type="Node" parent="."]
