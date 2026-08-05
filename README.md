@@ -296,11 +296,67 @@ Stat point allocation (and the rest of the character readout - level, exp, gold,
 
 To give the class new abilities, add `AbilityDefinition` `.tres` files to `resources/abilities/` the same way (set `ability_type`/`target_type` from the enums documented in `scripts/data/AbilityDefinition.gd`) and reference their `id`s in the class's `abilities` array.
 
+### Add real artwork (replacing a placeholder polygon)
+
+Every visual placeholder in the game (appearance options, enemies, allies) follows the same pattern: a `texture: Texture2D` field that's `null` by default (falls back to the colored polygon), and is preferred automatically the moment it's set. Nothing else needs to change - not the spawning code, not the registry, not the scene.
+
+To give the Alley Rat real art, for example:
+
+1. Drop the image file (e.g. `alley_rat.png`) anywhere under `resources/` - `res://resources/enemies/art/alley_rat.png` is a reasonable spot. Godot auto-imports any `.png`/`.jpg` it finds into a `Texture2D` the next time the project is opened (or, headless, the next `--editor --quit-after N` pass, same as after adding a new script).
+2. Open `resources/enemies/alley_rat.tres` and add the texture reference. By hand, that means adding an `ext_resource` line for the image and pointing the enemy's `texture` field at it:
+   ```
+   [ext_resource type="Texture2D" path="res://resources/enemies/art/alley_rat.png" id="3_art"]
+   ...
+   [resource]
+   ...
+   texture = ExtResource("3_art")
+   ```
+   (bump `load_steps` by 1 to match, same as adding any other `ext_resource`.) If you'd rather not hand-edit the `.tres`, opening the same file in the Godot editor's Inspector and dragging the image onto the new `Texture` property does the identical thing.
+3. That's it - `shape_points`/`body_color` are still there as the fallback (e.g. if you ever unset `texture`), but as long as `texture` is set, `EnemyCharacter` shows the real art everywhere that enemy appears (exploration marker and combat).
+
+**Where every art asset type lives** (all under `resources/`, all follow the exact same texture-field pattern above):
+
+```
+resources/appearance/body/         - one file per body type (base skin layer)
+resources/appearance/hair/         - one file per hairstyle
+resources/appearance/shirts/       - upper clothing
+resources/appearance/pants/        - lower clothing
+resources/appearance/footwear/     - shoes
+resources/appearance/skin_colors/  - color swatches only, never textures (see below)
+resources/appearance/hair_colors/  - color swatches only, never textures
+resources/enemies/                 - one file per enemy type
+resources/allies/                  - one file per recruitable ally
+```
+
+**How many views does the game need? Just one.** There is currently no directional facing anywhere in the code - no `flip_h`, no up/down/left/right sprites, nothing (the player, enemies, and allies always render the same single static image no matter which way they're moving or who they're facing). So one image per layer/enemy/ally is all that's needed; you don't need a front view and a side view. If you'd like walking-direction flipping or facing sprites later, that's a real feature to build (cheap for left/right flipping via `Sprite2D.flip_h`, more work for a full 4-direction sprite set) - ask if you want it added.
+
+**What view to draw**: since there's no turning, pick whatever reads best at a glance in a top-down game - most games like this use a **3/4 top-down angle** (viewed slightly from above, showing the top of the head/shoulders and the front of the body) rather than a flat front-on view, since that's the camera angle the player is always seen from while exploring. A straight front view also works and is simpler to keep consistent across a layered outfit system - either is legitimate, just be consistent across all your art.
+
+**Image size**: there's no single hard-coded pixel size - final on-screen size is always `texture pixels × the Node2D scale wherever it's placed`, and that scale varies a lot by context:
+
+| Context | Node/scene | Scale applied |
+| --- | --- | --- |
+| Player, exploring | `PlayerCharacter.gd` (`appearance.scale`) | 0.6x |
+| Player, in combat | `CombatScene.tscn` `PlayerAppearanceRoot` | 2.2x |
+| Player, character creator preview | `CharacterCreator.tscn` `PreviewRoot` | 3.0x |
+| Enemy/ally, in combat | `CombatScene.tscn` `EnemyContainer`/`AllyContainer` | 1.6x |
+| Enemy, exploration marker | per-instance, set on each `EnemyVisual` node | 0.8x-1.4x (varies per encounter) |
+
+The existing placeholder polygons are quite small in raw units (the body shape is ~18x74 units at scale 1) because they were hand-drawn as tiny vector shapes - real art at that native resolution would look soft when scaled up 2-3x for combat/the creator preview. A good starting point: **draw humanoid layers (body/hair/shirt/pants/footwear) on a shared 128x128 or 256x256 transparent-background canvas**, and **enemies/allies on a 96x96 or 128x128 transparent canvas** (they only ever get scaled up to 1.6x, so they need less headroom than the player). Whatever size you pick, expect to retune the scale values in the table above by eye once real art is in the editor - they were calibrated for tiny polygons, not full-resolution art, and "does it look right" is the only real test.
+
+**Critical: every layer of the same character must share the exact same canvas size and the character positioned identically within it.** `CharacterAppearanceRenderer` stacks `body`, `pants`, `shirt`, `footwear`, and `hair` directly on top of each other at the same position with no per-layer offset - so if the shirt art is centered differently than the body art on its own canvas, the shirt will visibly float in the wrong spot once equipped. Pick one canvas size for the whole appearance set and keep the character aligned the same way inside it on every layer (e.g. feet always at the same Y, always horizontally centered).
+
+**Color tinting behaves differently for the player's layers vs. enemies/allies:**
+- Body and hair layers are always modulated by the player's chosen **skin color** / **hair color** (`AppearanceOption.uses_skin_color`/`uses_hair_color`) - draw those in grayscale/white so the tint applies cleanly.
+- Clothing layers (shirt/pants/footwear) are modulated by their own fixed `tint_color` (default white = shown as-painted, full color).
+- Enemies and allies are **not** tinted at all once a `texture` is set - `body_color` only affects the placeholder polygon and is ignored the moment real art is assigned, so paint enemies/allies in their final, full colors directly.
+
 ### Add an enemy
 
 1. Create a new `EnemyDefinition` resource in `resources/enemies/` (duplicate `resources/enemies/back_alley_thug.tres`).
 2. Set `id`, `display_name`, `stats` (a `StatBlock`), `behavior_type` (`AGGRESSIVE` / `DEFENSIVE` / `RANDOM` - controls how often it defends instead of attacking), `loot_table` (array of `{"item_id": ..., "chance": 0.0-1.0}`), `xp_reward`, `currency_reward`, `body_color`, and a `shape_points` placeholder polygon.
 3. It's now selectable by `EnemyRegistry.get_random_id()` (used by randomized combat encounters) and can be referenced by id from any `Interactable` with `kind = COMBAT` in an exploration scene.
+   - **Real art instead of the placeholder polygon:** set the enemy's `texture` field (a `Texture2D`) and `EnemyCharacter` renders that `Sprite2D` instead of `shape_points`/`body_color` automatically - no other changes needed. Same field exists on `AllyDefinition`. See "Add real artwork" below for the exact steps.
 4. Optional miniboss fields (all default to "off" for a plain enemy): `intro_quote` (a taunt logged once combat starts), `guaranteed_artifact_id` (a specific artifact granted on top of the normal random drop), `can_summon_minions`/`summon_minion_id` (revives a same-id fallen ally instead of attacking, when one is dead), and `poison_attack_chance`/`poison_damage_per_turn`/`poison_duration_turns` (a chance to poison its target for residual damage instead of a normal hit). See "The Rat Den & the Rat Boss" above for the shipped example of all four.
 5. Optional fleeing-enemy fields: `flees_after_turns` (bolts instead of acting once it's taken this many of its own turns; 0 = never flees) and `flee_steal_percent` (fraction of the player's current gold stolen on a successful flee), plus the generic `on_defeat_story_flag_id` (set true in `RunData.story_flags` the moment this specific enemy is actually defeated, not fled). See "Rushing enemies & the Deeper Alley" above for the shipped example.
 6. Optional `dodge_uses_speed` (every attack against this enemy rolls a Speed-based dodge chance instead of the normal damage formula - see "Dodge: a second Speed-driven combat formula" above).

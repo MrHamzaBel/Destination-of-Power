@@ -10,6 +10,10 @@ unique_name_in_owner = true
 color = Color(0.6, 0.2, 0.2, 1)
 polygon = PackedVector2Array(-10, 10, 10, 10, 10, -10, -10, -10)
 
+[node name="Sprite" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+visible = false
+
 [node name="NameLabel" type="Label" parent="."]
 unique_name_in_owner = true
 position = Vector2(-40, -46)

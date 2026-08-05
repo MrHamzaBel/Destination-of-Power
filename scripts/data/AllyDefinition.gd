@@ -11,3 +11,5 @@ extends Resource
 @export var stats: StatBlock = null
 @export var body_color: Color = Color(0.3, 0.45, 0.7)
 @export var shape_points: PackedVector2Array = PackedVector2Array()
+## Optional real artwork - see EnemyDefinition.texture for how this is used.
+@export var texture: Texture2D = null

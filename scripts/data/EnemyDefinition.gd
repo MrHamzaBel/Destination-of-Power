@@ -15,6 +15,10 @@ enum BehaviorType { AGGRESSIVE, DEFENSIVE, RANDOM }
 @export var currency_reward: int = 0
 @export var body_color: Color = Color(0.6, 0.2, 0.2)
 @export var shape_points: PackedVector2Array = PackedVector2Array()
+## Optional real artwork. If set, EnemyCharacter renders this Sprite2D instead
+## of the shape_points placeholder polygon - drop in a texture and the enemy
+## instantly upgrades from a colored blob to real art with no other changes.
+@export var texture: Texture2D = null
 
 ## Optional taunt line logged when combat starts against this enemy.
 @export_multiline var intro_quote: String = ""
