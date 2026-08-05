@@ -1,0 +1,80 @@
+[gd_scene load_steps=4 format=3 uid="uid://bmaskedmanencounter01"]
+
+[ext_resource type="Script" path="res://scripts/world/MaskedManEncounter.gd" id="1_script"]
+[ext_resource type="Theme" path="res://resources/ui/nerax_theme.tres" id="2_theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueChoicePopup.tscn" id="3_dialogue"]
+
+[node name="MaskedManEncounter" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.04, 0.03, 0.06, 1)
+
+[node name="AdvanceArea" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+flat = true
+text = ""
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="TextLabel" type="Label" parent="CenterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(760, 0)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+text = ""
+
+[node name="HintLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+offset_bottom = -20.0
+mouse_filter = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.6, 0.58, 0.66, 1)
+theme_override_font_sizes/font_size = 14
+text = "Click, press Space/Enter to continue..."
+
+[node name="SkipButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -110.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 52.0
+focus_mode = 2
+text = "Skip"
+
+[node name="ChoicePopup" parent="." instance=ExtResource("3_dialogue")]
+unique_name_in_owner = true

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "bear_skin"
+display_name = "Bear Skin"
+description = "A thick, unmarked pelt from an unusually large forest bear. Any vendor would pay well for it."
+category = 3
+rarity = 2
+icon_color = Color(0.42, 0.28, 0.16, 1)
+equip_slot = ""
+is_ranged = false
+stat_modifiers = null
+heal_amount = 0
+resource_amount = 0
+value = 125
+droppable = true
+sell_price = 125

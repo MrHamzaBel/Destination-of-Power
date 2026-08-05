@@ -210,3 +210,72 @@ layout_mode = 2
 autowrap_mode = 3
 theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
 text = ""
+
+[node name="Character" type="VBoxContainer" parent="CenterContainer/Panel/VBox/Tabs"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="InfoScroll" type="ScrollContainer" parent="CenterContainer/Panel/VBox/Tabs/Character"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CharacterInfoLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/InfoScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+text = "..."
+
+[node name="CharStatPointsLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.85, 0.75, 0.4, 1)
+text = ""
+
+[node name="CharStatPointsRow" type="HBoxContainer" parent="CenterContainer/Panel/VBox/Tabs/Character"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HpPointButton" type="Button" parent="CenterContainer/Panel/VBox/Tabs/Character/CharStatPointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Spend 1 point on HP (+10 max health)"
+text = "HP +1"
+
+[node name="AttackPointButton" type="Button" parent="CenterContainer/Panel/VBox/Tabs/Character/CharStatPointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Spend 1 point on Attack"
+text = "ATK +1"
+
+[node name="DefensePointButton" type="Button" parent="CenterContainer/Panel/VBox/Tabs/Character/CharStatPointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Spend 1 point on Defense"
+text = "DEF +1"
+
+[node name="SpeedPointButton" type="Button" parent="CenterContainer/Panel/VBox/Tabs/Character/CharStatPointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Spend 1 point on Speed"
+text = "SPD +1"
+
+[node name="IntelligencePointButton" type="Button" parent="CenterContainer/Panel/VBox/Tabs/Character/CharStatPointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+tooltip_text = "Spend 1 point on Intelligence (+10 max resource)"
+text = "INT +1"

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="LoreScript" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/LoreScript.gd" id="1_lore"]
+
+[resource]
+script = ExtResource("1_lore")
+sections = Array[String](["He closes the distance before you can blink. Pain erupts through you as his blow lands - the world swims for a moment before your senses return.", "\"A cocky one,\" he laughs. \"I always liked those ones.\" A portal tears open behind him, and he steps back through it - gone as suddenly as he arrived."])

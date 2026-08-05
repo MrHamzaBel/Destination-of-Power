@@ -27,6 +27,15 @@ const EQUIP_SLOTS: Array[String] = ["weapon", "offhand", "armor"]
 @onready var artifact_detail_desc: Label = %ArtifactDetailDesc
 @onready var artifact_detail_info: Label = %ArtifactDetailInfo
 
+@onready var character_info_label: Label = %CharacterInfoLabel
+@onready var char_stat_points_label: Label = %CharStatPointsLabel
+@onready var char_stat_points_row: HBoxContainer = %CharStatPointsRow
+@onready var hp_point_button: Button = %HpPointButton
+@onready var attack_point_button: Button = %AttackPointButton
+@onready var defense_point_button: Button = %DefensePointButton
+@onready var speed_point_button: Button = %SpeedPointButton
+@onready var intelligence_point_button: Button = %IntelligencePointButton
+
 var _selected_item_id: String = ""
 var _selected_artifact_id: String = ""
 
@@ -35,6 +44,11 @@ func _ready() -> void:
 	equip_button.pressed.connect(_on_equip_pressed)
 	use_button.pressed.connect(_on_use_pressed)
 	drop_button.pressed.connect(_on_drop_pressed)
+	hp_point_button.pressed.connect(_on_stat_point_pressed.bind("hp"))
+	attack_point_button.pressed.connect(_on_stat_point_pressed.bind("attack"))
+	defense_point_button.pressed.connect(_on_stat_point_pressed.bind("defense"))
+	speed_point_button.pressed.connect(_on_stat_point_pressed.bind("speed"))
+	intelligence_point_button.pressed.connect(_on_stat_point_pressed.bind("intelligence"))
 	refresh()
 
 func refresh() -> void:
@@ -43,6 +57,7 @@ func refresh() -> void:
 	_select_item("")
 	_populate_artifacts()
 	_select_artifact("")
+	_populate_character()
 
 func _populate_equipped() -> void:
 	for child in equipped_list.get_children():
@@ -248,3 +263,60 @@ func _select_artifact(artifact_id: String) -> void:
 	if not artifact_def.class_restrictions.is_empty():
 		info_lines.append("Class restricted: %s" % ", ".join(artifact_def.class_restrictions))
 	artifact_detail_info.text = "\n".join(info_lines)
+
+# --- Character tab -------------------------------------------------------------
+## Same stats/equipment/artifacts/quests readout and stat-point spending as
+## PauseMenu's Character Info screen - duplicated here (rather than moved)
+## since players open this panel with 'I' far more readily than they find
+## the pause-menu button, and the level-up stat points specifically need to
+## be easy to find.
+
+func _populate_character() -> void:
+	if RunManager.run == null:
+		character_info_label.text = "No active run."
+		char_stat_points_row.visible = false
+		char_stat_points_label.visible = false
+		return
+	var class_def := RunManager.get_class_def()
+	var stats := RunManager.compute_current_stats()
+	var run := RunManager.run
+	var lines: Array[String] = []
+	lines.append("Name: %s" % RunManager.character_profile.character_name)
+	lines.append("Class: %s" % (class_def.display_name if class_def else "?"))
+	lines.append("Level: %d   Exp: %d / %d" % [run.level, run.current_exp, RunManager.exp_required_for_level(run.level)])
+	lines.append("Gold: %d" % run.currency)
+	var rank_def := RunManager.get_guild_rank_def()
+	if rank_def != null:
+		lines.append("Guild Rank: %s (%d%% off guild tax and lounge prices)" % [rank_def.id, int(rank_def.tax_discount_percent)])
+	else:
+		lines.append("Guild Rank: Not enrolled")
+	lines.append("")
+	lines.append("Health: %d / %d" % [run.current_health, stats.max_health])
+	lines.append("%s: %d / %d" % [class_def.resource_label if class_def else "Resource", run.current_resource, stats.max_resource])
+	lines.append("Attack: %d   Intelligence: %d" % [stats.attack, stats.intelligence])
+	lines.append("Defense: %d   Speed: %d" % [stats.defense, stats.speed])
+	lines.append("")
+	lines.append("Quests:")
+	if run.active_quests.is_empty() and run.completed_quests.is_empty():
+		lines.append("  None yet")
+	for quest_id in run.active_quests:
+		var quest_def := QuestRegistry.get_quest(quest_id)
+		if quest_def != null:
+			lines.append("  [In Progress] %s - %s" % [quest_def.display_name, quest_def.objective_text])
+	for quest_id in run.completed_quests:
+		var quest_def := QuestRegistry.get_quest(quest_id)
+		if quest_def != null:
+			lines.append("  [Complete] %s" % quest_def.display_name)
+	character_info_label.text = "\n".join(lines)
+
+	var unspent := run.unspent_stat_points
+	char_stat_points_label.visible = true
+	char_stat_points_row.visible = unspent > 0
+	char_stat_points_label.text = (
+		"You have %d unspent stat point%s - choose where to put them:" % [unspent, "" if unspent == 1 else "s"]
+		if unspent > 0 else "No unspent stat points."
+	)
+
+func _on_stat_point_pressed(stat_name: String) -> void:
+	if RunManager.allocate_stat_point(stat_name):
+		_populate_character()

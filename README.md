@@ -92,6 +92,8 @@ scenes/world/UndergroundNerax.tscn  - minimal stub beneath the Deeper Alley, not
 scenes/world/Market.tscn             - Southside's long market street, Plaza <-> the southern gate
 scenes/world/NeraxOutskirts.tscn    - beyond the gate: forest (bees) east, lake west
 scenes/world/FarReaches.tscn         - minimal stub south of the outskirts, not built out yet
+scenes/world/MaskedManEncounter.tscn - one-time cinematic: a masked man taunts the player in the forest
+scenes/world/DeepForest.tscn         - bigger forest beyond the portal: sleeping bear, hunter
 scenes/world/EncounterScreen.tscn- hub for the randomized run sequence
 scenes/combat/CombatScene.tscn
 scenes/entities/PlayerCharacter.tscn
@@ -149,6 +151,10 @@ Combat supports any number of enemies and allies simultaneously (each gets its o
 
 Allies are AI-controlled party members defined the same data-driven way as everything else: a new `AllyDefinition` `.tres` in `resources/allies/` (`id`, `display_name`, `stats`, `body_color`, `shape_points`) picked up automatically by `AllyRegistry`. They always auto-attack whichever enemy is currently targeted - there's no ally ability/action UI (see Known Limitations). Pass ally ids as the fourth argument to `SceneManager.start_combat(enemy_ids, return_scene, advances_encounter, ally_ids)` (or directly to `CombatManager.start(enemy_ids, ally_ids)`) to bring one into a fight; an ally being defeated doesn't end the combat, only the player dying does.
 
+### Arrival spawn points
+
+Every exploration scene used to have exactly one hardcoded `Player` position, used no matter which door the player actually came through - so leaving the Guild Lounge (whose only door is on its west wall) into the Adventure Centrum always dropped the player at the Centrum's single fixed spawn near *its* west wall (by the Plaza exit), regardless of which entrance made sense. `SceneManager.arriving_from_scene_path` now records which scene the player is leaving every time `goto_scene()` runs (read from `RunData.current_scene_path`, which every `ExplorationArea` already keeps current), and `ExplorationArea._apply_arrival_spawn()` (called first thing in `_ready()`) searches the new scene for an `EXIT` interactable whose `exit_target_scene` points back at that scene, then places the player a fixed distance inward from it (toward the room's center) instead of the scene's authored default. This needed no new per-scene data - it works retroactively for every exit pair already in the game - and falls back to the original fixed spawn whenever there's no such match (the start of a run, returning from combat, etc.).
+
 ### The Southside map
 
 Exploration is now a small connected map, not a single room:
@@ -168,8 +174,10 @@ TwoWayAlley (junction; has the alley trader)
                                                                     GuildLounge (member-priced shop)   NeraxOutskirts (forest w/ bees
                                                                                                          east, lake west)
                                                                                                                 |
-                                                                                                          <-- open path -->
-                                                                                                        FarReaches (minimal stub)
+                                                                       <-- deeper into the forest -->    <-- open path -->
+                                                              MaskedManEncounter (first time only)     FarReaches (minimal stub)
+                                                                        v
+                                                                  DeepForest (bear + hunter, bigger)
 ```
 
 Every `Interactable` of kind `EXIT` carries its own `exit_target_scene`, so the map graph is just data sitting in each scene file - there's no separate "level graph" resource to keep in sync. Add a new area by making a new `.tscn` + a two-line `ExplorationArea` subclass (see above) and pointing an `EXIT` interactable at it.
@@ -210,6 +218,20 @@ The boss fight itself exercises two new, fully generic `EnemyDefinition` minibos
 
 The Plaza has a third exit south (`ExitToMarket`) into `scenes/world/Market.tscn` - a long street lined with houses connecting the Plaza to Nerax's southern gate. Past the gate is `scenes/world/NeraxOutskirts.tscn`: forest to the east (bees nest by the old tree, near a repeatable `COMBAT` `Interactable` spawning 3 `forest_bee` at once - no escalation or respawn-chance logic like the Rat Den, just a plain always-available fight), a decorative lake to the west, and an open path south continuing to `scenes/world/FarReaches.tscn` - unlocked (no `required_guild_rank_order`), intentionally minimal for now, same "not a dead end" treatment as `UndergroundNerax.tscn`.
 
+### Deeper into the forest: the masked man, and the Deep Forest
+
+The forest zone hides one more thing: a `DeeperForestPathInteract` `EXIT`-flavored `Interactable` whose destination isn't fixed in the scene file - `NeraxOutskirts.gd` overrides `_on_interactable_triggered()` to check `RunData.story_flags["forest_portal_seen"]` and route to `scenes/world/MaskedManEncounter.tscn` the first time, or straight to `scenes/world/DeepForest.tscn` every time after.
+
+**The masked man cinematic** (`MaskedManEncounter.gd`) follows the same click/Space/Enter-to-advance, Skip-to-jump-ahead pattern as `LoreIntro`/`CityGuardArrival`/`CityGuardFarewell` (all four share the identical `TextLabel`/`HintLabel`/`SkipButton`/`AdvanceArea` layout), but inserts a three-way choice partway through instead of just running linearly to a fixed next scene: after the intro text (a portal opens, a masked man taunts the player), it shows `DialogueChoicePopup` with custom labels "What?" / "Who are you?" / "Shut up." - the popup's existing custom-label support (already used for the guild receptionist's yes/no transaction) turns out to cover a three-way conversational choice just as well, no popup changes needed. "What?" and "Who are you?" both load the same calm epilogue (`masked_man_leaves.tres`); "Shut up" instead halves the player's *current* health (`RunManager.run.current_health / 2`, so it can never itself be lethal) before loading a different epilogue (`masked_man_shutup.tres`) - either way, finishing the epilogue text sets `forest_portal_seen` (done in `_ready()`, before the choice is even made) and transitions to `DeepForest.tscn`.
+
+**Deep Forest** (`scenes/world/DeepForest.tscn`, bigger than the outskirts) has a sleeping bear (`forest_bear` - no special mechanics, just solid stats all around: 90 HP, 10 Attack, 8 Defense; a genuinely tough fight rather than a gimmick) on one side, one-shot and guaranteed to drop a **Bear Skin** (`resources/items/bear_skin.tres`) on defeat, and a hunter on the other. `DeepForest.gd` overrides `_on_interactable_triggered()` for the hunter to sequence three distinct states rather than branching purely on inventory: his "felt a disturbance, was that you?" icebreaker (`RunData.story_flags["hunter_greeted"]`) always plays first and exactly once, no matter whether the player already has the skin when they first talk to him; after that, every interaction offers to buy a currently-held skin for 50 gold, or shows a short idle line if the player isn't holding one. Selling to him removes the skin, pays the 50 gold, and permanently hides/disables him (`Interactable.story_flag_id = "hunter_bear_skin_sold"`, set the moment the sale succeeds) - he's genuinely gone after that, not just repeating himself. Declining ("Keep it") leaves him exactly as he was, so the player can still come back and sell to him later.
+
+**Selling to any vendor.** The bear skin is also the first item to use `ItemDefinition.sell_price` (125 gold) - a new, deliberately separate field from the pre-existing `value` field (which nearly every item already has set as flavor/worth text, but which nothing had ever read). `ExplorationArea._try_sell_to_vendor()`, checked at the top of `_handle_trade()`, sells the first `sell_price > 0` item the player is carrying to *any* `TRADE`-kind `Interactable` instead of running that vendor's normal buy flow - so "sellable at every vendor" needed zero per-vendor configuration. (Reusing `value` for this instead was the first draft; a debug test caught that nearly every piece of equipment already had `value` set, which would have made everything in the player's pack sellable everywhere as an unintended side effect - `sell_price` defaults to 0 and is deliberately unset on anything else.)
+
+### Using consumables outside combat now updates the HUD
+
+Using an item from the Inventory screen while exploring updated `RunData.current_health`/`current_resource` correctly, but the `ExplorationHUD` bars weren't told to refresh (they only refresh in response to specific calls, not automatically) - the numbers were right the moment you reopened the panel, just stale on the bar underneath it until something else happened to trigger a refresh. `ExplorationArea._close_inventory()` now calls `hud.refresh_stats()` when the panel closes, which covers using a potion, equipping/unequipping, or anything else the panel changed.
+
 ### Dodge: a second Speed-driven combat formula
 
 Bees introduce a second stat-comparison mechanic alongside the Attack-vs-Defense damage formula: `EnemyDefinition.dodge_uses_speed` (set on `forest_bee`) makes every attack against that enemy first roll `CombatManager.dodge_chance(attacker_speed, defender_speed)` - the exact same shape as `damage_multiplier()` (half a percent of chance per 1% Speed gap, same halving convention), but comparing Speed instead of Attack/Defense, capped at `MAX_DODGE_CHANCE_PERCENT` (90%), and interpreted as a complete miss (zero damage, no defense calculation at all) instead of a damage reduction. It only ever helps the *defender* - a defender with lower Speed than its attacker never dodges, mirroring how the damage formula never lets the weaker side "win." The check lives in `CombatManager._rolls_dodge()`, called from both `_perform_player_attack()` and `_ally_take_single_action()` (enemies attacking the player never check it, since only `enemy_def`-bearing units can hold the flag). Because it's gated on the flag rather than applied universally, existing enemies (including the deliberately-fast Sticky-Fingered Thug) are unaffected - only enemies that opt in via `dodge_uses_speed` get this passive.
@@ -249,6 +271,10 @@ Two things read the rank ladder:
 The **Lounge Door** in the Adventure Centrum is a normal `EXIT` interactable with `required_guild_rank_order` set to C-Rank's `order` (3) - `ExplorationArea` checks `RunManager.get_guild_rank_def()` before allowing the transition and shows `locked_message` instead if the requirement isn't met. `GuildLounge.tscn` sells a member-discounted potion and an exclusive `guild_reserve_longsword`. B-Rank's `unlocks_special_missions` flag is tracked but has no content behind it yet - see Known Limitations.
 
 **Guild standing.** Testing for the next rank isn't just a gold cost anymore - it now also requires `RunData.guild_progress` (a second, separate accumulator, distinct from player exp/level) to have reached `RunManager.guild_progress_required(order)`, which mirrors `exp_required_for_level()`'s shape (`GUILD_PROGRESS_BASE * GUILD_PROGRESS_GROWTH^order`) but compounds 25% per rank instead of 10% per level. Enrollment (F-Rank, order 0) never requires standing - there's nothing to have proven yet. `ExplorationArea._handle_guild_receptionist()` checks this before even showing the paid-upgrade prompt, and reports current/required standing in a locked-style message if it's not met yet; on a successful upgrade the required amount is subtracted from `guild_progress` (overflow carries forward, same as exp past a level-up), not reset to zero. The only way to earn standing is `QuestDefinition.reward_guild_progress` - completing **Kill the Bees** grants 5 ("very low," and it's repeatable, so it's the intended grind for standing between the existing gold-cost upgrades).
+
+### Character info & leveling, from the Inventory screen
+
+Stat point allocation (and the rest of the character readout - level, exp, gold, guild rank, stats, quests) is available from **two** places now: the pause menu's existing "Character Info" button, and a new **Character** tab on the Inventory screen (`I`) itself - `InventoryScreen._populate_character()`/`_on_stat_point_pressed()` duplicate `PauseMenu`'s equivalent logic rather than sharing it, specifically so players who never find the pause-menu button (the original complaint) still discover unspent stat points immediately from the panel they're already used to opening.
 
 ### Leveling & experience
 

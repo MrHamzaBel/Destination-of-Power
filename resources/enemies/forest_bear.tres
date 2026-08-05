@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 90
+max_resource = 0
+attack = 10
+intelligence = 2
+defense = 8
+speed = 8
+
+[resource]
+script = ExtResource("1_enemy")
+id = "forest_bear"
+display_name = "Sleeping Bear"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "bear_skin",
+"chance": 1.0
+}]
+behavior_type = 2
+level = 4
+xp_reward = 30
+currency_reward = 10
+body_color = Color(0.32, 0.22, 0.15, 1)
+shape_points = PackedVector2Array(-16, 10, -18, -6, -10, -16, 0, -18, 10, -16, 18, -6, 16, 10, 16, 18, -16, 18)
+intro_quote = "The bear rouses with a furious roar - you were not quiet enough!"

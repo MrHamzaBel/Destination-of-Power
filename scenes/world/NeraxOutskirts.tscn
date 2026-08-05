@@ -176,6 +176,17 @@ shape = SubResource("InteractShape")
 [node name="EnemyVisual" parent="BeeSwarmInteract" instance=ExtResource("7_enemy")]
 scale = Vector2(0.8, 0.8)
 
+[node name="DeeperForestPathInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(420, 180)
+script = ExtResource("6_interactable")
+display_name = "Deeper Into the Forest"
+kind = 2
+
+[node name="Shape" type="CollisionShape2D" parent="DeeperForestPathInteract"]
+shape = SubResource("InteractShape")
+
 [node name="ExitToMarket" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0

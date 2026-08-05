@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="LoreScript" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/LoreScript.gd" id="1_lore"]
+
+[resource]
+script = ExtResource("1_lore")
+sections = Array[String](["The trees ahead thin out, and the air itself seems to tighten. Without warning, a shimmering portal tears open in the space before you.", "A masked figure steps through, cloak trailing into nothing as the portal seals shut behind him. \"Curious,\" he says, tilting his head. \"I wonder how far you'll go - what heights you'll obtain. There's no shame in failure, in defeat, even in death. But quitting... now that would be disappointing.\""])

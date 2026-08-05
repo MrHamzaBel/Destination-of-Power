@@ -21,6 +21,8 @@ const UNDERGROUND_NERAX: String = "res://scenes/world/UndergroundNerax.tscn"
 const MARKET: String = "res://scenes/world/Market.tscn"
 const NERAX_OUTSKIRTS: String = "res://scenes/world/NeraxOutskirts.tscn"
 const FAR_REACHES: String = "res://scenes/world/FarReaches.tscn"
+const MASKED_MAN_ENCOUNTER: String = "res://scenes/world/MaskedManEncounter.tscn"
+const DEEP_FOREST: String = "res://scenes/world/DeepForest.tscn"
 
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect
@@ -28,6 +30,7 @@ var pending_combat_enemy_ids: Array[String] = [] ## Read by CombatScene on _read
 var pending_combat_ally_ids: Array[String] = [] ## Read by CombatScene on _ready().
 var return_scene_after_combat: String = BACK_ALLEY
 var advances_encounter_on_victory: bool = false ## True when this fight is the current run encounter slot.
+var arriving_from_scene_path: String = "" ## Read by ExplorationArea to spawn near the entrance actually used, not a fixed point.
 
 func _ready() -> void:
 	_fade_layer = CanvasLayer.new()
@@ -44,6 +47,7 @@ func _attach_fade_layer() -> void:
 
 func goto_scene(path: String) -> void:
 	print("SceneManager: switching to ", path)
+	arriving_from_scene_path = RunManager.run.current_scene_path if RunManager.run != null else ""
 	var tween := create_tween()
 	tween.tween_property(_fade_rect, "color:a", 1.0, 0.15)
 	tween.tween_callback(func():

@@ -16,6 +16,8 @@ extends Node2D
 @onready var dialogue_popup: DialogueChoicePopup = get_node_or_null("%DialoguePopup") ## Optional - only scenes with a DIALOGUE interactable need one.
 
 func _ready() -> void:
+	_apply_arrival_spawn()
+
 	if RunManager.run != null:
 		RunManager.run.current_scene_path = get_scene_path()
 		RunManager.save_current_run()
@@ -43,6 +45,28 @@ func get_objective_text() -> String:
 
 func _on_area_ready() -> void:
 	pass # Optional per-scene one-time setup, e.g. an intro notification.
+
+## Repositions the player near whichever EXIT actually leads back to the
+## scene they just came from, instead of always using this scene's single
+## fixed Player position regardless of which door was used. Works for every
+## existing scene pair automatically - it just looks for an EXIT interactable
+## whose exit_target_scene matches where the player arrived from, no new
+## per-scene data needed. Falls back to the scene's authored Player position
+## (the default, used when arriving from anywhere without such a match - the
+## very start of a run, after combat, etc.) when nothing matches.
+func _apply_arrival_spawn() -> void:
+	var from_path := SceneManager.arriving_from_scene_path
+	if from_path == "":
+		return
+	for node in get_tree().get_nodes_in_group("interactables"):
+		if node is Interactable:
+			var interactable := node as Interactable
+			if interactable.kind == Interactable.Kind.EXIT and interactable.exit_target_scene == from_path:
+				var inward := (Vector2.ZERO - interactable.position).normalized()
+				if inward == Vector2.ZERO:
+					inward = Vector2.DOWN
+				player.global_position = interactable.global_position + inward * 70.0
+				return
 
 ## --- Interactables ---------------------------------------------------------
 
@@ -108,6 +132,8 @@ func _on_interactable_triggered(interactable: Interactable) -> void:
 func _handle_trade(interactable: Interactable) -> void:
 	if RunManager.run == null:
 		return
+	if _try_sell_to_vendor():
+		return
 	var item_def := ItemRegistry.get_item(interactable.trade_item_id)
 	if item_def == null:
 		return
@@ -136,6 +162,26 @@ func _handle_trade(interactable: Interactable) -> void:
 	if interactable.trade_flavor_text != "":
 		notice += " " + interactable.trade_flavor_text
 	hud.show_notification(notice)
+
+## Any TRADE-kind vendor doubles as a generic buyer: if the player is
+## carrying an item with a positive ItemDefinition.sell_price (e.g. a trophy
+## like the bear skin), interacting sells it on the spot instead of buying
+## from that vendor - "sellable at every vendor" needs no per-vendor
+## configuration. Deliberately a separate field from ItemDefinition.value
+## (which every piece of equipment already has set as flavor/worth) so this
+## doesn't retroactively make the player's gear sellable everywhere.
+func _try_sell_to_vendor() -> bool:
+	for stack in RunManager.run.inventory:
+		var item_id: String = stack.get("item_id", "")
+		var item_def := ItemRegistry.get_item(item_id)
+		if item_def != null and item_def.sell_price > 0:
+			RunManager.run.remove_item(item_id, 1)
+			RunManager.run.currency += item_def.sell_price
+			RunManager.save_current_run()
+			hud.refresh_stats()
+			hud.show_notification("Sold %s for %d gold. (%d gold now)" % [item_def.display_name, item_def.sell_price, RunManager.run.currency])
+			return true
+	return false
 
 ## Shows the yes/no/decline popup for a DIALOGUE interactable. If quest_id is
 ## set and already active/completed, a status line is shown instead of
@@ -263,3 +309,4 @@ func _open_inventory() -> void:
 func _close_inventory() -> void:
 	inventory_screen.visible = false
 	get_tree().paused = false
+	hud.refresh_stats() # Using a consumable (or equipping/unequipping) while the panel was open doesn't touch the HUD directly.

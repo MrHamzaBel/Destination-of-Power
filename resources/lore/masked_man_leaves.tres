@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="LoreScript" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/LoreScript.gd" id="1_lore"]
+
+[resource]
+script = ExtResource("1_lore")
+sections = Array[String](["He simply chuckles. \"Not yet. Grow stronger first.\" A portal tears open behind him, and he steps back through it - gone as suddenly as he arrived."])

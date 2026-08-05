@@ -20,6 +20,7 @@ enum Rarity { COMMON, UNCOMMON, RARE, EPIC, LEGENDARY }
 @export var resource_amount: int = 0 ## Consumable: flat resource restored.
 @export var value: int = 0 ## Gold value, used for shops/selling.
 @export var droppable: bool = true
+@export var sell_price: int = 0 ## If > 0, any TRADE-kind vendor buys this item on the spot for this much gold (see ExplorationArea._try_sell_to_vendor()). 0 = not generically sellable (the default for equipment/consumables the player needs to keep).
 
 static func rarity_name(rarity: Rarity) -> String:
 	match rarity:
