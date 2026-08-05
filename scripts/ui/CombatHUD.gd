@@ -13,8 +13,13 @@ extends Control
 @onready var ally_list: VBoxContainer = %AllyList
 @onready var ally_panel: PanelContainer = %AllyPanel
 @onready var turn_label: Label = %TurnLabel
+@onready var turn_order_row: HBoxContainer = %TurnOrderRow
 @onready var log_label: RichTextLabel = %LogLabel
 @onready var log_scroll: ScrollContainer = %LogScroll
+
+const TURN_ORDER_LOOKAHEAD: int = 7
+const TURN_ORDER_CURRENT_SIZE: int = 52
+const TURN_ORDER_FUTURE_SIZE: int = 36
 
 @onready var action_row: HBoxContainer = %ActionRow
 @onready var attack_button: Button = %AttackButton
@@ -124,6 +129,86 @@ func _on_turn_changed(unit: CombatUnitState) -> void:
 	else:
 		turn_label.text = "%s is acting...%s" % [unit.display_name, burst]
 		_set_actions_enabled(false)
+	_refresh_turn_order()
+
+## Rebuilds the "speed wheel" - the upcoming turn order, current actor first,
+## each token shrinking and fading the further out it is so the strip reads
+## as "soon -> later" at a glance. Only called on turn_changed (not every
+## stats_changed) so it doesn't replay its pop-in animation on every single
+## damage tick - once per actual turn is frequent enough to feel alive
+## without being distracting.
+func _refresh_turn_order() -> void:
+	for child in turn_order_row.get_children():
+		child.queue_free()
+	var upcoming := _combat.get_upcoming_turn_order(TURN_ORDER_LOOKAHEAD)
+	for i in range(upcoming.size()):
+		var is_current := i == 0
+		var token := _build_turn_icon(upcoming[i], is_current)
+		turn_order_row.add_child(token)
+
+		var target_alpha := 1.0 if is_current else clampf(1.0 - float(i) * 0.12, 0.35, 1.0)
+		token.modulate.a = 0.0
+		token.pivot_offset = token.custom_minimum_size / 2.0
+		token.scale = Vector2(0.7, 0.7)
+		var tween := create_tween()
+		tween.tween_interval(i * 0.035)
+		tween.set_parallel(true)
+		tween.tween_property(token, "modulate:a", target_alpha, 0.25)
+		tween.tween_property(token, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+## One "speed wheel" token: a colored circular badge (real artwork if the
+## unit has a texture, otherwise its initial letter on its team color),
+## bigger and gold-bordered for whoever's acting right now.
+func _build_turn_icon(unit: CombatUnitState, is_current: bool) -> Control:
+	var size := TURN_ORDER_CURRENT_SIZE if is_current else TURN_ORDER_FUTURE_SIZE
+	var root := PanelContainer.new()
+	root.custom_minimum_size = Vector2(size, size)
+	root.tooltip_text = unit.display_name
+
+	var style := StyleBoxFlat.new()
+	style.bg_color = _turn_icon_color(unit)
+	style.set_corner_radius_all(size)
+	if is_current:
+		style.border_color = Color(1.0, 0.9, 0.5, 1)
+		style.set_border_width_all(3)
+	else:
+		style.border_color = Color(0, 0, 0, 0.35)
+		style.set_border_width_all(1)
+	root.add_theme_stylebox_override("panel", style)
+
+	var tex := _turn_icon_texture(unit)
+	if tex != null:
+		var rect := TextureRect.new()
+		rect.texture = tex
+		rect.custom_minimum_size = Vector2(size, size)
+		rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		root.add_child(rect)
+	else:
+		var label := Label.new()
+		label.text = unit.display_name.substr(0, 1).to_upper()
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		label.add_theme_font_size_override("font_size", 22 if is_current else 15)
+		label.add_theme_color_override("font_color", Color.WHITE)
+		root.add_child(label)
+
+	return root
+
+func _turn_icon_color(unit: CombatUnitState) -> Color:
+	if unit.is_player:
+		var class_def := RunManager.get_class_def()
+		return class_def.portrait_color if class_def != null else Color(0.8, 0.7, 0.3)
+	if unit.is_ally:
+		return unit.ally_def.body_color if unit.ally_def != null else Color(0.3, 0.45, 0.7)
+	return unit.enemy_def.body_color if unit.enemy_def != null else Color(0.6, 0.2, 0.2)
+
+func _turn_icon_texture(unit: CombatUnitState) -> Texture2D:
+	if unit.is_ally:
+		return unit.ally_def.texture if unit.ally_def != null else null
+	if not unit.is_player:
+		return unit.enemy_def.texture if unit.enemy_def != null else null
+	return null
 
 func _set_actions_enabled(enabled: bool) -> void:
 	for button in [attack_button, abilities_button, items_button, defend_button, end_turn_button]:

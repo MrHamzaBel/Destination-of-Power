@@ -321,6 +321,19 @@ func _begin_new_round() -> void:
 	if combatants.is_empty():
 		return
 
+	_round_queue = _compute_round_order(combatants)
+	round_stage = 0
+	_advance_round_action()
+
+## Pure computation of one round's action order from a set of combatants -
+## the speed-ratio algorithm described in the class doc comment. Factored out
+## of _begin_new_round() so get_upcoming_turn_order() can preview a round
+## without committing to it (used by the turn-order UI).
+func _compute_round_order(combatants: Array[CombatUnitState]) -> Array[CombatUnitState]:
+	var queue: Array[CombatUnitState] = []
+	if combatants.is_empty():
+		return queue
+
 	var slowest_speed: float = INF
 	for c in combatants:
 		slowest_speed = minf(slowest_speed, float(maxi(1, c.speed)))
@@ -337,15 +350,38 @@ func _begin_new_round() -> void:
 		return a["unit"].speed > b["unit"].speed
 	)
 
-	_round_queue.clear()
 	for entry in entries:
 		var unit: CombatUnitState = entry["unit"]
 		var actions: int = entry["actions"]
 		for i in range(actions):
-			_round_queue.append(unit)
+			queue.append(unit)
+	return queue
 
-	round_stage = 0
-	_advance_round_action()
+## Upcoming actors in order, current turn first, for the turn-order UI.
+## Reads the rest of this round straight from _round_queue (skipping anyone
+## who has since died), then - if more entries are still wanted - previews a
+## hypothetical next round computed from currently-alive combatants. That
+## preview is a best-effort approximation (it assumes nobody's speed or
+## alive-state changes before the round actually starts), same as the "always
+## recalculated fresh" convention described in the class doc comment.
+func get_upcoming_turn_order(max_count: int = 8) -> Array[CombatUnitState]:
+	var result: Array[CombatUnitState] = []
+	var i := round_stage
+	while result.size() < max_count and i < _round_queue.size():
+		if _round_queue[i].is_alive():
+			result.append(_round_queue[i])
+		i += 1
+
+	if result.size() < max_count:
+		var combatants: Array[CombatUnitState] = [player_unit]
+		combatants.append_array(get_alive_allies())
+		combatants.append_array(get_alive_enemies())
+		var next_round := _compute_round_order(combatants)
+		var j := 0
+		while result.size() < max_count and j < next_round.size():
+			result.append(next_round[j])
+			j += 1
+	return result
 
 func _advance_round_action() -> void:
 	if _check_combat_end():
