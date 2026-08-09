@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "crystal_shard"
+display_name = "Crystal Shard"
+description = "A fist-sized shard, still faintly warm, chipped from something much larger. Any collector in Nerax would pay well for it."
+category = 3
+rarity = 3
+icon_color = Color(0.45, 0.8, 0.9, 1)
+equip_slot = ""
+is_ranged = false
+stat_modifiers = null
+heal_amount = 0
+resource_amount = 0
+value = 90
+droppable = true
+sell_price = 90

@@ -236,6 +236,48 @@ shape = SubResource("InteractShape")
 color = Color(0.32, 0.45, 0.3, 1)
 polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
 
+[node name="JuniorClerkInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-60, -150)
+script = ExtResource("6_interactable")
+display_name = "Junior Clerk"
+kind = 6
+dialogue_prompt = "\"Oh - are you here about the rat problem?\" the junior clerk asks, barely looking up from his ledger. \"They keep getting into the stores behind the alley. Six of them, and there's a few coins in it for whoever deals with it.\""
+dialogue_yes_text = "\"Much appreciated,\" he says, already back to his ledger."
+dialogue_no_text = "\"Suit yourself. They'll still be there later.\""
+dialogue_decline_text = "He shrugs and goes back to his paperwork."
+dialogue_quest_active_text = "\"Still six rats too many out there,\" he mutters without looking up."
+quest_id = "pest_control"
+
+[node name="Shape" type="CollisionShape2D" parent="JuniorClerkInteract"]
+shape = SubResource("InteractShape")
+
+[node name="JuniorClerkVisual" type="Polygon2D" parent="JuniorClerkInteract"]
+color = Color(0.45, 0.4, 0.3, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="GuildScoutElinInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-220, 130)
+script = ExtResource("6_interactable")
+display_name = "Guild Scout Elin"
+kind = 6
+dialogue_prompt = "\"You look capable,\" a woman in guild colors says, studying a hand-drawn map. \"I'm Elin - I scout leads for the guild. Word's reached us of a sealed cavern far south, past the outskirts. I need someone to find it and report back before we risk a real expedition. Interested?\""
+dialogue_yes_text = "\"Good. Head south past the lake and the old tree, then keep going - there's a path that hasn't been mapped yet. Report back once you've seen it.\""
+dialogue_no_text = "\"Fair enough. It'll still be there if you change your mind.\""
+dialogue_decline_text = "\"No harm in asking,\" she says, and goes back to her map."
+dialogue_quest_active_text = "\"Any sign of that cavern yet?\" Elin asks, watching the southern road."
+quest_id = "into_the_hollow"
+
+[node name="Shape" type="CollisionShape2D" parent="GuildScoutElinInteract"]
+shape = SubResource("InteractShape")
+
+[node name="GuildScoutElinVisual" type="Polygon2D" parent="GuildScoutElinInteract"]
+color = Color(0.35, 0.42, 0.45, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
 [node name="LoungeDoorFacade" type="Polygon2D" parent="."]
 position = Vector2(220, -190)
 color = Color(0.4, 0.3, 0.24, 1)

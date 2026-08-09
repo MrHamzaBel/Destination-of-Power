@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 95
+max_resource = 0
+attack = 11
+intelligence = 2
+defense = 15
+speed = 2
+
+[resource]
+script = ExtResource("1_enemy")
+id = "underground_thug_tank"
+display_name = "Hulking Enforcer"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_healing_potion",
+"chance": 0.25
+}]
+behavior_type = 1
+level = 6
+xp_reward = 22
+currency_reward = 12
+body_color = Color(0.3, 0.26, 0.24, 1)
+shape_points = PackedVector2Array(-13, -20, 13, -20, 16, -2, 13, 18, -13, 18, -16, -2)
+intro_quote = "\"Come to bother us, huh?\" He cracks his knuckles slowly. \"Not going anywhere.\""
+on_defeat_counter_id = "underground_thugs_defeated"

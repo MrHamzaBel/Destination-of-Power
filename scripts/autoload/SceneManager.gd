@@ -23,6 +23,8 @@ const NERAX_OUTSKIRTS: String = "res://scenes/world/NeraxOutskirts.tscn"
 const FAR_REACHES: String = "res://scenes/world/FarReaches.tscn"
 const MASKED_MAN_ENCOUNTER: String = "res://scenes/world/MaskedManEncounter.tscn"
 const DEEP_FOREST: String = "res://scenes/world/DeepForest.tscn"
+const WHISPERING_HOLLOW: String = "res://scenes/world/WhisperingHollow.tscn"
+const GARRISON_WARD: String = "res://scenes/world/GarrisonWard.tscn"
 
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect

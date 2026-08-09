@@ -185,8 +185,15 @@ func _try_sell_to_vendor() -> bool:
 
 ## Shows the yes/no/decline popup for a DIALOGUE interactable. If quest_id is
 ## set and already active/completed, a status line is shown instead of
-## re-running the same pitch.
+## re-running the same pitch. required_guild_rank_order/locked_message (the
+## same fields EXIT already uses) let a DIALOGUE quest-giver be rank-gated
+## too - blocked before the prompt ever shows, not just before the reward.
 func _open_dialogue(interactable: Interactable) -> void:
+	if interactable.required_guild_rank_order >= 0:
+		var rank_def := RunManager.get_guild_rank_def()
+		if rank_def == null or rank_def.order < interactable.required_guild_rank_order:
+			hud.show_notification(interactable.locked_message if interactable.locked_message != "" else "You don't have the rank for this yet.")
+			return
 	if interactable.quest_id != "" and RunManager.is_quest_completed(interactable.quest_id):
 		if interactable.dialogue_quest_done_text != "":
 			hud.show_notification(interactable.dialogue_quest_done_text)

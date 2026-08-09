@@ -1,13 +1,13 @@
 extends ExplorationArea
-## The path south of the outskirts, past the forest and lake. Intentionally
-## minimal for now (a single connected clearing with a way back) - not
-## locked, not a dead end, just not built out yet.
+## The path south of the outskirts, past the forest and lake - a short
+## connecting clearing between the outskirts and the sealed cavern entrance
+## down into the Whispering Hollow.
 
 func get_scene_path() -> String:
 	return SceneManager.FAR_REACHES
 
 func get_objective_text() -> String:
-	return "The road continues, but there's nothing out here yet."
+	return "A crack in the earth leads down, further south."
 
 func _on_area_ready() -> void:
 	if RunManager.run == null:
@@ -16,4 +16,4 @@ func _on_area_ready() -> void:
 		return
 	RunManager.run.story_flags["far_reaches_intro_shown"] = true
 	RunManager.save_current_run()
-	hud.show_notification("The path trails off into open, untamed country. Whatever lies further south hasn't been mapped yet.")
+	hud.show_notification("The path trails off into open, untamed country - but a jagged crack in the ground nearby leads down into darkness.")

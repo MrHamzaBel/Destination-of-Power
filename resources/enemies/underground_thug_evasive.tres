@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 62
+max_resource = 0
+attack = 9
+intelligence = 2
+defense = 13
+speed = 22
+
+[resource]
+script = ExtResource("1_enemy")
+id = "underground_thug_evasive"
+display_name = "Shadowstep Thug"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_healing_potion",
+"chance": 0.2
+}]
+behavior_type = 1
+level = 6
+xp_reward = 21
+currency_reward = 11
+body_color = Color(0.24, 0.24, 0.3, 1)
+shape_points = PackedVector2Array(-10, -18, 10, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+intro_quote = "\"You'll never land a hit,\" she smirks, already circling around you."
+on_defeat_counter_id = "underground_thugs_defeated"

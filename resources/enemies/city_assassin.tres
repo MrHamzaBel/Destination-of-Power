@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 110
+max_resource = 0
+attack = 20
+intelligence = 8
+defense = 10
+speed = 16
+
+[resource]
+script = ExtResource("1_enemy")
+id = "city_assassin"
+display_name = "Masked Assassin"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_healing_potion",
+"chance": 0.4
+}, {
+"item_id": "minor_mana_potion",
+"chance": 0.3
+}]
+behavior_type = 0
+level = 8
+xp_reward = 45
+currency_reward = 20
+body_color = Color(0.14, 0.13, 0.18, 1)
+shape_points = PackedVector2Array(-10, -20, 10, -20, 13, -2, 10, 18, -10, 18, -13, -2)
+intro_quote = "\"You noticed me. Impressive.\" A blade glints in the dark. \"A shame it won't matter.\""
+dodge_uses_speed = true
+on_defeat_story_flag_id = "city_assassin_defeated"
+haste_spell_chance = 0.35
+haste_multiplier = 2.0
+haste_duration_rounds = 4

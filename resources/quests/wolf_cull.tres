@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/QuestDefinition.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "wolf_cull"
+display_name = "Wolf Cull"
+description = "Wolves have been getting bold along the forest road. Only guild members with a proven standing get put forward for this one."
+objective_text = "Cull 7 wolves in the Deep Forest."
+reward_gold = 14
+reward_exp = 22
+reward_stat_points = 0
+reward_item_ids = Array[String]([])
+reward_artifact_id = ""
+reward_guild_progress = 4
+repeatable = true
+objective_enemy_id = "forest_wolf"
+objective_kill_count = 7

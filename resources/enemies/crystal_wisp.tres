@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 26
+max_resource = 0
+attack = 8
+intelligence = 9
+defense = 3
+speed = 14
+
+[resource]
+script = ExtResource("1_enemy")
+id = "crystal_wisp"
+display_name = "Crystal Wisp"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_mana_potion",
+"chance": 0.25
+}]
+behavior_type = 2
+level = 8
+xp_reward = 9
+currency_reward = 4
+body_color = Color(0.45, 0.8, 0.9, 1)
+shape_points = PackedVector2Array(0, -12, 8, -6, 8, 6, 0, 12, -8, 6, -8, -6)
+intro_quote = "The wisp's glow sharpens into something almost like anger."
+absorbs_first_hit = true

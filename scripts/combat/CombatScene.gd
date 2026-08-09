@@ -21,6 +21,7 @@ func _ready() -> void:
 	appearance.apply_profile(RunManager.character_profile)
 
 	hud.bind(combat_manager)
+	combat_manager.roster_changed.connect(_spawn_enemy_visuals)
 
 	combat_manager.start(SceneManager.pending_combat_enemy_ids, SceneManager.pending_combat_ally_ids)
 	_spawn_enemy_visuals()

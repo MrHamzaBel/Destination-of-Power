@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "heart_of_the_hollow"
+display_name = "Heart of the Hollow"
+description = "A shard of crystallized resilience torn from the Hollow Warden's core. It hums faintly, lending its wearer both a harder shell and a sharper mind."
+rarity = 4
+icon_color = Color(0.4, 0.75, 0.85, 1)
+effect_id = "heart_of_the_hollow"
+effect_values = {
+"defense_bonus": 8,
+"intelligence_bonus": 6
+}
+stacking_allowed = false
+class_restrictions = Array[String]([])
+random_drop_eligible = false

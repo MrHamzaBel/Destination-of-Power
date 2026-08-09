@@ -20,6 +20,7 @@ signal log_message(text: String)
 signal stats_changed
 signal turn_changed(unit: CombatUnitState)
 signal combat_finished(victory: bool)
+signal roster_changed ## Emitted when enemies are added mid-combat (e.g. an enrage summon) - CombatScene re-spawns visuals in response.
 
 const CRIT_MULTIPLIER: float = 1.5
 ## Damage-formula safety bounds: attack-over-defense can boost damage up to
@@ -229,9 +230,19 @@ static func dodge_chance(attacker_speed: int, defender_speed: int) -> float:
 func _rolls_dodge(attacker: CombatUnitState, defender: CombatUnitState) -> bool:
 	if defender.enemy_def == null or not defender.enemy_def.dodge_uses_speed:
 		return false
-	if _rng.randf() >= dodge_chance(attacker.speed, defender.speed):
+	if _rng.randf() >= dodge_chance(attacker.get_effective_speed(), defender.get_effective_speed()):
 		return false
 	_log("%s is too quick - %s's attack whiffs completely!" % [defender.display_name, attacker.display_name])
+	return true
+
+## True (and logs the shatter) exactly once per combat if `defender` has a
+## shimmering shield that absorbs its very first hit - after that it behaves
+## like a normal defender for the rest of the fight.
+func _rolls_shield(attacker: CombatUnitState, defender: CombatUnitState) -> bool:
+	if defender.enemy_def == null or not defender.enemy_def.absorbs_first_hit or defender.has_absorbed_hit:
+		return false
+	defender.has_absorbed_hit = true
+	_log("%s's shimmering shield absorbs %s's attack completely, then shatters!" % [defender.display_name, attacker.display_name])
 	return true
 
 ## Records the most recent hit the player took - not necessarily fatal, but
@@ -268,7 +279,7 @@ func _perform_player_attack(power: float, uses_intelligence: bool, is_ranged: bo
 	var is_crit := crit_chance > 0.0 and _rng.randf() < crit_chance
 	if is_crit:
 		post_artifact_damage = int(round(float(post_artifact_damage) * CRIT_MULTIPLIER))
-	if _rolls_dodge(player_unit, target):
+	if _rolls_dodge(player_unit, target) or _rolls_shield(player_unit, target):
 		stats_changed.emit()
 		_finish_action()
 		return
@@ -283,6 +294,8 @@ func _perform_player_attack(power: float, uses_intelligence: bool, is_ranged: bo
 	stats_changed.emit()
 	if not target.is_alive():
 		_on_enemy_defeated(target)
+	else:
+		_check_enrage(target)
 	_check_health_low(target)
 	_finish_action()
 
@@ -321,6 +334,12 @@ func _begin_new_round() -> void:
 	if combatants.is_empty():
 		return
 
+	# Speed debuffs (e.g. a mage's freeze) last a number of rounds, not turns -
+	# tick them here, before this round's order is computed, so an expiring
+	# freeze is already gone by the round it wears off.
+	for c in combatants:
+		c.tick_speed_debuff()
+
 	_round_queue = _compute_round_order(combatants)
 	round_stage = 0
 	_advance_round_action()
@@ -336,18 +355,18 @@ func _compute_round_order(combatants: Array[CombatUnitState]) -> Array[CombatUni
 
 	var slowest_speed: float = INF
 	for c in combatants:
-		slowest_speed = minf(slowest_speed, float(maxi(1, c.speed)))
+		slowest_speed = minf(slowest_speed, float(maxi(1, c.get_effective_speed())))
 
 	# One entry per combatant: how many actions it gets this round.
 	var entries: Array[Dictionary] = []
 	for c in combatants:
-		var speed: float = float(maxi(1, c.speed))
+		var speed: float = float(maxi(1, c.get_effective_speed()))
 		var actions: int = maxi(1, int(floor(speed / slowest_speed)))
 		entries.append({"unit": c, "actions": actions})
 	entries.sort_custom(func(a, b) -> bool:
 		if a["actions"] != b["actions"]:
 			return a["actions"] > b["actions"]
-		return a["unit"].speed > b["unit"].speed
+		return a["unit"].get_effective_speed() > b["unit"].get_effective_speed()
 	)
 
 	for entry in entries:
@@ -456,6 +475,7 @@ func _apply_poison_tick(unit: CombatUnitState) -> void:
 		if not unit.is_player and not unit.is_ally:
 			_on_enemy_defeated(unit)
 	else:
+		_check_enrage(unit)
 		_check_health_low(unit)
 
 ## Allies are always AI-controlled: they focus whatever enemy the player has
@@ -468,7 +488,7 @@ func _ally_take_single_action(ally: CombatUnitState) -> void:
 	if target == null or not target.is_alive():
 		_finish_action()
 		return
-	if _rolls_dodge(ally, target):
+	if _rolls_dodge(ally, target) or _rolls_shield(ally, target):
 		stats_changed.emit()
 		_finish_action()
 		return
@@ -479,6 +499,8 @@ func _ally_take_single_action(ally: CombatUnitState) -> void:
 	stats_changed.emit()
 	if not target.is_alive():
 		_on_enemy_defeated(target)
+	else:
+		_check_enrage(target)
 	_check_health_low(target)
 	_finish_action()
 
@@ -510,6 +532,13 @@ func _enemy_take_single_action(enemy: CombatUnitState) -> void:
 		_finish_action()
 		return
 
+	# Assassin special: a self-buff that spends the whole turn instead of attacking -
+	# only recast once the previous haste has actually worn off, not every eligible turn.
+	if def != null and def.haste_spell_chance > 0.0 and enemy.speed_debuff_turns_remaining <= 0 and _rng.randf() < def.haste_spell_chance:
+		_perform_haste_spell(enemy, def)
+		_finish_action()
+		return
+
 	var party := _get_alive_party_members()
 	if party.is_empty():
 		_finish_action()
@@ -521,6 +550,21 @@ func _enemy_take_single_action(enemy: CombatUnitState) -> void:
 		_perform_enemy_poison_attack(enemy, target, def)
 		_finish_action()
 		return
+
+	# Miniboss special: a low-damage spell with a chance to halve the target's Speed for a few rounds.
+	if def != null and def.ice_spell_chance > 0.0 and _rng.randf() < def.ice_spell_chance:
+		_perform_ice_spell(enemy, target, def)
+		_finish_action()
+		return
+
+	# Boss special: needs several of its own turns to wind up before it actually lands a hit.
+	if def != null and def.charges_before_attack > 1:
+		enemy.charge_progress += 1
+		if enemy.charge_progress < def.charges_before_attack:
+			_log("%s winds up for a devastating blow..." % enemy.display_name)
+			_finish_action()
+			return
+		enemy.charge_progress = 0
 
 	if _decide_enemy_defends(enemy):
 		enemy.is_defending = true
@@ -581,14 +625,75 @@ func _perform_enemy_poison_attack(attacker: CombatUnitState, target: CombatUnitS
 	var raw_damage := int(round(float(attacker.attack) * 0.6 * multiplier))
 	var dealt := target.apply_damage(raw_damage)
 	target.apply_poison(def.poison_damage_per_turn, def.poison_duration_turns, attacker.display_name, def.level)
-	_log("%s lands a venomous strike on %s for %d damage - poisoned for %d turns!" % [
+	_log("%s lands a debilitating strike on %s for %d damage - poisoned for %d turns!" % [
 		attacker.display_name, target.display_name, dealt, def.poison_duration_turns
 	])
 	stats_changed.emit()
 	if target.is_player:
 		EventBus.player_took_damage.emit({"combat": self, "amount": dealt})
-		_record_death_info(attacker.display_name, def.level, "a venomous strike")
+		_record_death_info(attacker.display_name, def.level, "a debilitating strike")
 	_check_health_low(target)
+
+## Low direct damage, but a chance to halve the target's Speed for a few
+## rounds - unlike poison, this never deals residual damage, it just makes
+## the target act less often (see CombatUnitState.get_effective_speed()).
+func _perform_ice_spell(attacker: CombatUnitState, target: CombatUnitState, def: EnemyDefinition) -> void:
+	var multiplier := _resolve_damage_multiplier(attacker, target)
+	var raw_damage := int(round(float(attacker.attack) * 0.4 * multiplier))
+	var dealt := target.apply_damage(raw_damage)
+	var froze := _rng.randf() < def.ice_freeze_chance
+	if froze:
+		target.apply_speed_debuff(def.ice_freeze_multiplier, def.ice_freeze_duration_rounds)
+	_log("%s casts a freezing spell on %s for %d damage%s" % [
+		attacker.display_name, target.display_name, dealt,
+		" - their Speed is frozen!" if froze else "."
+	])
+	stats_changed.emit()
+	if target.is_player:
+		EventBus.player_took_damage.emit({"combat": self, "amount": dealt})
+		_record_death_info(attacker.display_name, def.level, "an ice spell")
+	_check_health_low(target)
+
+## Assassin special: buffs its own Speed for several rounds instead of
+## attacking this turn - the exact same mechanism as the ice spell's freeze
+## (CombatUnitState.apply_speed_debuff()), just with a multiplier above 1.0
+## instead of below it, so no new state needed on the unit at all.
+func _perform_haste_spell(caster: CombatUnitState, def: EnemyDefinition) -> void:
+	caster.apply_speed_debuff(def.haste_multiplier, def.haste_duration_rounds)
+	_log("%s murmurs a quickening word and blurs with sudden speed!" % caster.display_name)
+	stats_changed.emit()
+
+## Boss special: a one-time self-heal plus fresh reinforcements once this
+## unit's health drops to/below EnemyDefinition.enrages_below_health_percent.
+## Checked alongside _check_health_low() at every place an enemy takes damage.
+func _check_enrage(unit: CombatUnitState) -> void:
+	if unit.is_player or unit.is_ally or unit.enemy_def == null or not unit.is_alive():
+		return
+	var def := unit.enemy_def
+	if def.enrages_below_health_percent <= 0.0 or unit.has_enraged:
+		return
+	if float(unit.current_health) / float(unit.max_health) > def.enrages_below_health_percent:
+		return
+	unit.has_enraged = true
+	var heal_amount := int(round(float(unit.max_health) * def.enrage_heal_percent))
+	unit.current_health = mini(unit.max_health, unit.current_health + heal_amount)
+	_log("%s roars and tears its wounds shut, recovering %d health!" % [unit.display_name, heal_amount])
+	if def.enrage_summon_id != "" and def.enrage_summon_count > 0:
+		_summon_fresh_enemies(def.enrage_summon_id, def.enrage_summon_count)
+		_log("%s calls for reinforcements!" % unit.display_name)
+	stats_changed.emit()
+
+## Adds brand-new, full-health enemies to an ongoing fight (e.g. an enrage
+## summon). enemy_units is read fresh by _begin_new_round() every round, so
+## the newcomers are automatically included in the very next round's turn
+## order with no further wiring - only the visuals need telling (roster_changed).
+func _summon_fresh_enemies(enemy_id: String, count: int) -> void:
+	var summon_def := EnemyRegistry.get_enemy(enemy_id)
+	if summon_def == null:
+		return
+	for i in range(count):
+		enemy_units.append(CombatUnitState.from_enemy(summon_def))
+	roster_changed.emit()
 
 func _decide_enemy_defends(enemy: CombatUnitState) -> bool:
 	var def := enemy.enemy_def
@@ -619,8 +724,17 @@ func _on_enemy_defeated(enemy: CombatUnitState) -> void:
 		RunManager.run.add_artifact(guaranteed_id)
 		(last_rewards["guaranteed_artifacts"] as Array).append(guaranteed_id)
 
+	if enemy.enemy_def != null and enemy.enemy_def.guarantees_random_artifact:
+		var random_artifact := ArtifactRegistry.get_random(_rng, RunManager.run.class_id)
+		if random_artifact != null:
+			RunManager.run.add_artifact(random_artifact.id)
+			(last_rewards["guaranteed_artifacts"] as Array).append(random_artifact.id)
+
 	if enemy.enemy_def != null and enemy.enemy_def.on_defeat_story_flag_id != "":
 		RunManager.run.story_flags[enemy.enemy_def.on_defeat_story_flag_id] = true
+
+	if enemy.enemy_def != null and enemy.enemy_def.on_defeat_counter_id != "":
+		RunManager.increment_counter(enemy.enemy_def.on_defeat_counter_id)
 
 	if enemy.enemy_def != null:
 		var completed_quests := RunManager.register_enemy_kill_for_quests(enemy.enemy_def.id)

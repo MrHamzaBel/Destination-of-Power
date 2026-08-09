@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/QuestDefinition.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "guild_grudge"
+display_name = "The Guild's Grudge"
+description = "The guild has had a standing bounty on the Underground Warlord for months - nobody's collected it yet. Only adventurers with a proven track record get put forward for this one."
+objective_text = "Defeat the Underground Warlord."
+reward_gold = 25
+reward_exp = 40
+reward_stat_points = 1
+reward_item_ids = Array[String]([])
+reward_artifact_id = ""
+reward_guild_progress = 8
+repeatable = false
+objective_enemy_id = ""
+objective_kill_count = 0

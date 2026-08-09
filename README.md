@@ -93,7 +93,9 @@ scenes/world/DeeperAlley.tscn        - the alley's other path; the Sticky-Finger
 scenes/world/UndergroundNerax.tscn  - minimal stub beneath the Deeper Alley, not built out yet
 scenes/world/Market.tscn             - Southside's long market street, Plaza <-> the southern gate
 scenes/world/NeraxOutskirts.tscn    - beyond the gate: forest (bees) east, lake west
-scenes/world/FarReaches.tscn         - minimal stub south of the outskirts, not built out yet
+scenes/world/FarReaches.tscn         - short connecting clearing south of the outskirts
+scenes/world/WhisperingHollow.tscn   - sealed crystal cavern: Crystal Wisps, the Hollow Warden
+scenes/world/GarrisonWard.tscn       - military district west of the Market: knights, a rushing assassin
 scenes/world/MaskedManEncounter.tscn - one-time cinematic: a masked man taunts the player in the forest
 scenes/world/DeepForest.tscn         - bigger forest beyond the portal: sleeping bear, hunter
 scenes/world/EncounterScreen.tscn- hub for the randomized run sequence
@@ -170,22 +172,24 @@ Exploration is now a small connected map, not a single room:
 ```
                                 DeeperAlley (narrower, darker; the Sticky-Fingered Thug ambushes here)
                                     <-- one exit up -->            <-- one exit down -->
-BackAlley (spawn point) -------------^                        UndergroundNerax (minimal stub, more to come)
-    <-- one exit -->
+BackAlley (spawn point) -------------^                        UndergroundNerax (4 thugs + mage, a trader,
+    <-- one exit -->                                                            an informant, then the Warlord)
 TwoWayAlley (junction; has the alley trader)
     <-- one exit -->                    <-- other exit -->
   (back to BackAlley)                 Plaza (Nerax's central plaza; food vendor, swindler, adventurer NPC)
                                            <-- city gate -->        <-- guild hall door -->             <-- market exit -->
-                                EncounterScreen (randomized run)   AdventureCentrum (loot sellers,     Market (long street, houses)
-                                                                     receptionist, mission board)              |
-                                                                        <-- lounge door (C-Rank+) -->    <-- southern gate -->
-                                                                    GuildLounge (member-priced shop)   NeraxOutskirts (forest w/ bees
-                                                                                                         east, lake west)
-                                                                                                                |
-                                                                       <-- deeper into the forest -->    <-- open path -->
-                                                              MaskedManEncounter (first time only)     FarReaches (minimal stub)
-                                                                        v
-                                                                  DeepForest (bear + hunter, bigger)
+                                EncounterScreen (randomized run)   AdventureCentrum (loot sellers,     Market (long street, houses,
+                                                                     receptionist, mission board)        a vendor, a resident)
+                                                                        <-- lounge door (C-Rank+) -->    |              |
+                                                                    GuildLounge (member-priced shop)     |         <-- southern gate -->
+                                                              <-- west exit -->                          |       NeraxOutskirts (forest w/ bees
+                                                        GarrisonWard (knight, mercenary,                 |        east, lake west)
+                                                         a rushing assassin - D-Rank mission)             |              |
+                                                                                                    (back to Plaza)  <-- deeper into the forest -->    <-- open path -->
+                                                                                                                    MaskedManEncounter (first time only)     FarReaches
+                                                                                                                              v                                     |
+                                                                                                                        DeepForest (bear + hunter, bigger)    <-- crack in the earth -->
+                                                                                                                                                             WhisperingHollow (wisps + Warden)
 ```
 
 Every `Interactable` of kind `EXIT` carries its own `exit_target_scene`, so the map graph is just data sitting in each scene file - there's no separate "level graph" resource to keep in sync. Add a new area by making a new `.tscn` + a two-line `ExplorationArea` subclass (see above) and pointing an `EXIT` interactable at it.
@@ -224,7 +228,53 @@ The boss fight itself exercises two new, fully generic `EnemyDefinition` minibos
 
 ### Southside Market, the gate, and the outskirts
 
-The Plaza has a third exit south (`ExitToMarket`) into `scenes/world/Market.tscn` - a long street lined with houses connecting the Plaza to Nerax's southern gate. Past the gate is `scenes/world/NeraxOutskirts.tscn`: forest to the east (bees nest by the old tree, near a repeatable `COMBAT` `Interactable` spawning 3 `forest_bee` at once - no escalation or respawn-chance logic like the Rat Den, just a plain always-available fight), a decorative lake to the west, and an open path south continuing to `scenes/world/FarReaches.tscn` - unlocked (no `required_guild_rank_order`), intentionally minimal for now, same "not a dead end" treatment as `UndergroundNerax.tscn`.
+The Plaza has a third exit south (`ExitToMarket`) into `scenes/world/Market.tscn` - a long street lined with houses connecting the Plaza to Nerax's southern gate, now with two residents of its own: a **Market Vendor** (`TRADE`, sells `minor_mana_potion` - a second, surface-level source for it so players don't have to trek all the way to the Underground trader just to restock) and a **Local Resident** (`MESSAGE`, gossiping about the strange lights and sealed cave further south - a bit of connective flavor text pointing at the Whispering Hollow before the player's even reached the outskirts). Past the gate is `scenes/world/NeraxOutskirts.tscn`: forest to the east (bees nest by the old tree, near a repeatable `COMBAT` `Interactable` spawning 3 `forest_bee` at once - no escalation or respawn-chance logic like the Rat Den, just a plain always-available fight), a decorative lake to the west, and an open path south continuing to `scenes/world/FarReaches.tscn`, itself now leading on to the Whispering Hollow (see below).
+
+### The Garrison Ward: haste, a rushing assassin, and D-Rank's mission
+
+The Market has a second new exit, this time west (`ExitToGarrison`, its own wall-split following the same top/bottom-gap pattern used everywhere else, just rotated onto the left wall) into `scenes/world/GarrisonWard.tscn` - a military district, freely explorable at any rank. A knight and a mercenary (both plain `MESSAGE` NPCs) discuss half the Southside garrison being pulled north on the Crown's orders, and a posted decree makes it official - scene-setting for a bigger threat than one assassin, without committing to what it is yet.
+
+**A genuine ambush, not a walk-up fight.** The Masked Assassin is a `RushingEnemy` (the same mechanic the Deeper Alley robber uses) lurking in the ward - strong stats, `dodge_uses_speed` (fitting, for an assassin), and a new signature move.
+
+**Haste - the mirror image of the ice mage's freeze.** `EnemyDefinition.haste_spell_chance`/`haste_multiplier`/`haste_duration_rounds` reuse the exact same mechanism the freeze debuff already uses (`CombatUnitState.apply_speed_debuff()`/`get_effective_speed()`) - just with a multiplier above 1.0 instead of below it, so no new state was needed on the unit at all. Casting it costs the assassin his whole turn (no attack that turn), and `CombatManager._enemy_take_single_action()` guards against recasting it while already hasted (checked via `speed_debuff_turns_remaining > 0`), so it reads as a real "burst window" that has to wear off first rather than something he can chain forever. Verified: casting doubles his effective Speed for exactly 4 rounds, decaying back to normal on schedule, and forcing the cast chance to 100% while already hasted still doesn't recast it - he attacks normally instead.
+
+Defeating him resolves **A Blade in the Dark** if it's active - offered by a new **Watch Sergeant** NPC back in the Market, D-Rank and up (`required_guild_rank_order = 2`), using the exact same rank-gated-`DIALOGUE` mechanism described below. Same "return here implies it happened" completion pattern as The Guild's Grudge: `GarrisonWard.gd._check_blade_quest_completion()` checks `RunData.story_flags["city_assassin_defeated"]` (set automatically by his `on_defeat_story_flag_id`) every time the scene loads, and the same flag also permanently `queue_free()`s the `RushingEnemy` node so he doesn't come back.
+
+### Rank-gated missions, and three more guild missions
+
+`Interactable` already had `required_guild_rank_order`/`locked_message` for gating `EXIT` transitions (the Guild Lounge door) - `ExplorationArea._open_dialogue()` now checks the exact same two fields before showing a `DIALOGUE` quest-giver's prompt at all, so a quest-giver NPC can be rank-gated with zero new data fields, just by setting `required_guild_rank_order` on its `Interactable`. Below E-Rank, talking to a gated NPC shows the `locked_message` instead of the pitch; the quest is never even offered, not just hidden after the fact.
+
+Two new missions use this:
+- **The Guild's Grudge** (Underground) - a new NPC, the **Frightened Merchant**, hiding just past the entrance (his own `Interactable` is the one with `required_guild_rank_order = 1`). Accepting posts a bounty on the Underground Warlord; completion isn't kill-count or arrival-based like earlier quests, but a third pattern - `UndergroundNerax.gd._check_grudge_quest_completion()` checks the quest is active and `RunData.story_flags["underground_boss_defeated"]` (already set by the Warlord's own `on_defeat_story_flag_id`) every time the scene loads, same "return here implies it happened" convention `_check_boss_trigger()` already uses.
+
+**Wolf Cull** (offered by the **Guild Receptionist** in the Adventure Centrum, not a field-gated quest-giver): originally lived on the Deep Forest Hunter, but the Hunter can permanently vanish - selling him the bear skin makes him leave for good (`visible`/`monitorable`/`monitoring` all cleared, persisted via `story_flag_id`), which could soft-lock the quest for the rest of the run if that happened before the wolf offer was ever seen. `AdventureCentrum.gd._talk_to_receptionist()` now offers it (E-Rank+, inline check, same condition the Hunter used to gate on) ahead of her normal enrollment/rank-up business whenever it's available, falling through to `_handle_guild_receptionist()` otherwise - a repeatable "cull 7 Forest Wolves" mission against the pack enemy at `resources/enemies/forest_wolf.tres` (`WolfPackInteract` in Deep Forest, 2 at a time, same pattern as the bee/wisp swarms). The Hunter himself is back to just the icebreaker and the bear-skin sale.
+- **Pest Control**, **Into the Hollow** → **Hollow Menace** - covered above and below; all of these plus Kill the Bees now feed the same `RunData.guild_progress` pool.
+
+### The Whispering Hollow, and two new guild missions
+
+`FarReaches.tscn` (previously a genuine dead-end stub) now leads somewhere: a crack in its south wall opens into `scenes/world/WhisperingHollow.tscn`, a sealed crystal cavern. Repeatable Crystal Wisps drift freely (a `COMBAT` interactable spawning 3 at once, same pattern as the forest bees), an old inscription hints at why the cavern was sealed at all, and the Hollow Warden waits at the back - a one-shot boss guaranteeing **Heart of the Hollow** (a passive Legendary artifact, +8 Defense/+6 Intelligence, `random_drop_eligible = false`) and two **Crystal Shards** (a new trophy item, `sell_price = 90`, sellable at any vendor the same way the Deep Forest's bear skin already is).
+
+**A new combat mechanic, from the Crystal Wisps: a one-time shield.** `EnemyDefinition.absorbs_first_hit` negates the very first hit an enemy takes each combat entirely (`CombatUnitState.has_absorbed_hit`, `CombatManager._rolls_shield()`) - structurally the same one-time-guard shape as the enrage/dodge checks, just unconditional on the first hit rather than a per-hit roll. Checked at the same call sites as `_rolls_dodge()`, so it composes with dodge automatically for any future enemy that has both. Verified: the first attack against a wisp is fully absorbed and shatters the shield; every attack after that lands normally.
+
+**Two new missions**, both posted from the Adventure Centrum and both feeding `RunData.guild_progress` (see the Adventurers' Guild section above) the same way Kill the Bees already does:
+- **Pest Control** (Junior Clerk, a new NPC) - repeatable, kill 6 `alley_rat`. A low-stakes F-Rank-friendly starter mission using nothing but the existing kill-count quest machinery.
+- **Into the Hollow** / **Hollow Menace** - a small two-quest chain through one new NPC, **Guild Scout Elin**. `AdventureCentrum.gd` overrides `_on_interactable_triggered()` for her (same pattern as the Deep Forest hunter's inventory-dependent dialogue): she offers the one-shot "scout the cavern" quest first (completed on arrival at the Hollow, same "explore this place" pattern Find Wassim uses), and once that's done, always offers the repeatable "cull 8 Crystal Wisps" follow-up instead - a lightweight, reusable way to chain quests through a single NPC without a new dialogue system.
+
+### The Underground: four thugs, a trader, and the Warlord
+
+`UndergroundNerax.tscn` (beneath the Deeper Alley) grew from a one-room stub into a real fight: four separate `COMBAT` interactables (three regular thugs, one mage miniboss), each one-shot with its own `story_flag_id` so they can be fought in **any order**, plus a `TRADE` interactable selling Minor Mana Potions (`resources/items/minor_mana_potion.tres`, restores the class resource instead of health). Interacting with any of them is the "anger" - `EnemyDefinition.intro_quote` supplies each one's taunt, logged the instant combat starts.
+
+**Two new generic combat mechanics, introduced by the mage:**
+- **A Speed debuff ("frozen").** `EnemyDefinition.ice_spell_chance`/`ice_freeze_chance`/`ice_freeze_multiplier`/`ice_freeze_duration_rounds` - a low-damage spell with a chance to multiply the target's Speed (`CombatUnitState.apply_speed_debuff()`/`get_effective_speed()`) for a few rounds. Every place Speed previously mattered (`_compute_round_order()`'s turn ordering, `dodge_chance()`) now reads `get_effective_speed()` instead of raw `speed`, so a frozen unit visibly acts less often and dodges worse without any special-casing elsewhere. Debuffs tick down once per round (`_begin_new_round()`), not per-turn like poison, since Speed only matters for round-wide ordering.
+- **A shared kill counter driving an instant boss ambush.** `EnemyDefinition.on_defeat_counter_id` increments a `RunData.counters` key on defeat - all four underground enemies point at the same `"underground_thugs_defeated"` key. `UndergroundNerax.gd._check_boss_trigger()`, run every time the scene loads (including the instant the player returns from whichever fight happened to be the last one), starts the boss fight automatically once that counter hits 4 - so it genuinely doesn't matter which of the four is defeated last.
+
+**The Underground Warlord** (`resources/enemies/underground_boss.tres`) introduces two more generic mechanics:
+- **A charge attack.** `EnemyDefinition.charges_before_attack` (2 here) makes an enemy spend that many of its own turns winding up (logged, no damage) before the next one actually lands a hit (`CombatUnitState.charge_progress`) - a bulky, slow-hitting boss without needing a bespoke state machine.
+- **An enrage phase.** `EnemyDefinition.enrages_below_health_percent`/`enrage_heal_percent`/`enrage_summon_id`/`enrage_summon_count` - a one-time (`CombatUnitState.has_enraged` guard) self-heal plus fresh reinforcements, checked (`CombatManager._check_enrage()`) everywhere an enemy takes damage, same call sites as the existing `_check_health_low()`. The reinforcements are just appended to `enemy_units` - `_begin_new_round()` already rebuilds the turn order from living combatants every round, so they're included automatically; only the *visuals* need telling, via a new `roster_changed` signal that `CombatScene` uses to re-spawn enemy tokens.
+
+Defeating him drops **Warlord's Renewal** (`guaranteed_artifact_id`, rarity Legendary, `random_drop_eligible = false`) - a relic that mirrors his own mechanic back at the player, toned down: once per combat, the moment the player's health drops low (`EventBus.health_low`, the same 30%-threshold event several other systems already react to), it heals them for 25% of max health (`WarlordsRenewalEffect.gd`, `on_health_low` hook, one-shot guard reset on `on_combat_started`).
+
+The mage also guarantees its own rewards on defeat: `EnemyDefinition.guarantees_random_artifact` (a new flag, distinct from `guaranteed_artifact_id`) grants a random artifact from the normal pool instead of a fixed one, and its `loot_table` uses four separate 100%-chance entries for the same item to guarantee exactly four Minor Healing Potions - no new data structure needed for either.
 
 ### Deeper into the forest: the masked man, and the Deep Forest
 
@@ -366,6 +416,9 @@ The existing placeholder polygons are quite small in raw units (the body shape i
 4. Optional miniboss fields (all default to "off" for a plain enemy): `intro_quote` (a taunt logged once combat starts), `guaranteed_artifact_id` (a specific artifact granted on top of the normal random drop), `can_summon_minions`/`summon_minion_id` (revives a same-id fallen ally instead of attacking, when one is dead), and `poison_attack_chance`/`poison_damage_per_turn`/`poison_duration_turns` (a chance to poison its target for residual damage instead of a normal hit). See "The Rat Den & the Rat Boss" above for the shipped example of all four.
 5. Optional fleeing-enemy fields: `flees_after_turns` (bolts instead of acting once it's taken this many of its own turns; 0 = never flees) and `flee_steal_percent` (fraction of the player's current gold stolen on a successful flee), plus the generic `on_defeat_story_flag_id` (set true in `RunData.story_flags` the moment this specific enemy is actually defeated, not fled). See "Rushing enemies & the Deeper Alley" above for the shipped example.
 6. Optional `dodge_uses_speed` (every attack against this enemy rolls a Speed-based dodge chance instead of the normal damage formula - see "Dodge: a second Speed-driven combat formula" above).
+7. Optional fields from the Underground Warlord fight: `ice_spell_chance`/`ice_freeze_chance`/`ice_freeze_multiplier`/`ice_freeze_duration_rounds` (a Speed-debuffing spell), `charges_before_attack` (needs N of its own turns to land one hit), `enrages_below_health_percent`/`enrage_heal_percent`/`enrage_summon_id`/`enrage_summon_count` (a one-time self-heal-plus-reinforcements phase), `guarantees_random_artifact` (a random, not fixed, guaranteed drop), and `on_defeat_counter_id` (bumps a shared `RunData.counters` key on defeat - lets several different enemies contribute to one tally). See "The Underground: four thugs, a trader, and the Warlord" above for the shipped example of all of them.
+8. Optional `absorbs_first_hit` (negates the very first hit this enemy takes each combat, then behaves normally - see "The Whispering Hollow" above).
+9. Optional `haste_spell_chance`/`haste_multiplier`/`haste_duration_rounds` (a self-buff that spends its turn to multiply its own Speed for a few rounds, guarded against recasting while already active - see "The Garrison Ward" above).
 
 ### Add an artifact
 

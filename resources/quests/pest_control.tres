@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/QuestDefinition.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "pest_control"
+display_name = "Pest Control"
+description = "The alley rats behind the guild hall keep getting into the stores. A standing bounty for anyone willing to thin them out."
+objective_text = "Cull 6 rats in the Back Alley."
+reward_gold = 6
+reward_exp = 10
+reward_stat_points = 0
+reward_item_ids = Array[String]([])
+reward_artifact_id = ""
+reward_guild_progress = 2
+repeatable = true
+objective_enemy_id = "alley_rat"
+objective_kill_count = 6

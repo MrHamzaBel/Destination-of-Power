@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 260
+max_resource = 0
+attack = 18
+intelligence = 6
+defense = 15
+speed = 5
+
+[resource]
+script = ExtResource("1_enemy")
+id = "underground_boss"
+display_name = "The Underground Warlord"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_healing_potion",
+"chance": 0.5
+}]
+behavior_type = 0
+level = 9
+xp_reward = 70
+currency_reward = 40
+body_color = Color(0.4, 0.12, 0.14, 1)
+shape_points = PackedVector2Array(-18, -28, 18, -28, 22, -2, 18, 24, -18, 24, -22, -2)
+intro_quote = "The ground shakes. \"You've cost me four good fighters,\" the Warlord growls, hefting his weapon. \"That debt is paid in blood.\""
+guaranteed_artifact_id = "warlords_renewal"
+on_defeat_story_flag_id = "underground_boss_defeated"
+charges_before_attack = 2
+enrages_below_health_percent = 0.5
+enrage_heal_percent = 0.5
+enrage_summon_id = "back_alley_thug"
+enrage_summon_count = 2

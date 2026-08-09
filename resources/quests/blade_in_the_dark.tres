@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/QuestDefinition.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "blade_in_the_dark"
+display_name = "A Blade in the Dark"
+description = "A masked killer has been spotted stalking the Garrison Ward. Guild command wants the threat ended before it reaches Southside - only D-Rank adventurers and above are being briefed on this one."
+objective_text = "Hunt down the assassin in the Garrison Ward."
+reward_gold = 30
+reward_exp = 45
+reward_stat_points = 1
+reward_item_ids = Array[String]([])
+reward_artifact_id = ""
+reward_guild_progress = 9
+repeatable = false
+objective_enemy_id = ""
+objective_kill_count = 0

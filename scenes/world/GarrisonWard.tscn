@@ -1,0 +1,229 @@
+[gd_scene load_steps=15 format=3 uid="uid://bgarrisonward01"]
+
+[ext_resource type="Script" path="res://scripts/world/GarrisonWard.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/entities/EnemyCharacter.tscn" id="7_enemy"]
+[ext_resource type="Script" path="res://scripts/world/RushingEnemy.gd" id="8_rushing"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(720, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVFull"]
+size = Vector2(20, 520)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVSeg"]
+size = Vector2(20, 290)
+
+[sub_resource type="RectangleShape2D" id="GapShapeV"]
+size = Vector2(20, 140)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 36.0
+
+[sub_resource type="RectangleShape2D" id="BarracksShape"]
+size = Vector2(160, 50)
+
+[node name="GarrisonWard" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.2, 0.19, 0.17, 1)
+polygon = PackedVector2Array(-350, -250, 350, -250, 350, 250, -350, 250)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.26, 0.24, 0.21, 1)
+polygon = PackedVector2Array(-340, -240, 340, -240, 340, 240, -340, 240)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -250)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.13, 0.11, 0.09, 1)
+polygon = PackedVector2Array(-360, -10, 360, -10, 360, 10, -360, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, 250)
+
+[node name="Visual" type="Polygon2D" parent="WallBottom"]
+color = Color(0.13, 0.11, 0.09, 1)
+polygon = PackedVector2Array(-360, -10, 360, -10, 360, 10, -360, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottom"]
+shape = SubResource("WallShapeH")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-350, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallLeft"]
+color = Color(0.13, 0.11, 0.09, 1)
+polygon = PackedVector2Array(-10, -260, 10, -260, 10, 260, -10, 260)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WallShapeVFull")
+
+[node name="WallRightTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(350, -215)
+
+[node name="Visual" type="Polygon2D" parent="WallRightTop"]
+color = Color(0.13, 0.11, 0.09, 1)
+polygon = PackedVector2Array(-10, -145, 10, -145, 10, 145, -10, 145)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRightTop"]
+shape = SubResource("WallShapeVSeg")
+
+[node name="WallRightBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(350, 215)
+
+[node name="Visual" type="Polygon2D" parent="WallRightBottom"]
+color = Color(0.13, 0.11, 0.09, 1)
+polygon = PackedVector2Array(-10, -145, 10, -145, 10, 145, -10, 145)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRightBottom"]
+shape = SubResource("WallShapeVSeg")
+
+[node name="Banner1" type="Polygon2D" parent="."]
+position = Vector2(-250, -200)
+color = Color(0.55, 0.15, 0.15, 0.85)
+polygon = PackedVector2Array(-10, -30, 10, -30, 10, 30, 0, 20, -10, 30)
+
+[node name="Banner2" type="Polygon2D" parent="."]
+position = Vector2(250, -200)
+color = Color(0.55, 0.15, 0.15, 0.85)
+polygon = PackedVector2Array(-10, -30, 10, -30, 10, 30, 0, 20, -10, 30)
+
+[node name="Barracks" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -190)
+
+[node name="Visual" type="Polygon2D" parent="Barracks"]
+color = Color(0.42, 0.36, 0.28, 1)
+polygon = PackedVector2Array(-80, -25, 80, -25, 80, 25, -80, 25)
+
+[node name="Roof" type="Polygon2D" parent="Barracks"]
+color = Color(0.28, 0.16, 0.12, 1)
+polygon = PackedVector2Array(-90, -25, 0, -50, 90, -25)
+
+[node name="Shape" type="CollisionShape2D" parent="Barracks"]
+shape = SubResource("BarracksShape")
+
+[node name="KnightInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-150, -60)
+script = ExtResource("6_interactable")
+display_name = "Knight of Nerax"
+kind = 0
+message = "\"Orders came down from the Crown three days ago,\" a knight in Nerax colors says grimly, checking her blade. \"Half the Southside garrison's being pulled north. Something's stirring past the border - nobody's saying what, just that HQ wants steel there, not here.\""
+
+[node name="Shape" type="CollisionShape2D" parent="KnightInteract"]
+shape = SubResource("InteractShape")
+
+[node name="KnightVisual" type="Polygon2D" parent="KnightInteract"]
+color = Color(0.4, 0.42, 0.5, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="MercenaryInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(150, -60)
+script = ExtResource("6_interactable")
+display_name = "Mercenary"
+kind = 0
+message = "\"Knights leaving means less competition for us,\" a mercenary shrugs, sharpening a dagger. \"Though patrols thinning out down south makes me nervous too, if I'm honest. Guess that's why they still pay guild folk like you.\""
+
+[node name="Shape" type="CollisionShape2D" parent="MercenaryInteract"]
+shape = SubResource("InteractShape")
+
+[node name="MercenaryVisual" type="Polygon2D" parent="MercenaryInteract"]
+color = Color(0.45, 0.35, 0.24, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="NoticeInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 60)
+script = ExtResource("6_interactable")
+display_name = "Posted Decree"
+kind = 0
+message = "A freshly-posted decree, sealed with the royal crest: \"BY ORDER OF THE CROWN - GARRISON REDEPLOYMENT, EFFECTIVE IMMEDIATELY. ALL AVAILABLE KNIGHTS TO REPORT NORTH. CITIZENS ARE ASKED TO EXERCISE CAUTION.\""
+
+[node name="Shape" type="CollisionShape2D" parent="NoticeInteract"]
+shape = SubResource("InteractShape")
+
+[node name="NoticeVisual" type="Polygon2D" parent="NoticeInteract"]
+color = Color(0.5, 0.42, 0.3, 1)
+polygon = PackedVector2Array(-14, -18, 14, -18, 14, 18, -14, 18)
+
+[node name="AssassinRusher" type="CharacterBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-40, 170)
+script = ExtResource("8_rushing")
+display_name = "Masked Assassin"
+enemy_ids = Array[String](["city_assassin"])
+chase_speed = 160.0
+detection_radius = 210.0
+catch_radius = 30.0
+rush_notification = "A shape detaches from the shadows between the buildings - too quick to be anyone friendly."
+
+[node name="Shape" type="CollisionShape2D" parent="AssassinRusher"]
+shape = SubResource("InteractShape")
+
+[node name="AssassinVisual" parent="AssassinRusher" instance=ExtResource("7_enemy")]
+scale = Vector2(1.1, 1.1)
+
+[node name="ExitToMarket" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(350, 0)
+script = ExtResource("6_interactable")
+display_name = "Back to the Market"
+kind = 2
+exit_target_scene = "res://scenes/world/Market.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToMarket"]
+shape = SubResource("GapShapeV")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToMarket"]
+color = Color(0.85, 0.75, 0.35, 0.5)
+polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(280, 0)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -370
+limit_top = -270
+limit_right = 370
+limit_bottom = 270
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true

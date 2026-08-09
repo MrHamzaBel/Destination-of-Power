@@ -30,6 +30,12 @@ var poison_source_name: String = "" ## Who inflicted the active poison - used to
 var poison_source_level: int = 0
 var actions_taken: int = 0 ## Counts this unit's own resolved actions this combat - used by e.g. fleeing enemies.
 
+var speed_debuff_multiplier: float = 1.0 ## e.g. 0.5 while "frozen" - see apply_speed_debuff().
+var speed_debuff_turns_remaining: int = 0
+var charge_progress: int = 0 ## Counts toward EnemyDefinition.charges_before_attack.
+var has_enraged: bool = false ## One-time guard for EnemyDefinition's enrage-at-low-health phase.
+var has_absorbed_hit: bool = false ## One-time guard for EnemyDefinition.absorbs_first_hit.
+
 func is_alive() -> bool:
 	return current_health > 0
 
@@ -43,6 +49,27 @@ func apply_poison(damage_per_turn: int, duration_turns: int, source_name: String
 
 func is_poisoned() -> bool:
 	return poison_turns_remaining > 0
+
+## Refreshes (not stacks) a temporary Speed multiplier, e.g. a mage's ice
+## spell halving Speed for a few rounds. Ticked down once per round in
+## CombatManager._begin_new_round(), not per-turn like poison, since Speed
+## only matters for round-wide turn ordering.
+func apply_speed_debuff(multiplier: float, duration_rounds: int) -> void:
+	speed_debuff_multiplier = multiplier
+	speed_debuff_turns_remaining = duration_rounds
+
+func tick_speed_debuff() -> void:
+	if speed_debuff_turns_remaining <= 0:
+		return
+	speed_debuff_turns_remaining -= 1
+	if speed_debuff_turns_remaining <= 0:
+		speed_debuff_multiplier = 1.0
+
+## Speed used for turn ordering and dodge rolls - raw Speed adjusted by any
+## active speed_debuff_multiplier. Never below 1 so a "frozen" unit still
+## gets a turn eventually rather than being locked out entirely.
+func get_effective_speed() -> int:
+	return maxi(1, int(round(float(speed) * speed_debuff_multiplier)))
 
 ## Defense used for the attack-vs-defense damage formula. Defending/Guard-type
 ## abilities temporarily raise this via defense_bonus_percent until this

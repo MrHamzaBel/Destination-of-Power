@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "minor_mana_potion"
+display_name = "Minor Mana Potion"
+description = "A small vial of shimmering tonic. Restores a modest amount of your class resource (mana, stamina, or energy)."
+category = 2
+rarity = 0
+icon_color = Color(0.3, 0.4, 0.85, 1)
+equip_slot = ""
+is_ranged = false
+stat_modifiers = null
+heal_amount = 0
+resource_amount = 15
+value = 6
+droppable = true

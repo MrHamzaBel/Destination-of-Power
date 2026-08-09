@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/QuestDefinition.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "hollow_menace"
+display_name = "Hollow Menace"
+description = "The Crystal Wisps drifting through the Whispering Hollow have started following travelers back toward the surface. The guild wants their numbers kept down."
+objective_text = "Cull 8 Crystal Wisps in the Whispering Hollow."
+reward_gold = 18
+reward_exp = 30
+reward_stat_points = 0
+reward_item_ids = Array[String]([])
+reward_artifact_id = ""
+reward_guild_progress = 6
+repeatable = true
+objective_enemy_id = "crystal_wisp"
+objective_kill_count = 8

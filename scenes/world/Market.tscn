@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bmarketnerax01"]
+[gd_scene load_steps=15 format=3 uid="uid://bmarketnerax01"]
 
 [ext_resource type="Script" path="res://scripts/world/Market.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
 [ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
 [ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/entities/EnemyCharacter.tscn" id="7_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueChoicePopup.tscn" id="8_dialogue"]
 
 [sub_resource type="RectangleShape2D" id="WallShapeHSeg"]
 size = Vector2(150, 20)
@@ -13,11 +15,20 @@ size = Vector2(150, 20)
 [sub_resource type="RectangleShape2D" id="WallShapeV"]
 size = Vector2(20, 720)
 
+[sub_resource type="RectangleShape2D" id="WallShapeVSeg"]
+size = Vector2(20, 290)
+
 [sub_resource type="RectangleShape2D" id="GapShapeH"]
 size = Vector2(160, 20)
 
+[sub_resource type="RectangleShape2D" id="GapShapeV"]
+size = Vector2(20, 140)
+
 [sub_resource type="RectangleShape2D" id="HouseShape"]
 size = Vector2(70, 60)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 36.0
 
 [node name="Market" type="Node2D"]
 script = ExtResource("1_script")
@@ -78,17 +89,29 @@ polygon = PackedVector2Array(-75, -10, 75, -10, 75, 10, -75, 10)
 [node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
 shape = SubResource("WallShapeHSeg")
 
-[node name="WallLeft" type="StaticBody2D" parent="."]
+[node name="WallLeftTop" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(-230, 0)
+position = Vector2(-230, -215)
 
-[node name="Visual" type="Polygon2D" parent="WallLeft"]
+[node name="Visual" type="Polygon2D" parent="WallLeftTop"]
 color = Color(0.16, 0.13, 0.1, 1)
-polygon = PackedVector2Array(-10, -360, 10, -360, 10, 360, -10, 360)
+polygon = PackedVector2Array(-10, -145, 10, -145, 10, 145, -10, 145)
 
-[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
-shape = SubResource("WallShapeV")
+[node name="Shape" type="CollisionShape2D" parent="WallLeftTop"]
+shape = SubResource("WallShapeVSeg")
+
+[node name="WallLeftBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-230, 215)
+
+[node name="Visual" type="Polygon2D" parent="WallLeftBottom"]
+color = Color(0.16, 0.13, 0.1, 1)
+polygon = PackedVector2Array(-10, -145, 10, -145, 10, 145, -10, 145)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeftBottom"]
+shape = SubResource("WallShapeVSeg")
 
 [node name="WallRight" type="StaticBody2D" parent="."]
 collision_layer = 1
@@ -208,6 +231,75 @@ position = Vector2(0, 100)
 color = Color(0.9, 0.78, 0.35, 0.85)
 polygon = PackedVector2Array(-5, -5, 5, -5, 5, 5, -5, 5)
 
+[node name="MarketVendorInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(70, -30)
+script = ExtResource("6_interactable")
+display_name = "Market Vendor"
+kind = 5
+trade_item_id = "minor_mana_potion"
+trade_price = 7
+trade_flavor_text = "\"Fresher than whatever they're selling underground, I'd bet,\" the vendor winks."
+
+[node name="Shape" type="CollisionShape2D" parent="MarketVendorInteract"]
+shape = SubResource("InteractShape")
+
+[node name="MarketVendorVisual" parent="MarketVendorInteract" instance=ExtResource("7_enemy")]
+
+[node name="GossipingResidentInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-70, 30)
+script = ExtResource("6_interactable")
+display_name = "Local Resident"
+kind = 0
+message = "\"Did you hear? Guards've been talking about strange lights past the old tree, and something about a sealed cave even further south. Adventurers, I swear - can't leave well enough alone.\""
+
+[node name="Shape" type="CollisionShape2D" parent="GossipingResidentInteract"]
+shape = SubResource("InteractShape")
+
+[node name="GossipingResidentVisual" parent="GossipingResidentInteract" instance=ExtResource("7_enemy")]
+
+[node name="WatchSergeantInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-100, -60)
+script = ExtResource("6_interactable")
+display_name = "Watch Sergeant"
+kind = 6
+dialogue_prompt = "\"You've got the look of someone who can handle themselves,\" the sergeant says, voice low. \"There's a killer working the Garrison Ward, west of here. Guild command's authorized a bounty - but only for adventurers we actually trust with this. You in?\""
+dialogue_yes_text = "\"Good. He's fast and he won't announce himself. Watch your back.\""
+dialogue_no_text = "\"Your call. Offer stands if you change your mind.\""
+dialogue_decline_text = "\"Fair enough,\" he says, and goes back to watching the street."
+dialogue_quest_active_text = "\"Any sign of him yet?\" the sergeant asks, scanning the rooftops."
+quest_id = "blade_in_the_dark"
+required_guild_rank_order = 2
+locked_message = "\"This one's above your rank,\" the sergeant says, not unkindly. \"Come back once you've made D-Rank.\""
+
+[node name="Shape" type="CollisionShape2D" parent="WatchSergeantInteract"]
+shape = SubResource("InteractShape")
+
+[node name="WatchSergeantVisual" type="Polygon2D" parent="WatchSergeantInteract"]
+color = Color(0.38, 0.4, 0.46, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="ExitToGarrison" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-230, 0)
+script = ExtResource("6_interactable")
+display_name = "Garrison Ward"
+kind = 2
+exit_target_scene = "res://scenes/world/GarrisonWard.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToGarrison"]
+shape = SubResource("GapShapeV")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToGarrison"]
+color = Color(0.55, 0.15, 0.15, 0.5)
+polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
+
 [node name="ExitToPlaza" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0
@@ -260,4 +352,7 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 
 [node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true
+
+[node name="DialoguePopup" parent="UILayer" instance=ExtResource("8_dialogue")]
 unique_name_in_owner = true

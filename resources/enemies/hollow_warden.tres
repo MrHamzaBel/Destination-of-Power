@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 230
+max_resource = 0
+attack = 17
+intelligence = 10
+defense = 13
+speed = 14
+
+[resource]
+script = ExtResource("1_enemy")
+id = "hollow_warden"
+display_name = "The Hollow Warden"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "crystal_shard",
+"chance": 1.0
+}, {
+"item_id": "crystal_shard",
+"chance": 1.0
+}]
+behavior_type = 0
+level = 10
+xp_reward = 60
+currency_reward = 30
+body_color = Color(0.35, 0.65, 0.78, 1)
+shape_points = PackedVector2Array(0, -26, 16, -12, 20, 6, 10, 22, -10, 22, -20, 6, -16, -12)
+intro_quote = "Light fractures through a thousand facets as the Warden unfolds to its full height. It does not speak - it simply advances."
+guaranteed_artifact_id = "heart_of_the_hollow"
+on_defeat_story_flag_id = "hollow_warden_defeated"
+dodge_uses_speed = true
+poison_attack_chance = 0.35
+poison_damage_per_turn = 5
+poison_duration_turns = 3

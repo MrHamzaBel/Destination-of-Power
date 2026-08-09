@@ -47,3 +47,40 @@ enum BehaviorType { AGGRESSIVE, DEFENSIVE, RANDOM }
 ## the same attack-vs-defense formula shape, just Speed instead of
 ## Attack/Defense, and a complete miss instead of a damage reduction.
 @export var dodge_uses_speed: bool = false
+
+## --- Ice spell (miniboss special: like the poison attack, but debuffs Speed instead of dealing residual damage) ---
+@export var ice_spell_chance: float = 0.0 ## Chance per turn to cast instead of attacking normally. 0 = never.
+@export var ice_freeze_chance: float = 0.5 ## Chance the cast actually freezes (independent of whether it hits).
+@export var ice_freeze_multiplier: float = 0.5 ## Speed multiplier while frozen, e.g. 0.5 = half Speed.
+@export var ice_freeze_duration_rounds: int = 3
+
+## --- Charge attack (boss special: needs this many of its own turns to land one hit) ---
+@export var charges_before_attack: int = 0 ## 0 or 1 = attacks normally every turn; 2+ = winds up first.
+
+## --- Enrage phase (boss special: a one-time self-heal + reinforcements once health drops low enough) ---
+@export var enrages_below_health_percent: float = 0.0 ## 0 = never enrages, else the health fraction (0-1) that triggers it.
+@export var enrage_heal_percent: float = 0.0 ## Fraction of max health restored when enraging.
+@export var enrage_summon_id: String = "" ## Enemy id freshly spawned as reinforcements when enraging.
+@export var enrage_summon_count: int = 0
+
+## If true, a random artifact (from the normal drop pool, class-filtered) is
+## granted on defeat regardless of the normal random-drop chance roll -
+## unlike guaranteed_artifact_id, it isn't always the same one.
+@export var guarantees_random_artifact: bool = false
+
+## If set, increments this key in RunData.counters the moment this enemy is
+## defeated - lets several different enemy types contribute to one shared
+## tally (e.g. "how many of this room's guards are dead") without any of
+## them needing to know about each other.
+@export var on_defeat_counter_id: String = ""
+
+## If true, the very first hit this enemy would take each combat is negated
+## entirely (a shimmering shield that shatters instead) - a one-time guard,
+## same shape as dodge but unconditional on the first hit rather than a
+## per-hit Speed roll.
+@export var absorbs_first_hit: bool = false
+
+## --- Self-haste (an assassin's speed-up spell: the inverse of the ice spell's freeze) ---
+@export var haste_spell_chance: float = 0.0 ## Chance per turn to buff its own Speed instead of attacking, while not already hasted. 0 = never.
+@export var haste_multiplier: float = 2.0 ## Speed multiplier while hasted, e.g. 2.0 = double Speed.
+@export var haste_duration_rounds: int = 4

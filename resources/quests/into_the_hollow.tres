@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/QuestDefinition.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "into_the_hollow"
+display_name = "Into the Hollow"
+description = "Guild Scout Elin has heard whispers of a sealed cavern far south of the city, beyond the outskirts, and wants it scouted before the guild sends a full expedition."
+objective_text = "Find and report back on the Whispering Hollow."
+reward_gold = 15
+reward_exp = 25
+reward_stat_points = 1
+reward_item_ids = Array[String]([])
+reward_artifact_id = ""
+reward_guild_progress = 0
+repeatable = false
+objective_enemy_id = ""
+objective_kill_count = 0

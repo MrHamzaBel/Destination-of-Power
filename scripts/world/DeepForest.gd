@@ -25,7 +25,10 @@ func _on_interactable_triggered(interactable: Interactable) -> void:
 ## buy the skin for 50 gold if the player is still carrying one - worse than
 ## selling to any regular vendor (see ExplorationArea._try_sell_to_vendor(),
 ## which pays the skin's full value) - or an idle line if not. Selling to him
-## specifically makes him leave for good (story_flag_id on the node itself).
+## specifically makes him leave for good (story_flag_id on the node itself) -
+## which is exactly why Wolf Cull is no longer offered through him: it now
+## lives with the Guild Receptionist instead (see AdventureCentrum.gd), an
+## NPC who's never at risk of permanently disappearing mid-run.
 func _talk_to_hunter(interactable: Interactable) -> void:
 	if RunManager.run == null or dialogue_popup == null:
 		return
@@ -41,8 +44,9 @@ func _talk_to_hunter(interactable: Interactable) -> void:
 			"Sell for 50 gold", "Keep it", ""
 		)
 		dialogue_popup.choice_made.connect(_on_hunter_offer, CONNECT_ONE_SHOT)
-	else:
-		hud.show_notification("The hunter gives you a small nod and goes back to watching the treeline.")
+		return
+
+	hud.show_notification("The hunter gives you a small nod and goes back to watching the treeline.")
 
 func _on_hunter_offer(choice_index: int) -> void:
 	if choice_index != 0 or RunManager.run == null:

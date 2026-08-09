@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 95
+max_resource = 20
+attack = 10
+intelligence = 15
+defense = 9
+speed = 11
+
+[resource]
+script = ExtResource("1_enemy")
+id = "underground_mage"
+display_name = "Underground Mage"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_healing_potion",
+"chance": 1.0
+}, {
+"item_id": "minor_healing_potion",
+"chance": 1.0
+}, {
+"item_id": "minor_healing_potion",
+"chance": 1.0
+}, {
+"item_id": "minor_healing_potion",
+"chance": 1.0
+}]
+behavior_type = 2
+level = 7
+xp_reward = 34
+currency_reward = 16
+body_color = Color(0.22, 0.35, 0.55, 1)
+shape_points = PackedVector2Array(-10, -22, 10, -22, 13, -2, 10, 18, -10, 18, -13, -2)
+intro_quote = "\"So the last of my associates finally sends a challenger.\" Frost gathers around her fingertips. \"Let's see what you're made of.\""
+guarantees_random_artifact = true
+on_defeat_counter_id = "underground_thugs_defeated"
+ice_spell_chance = 0.45
+ice_freeze_chance = 0.5
+ice_freeze_multiplier = 0.5
+ice_freeze_duration_rounds = 3
