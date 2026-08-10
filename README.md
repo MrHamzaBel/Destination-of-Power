@@ -97,7 +97,8 @@ scenes/world/FarReaches.tscn         - short connecting clearing south of the ou
 scenes/world/WhisperingHollow.tscn   - sealed crystal cavern: Crystal Wisps, the Hollow Warden
 scenes/world/GarrisonWard.tscn       - military district west of the Market: knights, a rushing assassin
 scenes/world/MaskedManEncounter.tscn - one-time cinematic: a masked man taunts the player in the forest
-scenes/world/DeepForest.tscn         - bigger forest beyond the portal: sleeping bear, hunter
+scenes/world/DeepForest.tscn         - bigger forest beyond the portal: sleeping bear, hunter, a berry bush, a hidden trail
+scenes/world/BugCatchersGrove.tscn   - hidden clearing off that trail: Bug Catcher Joe's camp
 scenes/world/EncounterScreen.tscn- hub for the randomized run sequence
 scenes/combat/CombatScene.tscn
 scenes/entities/PlayerCharacter.tscn
@@ -249,6 +250,30 @@ Two new missions use this:
 
 **Wolf Cull** (offered by the **Guild Receptionist** in the Adventure Centrum, not a field-gated quest-giver): originally lived on the Deep Forest Hunter, but the Hunter can permanently vanish - selling him the bear skin makes him leave for good (`visible`/`monitorable`/`monitoring` all cleared, persisted via `story_flag_id`), which could soft-lock the quest for the rest of the run if that happened before the wolf offer was ever seen. `AdventureCentrum.gd._talk_to_receptionist()` now offers it (E-Rank+, inline check, same condition the Hunter used to gate on) ahead of her normal enrollment/rank-up business whenever it's available, falling through to `_handle_guild_receptionist()` otherwise - a repeatable "cull 7 Forest Wolves" mission against the pack enemy at `resources/enemies/forest_wolf.tres` (`WolfPackInteract` in Deep Forest, 2 at a time, same pattern as the bee/wisp swarms). The Hunter himself is back to just the icebreaker and the bear-skin sale.
 - **Pest Control**, **Into the Hollow** → **Hollow Menace** - covered above and below; all of these plus Kill the Bees now feed the same `RunData.guild_progress` pool.
+
+### The Deep Forest expands: Bug Catcher Joe and a new heal-seal mechanic
+
+Three new interactables in `DeepForest.tscn`: a one-time **Berry Bush** (`ITEM`, grants 2x the new `wild_berries` consumable, a minor 6-health snack cheaper than Meat Pie), a **Weathered Sign** (`MESSAGE`, "PRIVATE - TRAPS SET" flavor foreshadowing what's ahead), and a **Hidden Trail** (`EXIT`, easy to miss, tucked in the southeast corner - no wall gap needed since it's a path through the brush, not a door) leading to a brand-new connected scene, `scenes/world/BugCatchersGrove.tscn`.
+
+The Grove is **Bug Catcher Joe**'s camp - a lean-to, cracked specimen jars, and a one-shot fight against him and his swarm (`JoeInteract`, `enemy_ids = ["joe_bug_catcher", "forest_bug", "forest_bug", "forest_bug"]`). The three `forest_bug` minions are individually trivial (14 HP, 5 Attack) but Joe himself is a real threat (105 HP/15 Attack/11 Defense - tougher across the board than the Sleeping Bear). Two more interactables round out the clearing: **Overturned Jars** and the **Makeshift Camp** (both flavor `MESSAGE`s) and a one-time **Prize Specimen** pickup (`ITEM`, the new `iridescent_beetle_shell` trophy - `sell_price = 40`, sellable at any vendor like the bear skin/crystal shards).
+
+### Small touches across town, the Underground, and every earlier area
+
+A pass of light, low-risk flavor and loot additions across every previously-built scene - all using the same generic `MESSAGE`/`ITEM` `Interactable` kinds `ExplorationArea` already handles, so none of it needed new mechanics or script overrides, just new nodes:
+
+- **Back Alley**: a one-time **Torn Note** (`MESSAGE`) - a half-rotted warning about "the hunter in the deep trees," planted well before the player could possibly meet him.
+- **Plaza**: a **Street Performer** (`MESSAGE`, pure color) and **Fountain Floor** (`ITEM`, one-time, sifts up the new `lucky_coin` trophy - `sell_price = 15`).
+- **Market**: a **Stray Cat** (`MESSAGE`), wandering the stalls and ignoring the player entirely.
+- **Adventure Centrum**: a **Trophy Wall** (`MESSAGE`) referencing the bear and the wolves - a small nod to what the player's already done by the time they'd plausibly see it.
+- **Guild Lounge**: an **Off-Duty Guard** (`MESSAGE`) grumbling about the Garrison Ward redeployment - ties back to the Knight/Mercenary dialogue already in `GarrisonWard.tscn`.
+- **Deeper Alley**: a one-time **Stashed Satchel** (`ITEM`, a spare `minor_healing_potion`) - required adding a `CircleShape2D` interact shape to this scene, since it previously had no `MESSAGE`/`ITEM`-kind interactables at all.
+- **Underground Nerax**: a **Hidden Stash** (`ITEM`, 2x `minor_mana_potion`) and a **Warning Scrawl** (`MESSAGE`) about the Warlord's heal-and-recover phase, foreshadowing the fight for anyone who reads it first.
+- **Nerax Outskirts**: **Lake Shallows** (`ITEM`, one-time, another `lucky_coin` - reusing the same item from the Plaza fountain rather than minting a near-identical one).
+- **Whispering Hollow**: an **Old Miner's Pack** (`ITEM`, one-time `minor_healing_potion`) tucked away from the main path.
+
+Verified by instantiating all eleven new interactables inside their real scenes and calling `.trigger()` directly: every `ITEM` one grants the right item/quantity and sets its story flag (so it can't be re-triggered), every `MESSAGE` one fires without error, and the full scene-boot regression sweep stays clean project-wide.
+
+Joe's gimmick is a brand-new mechanic, **heal seal**: `EnemyDefinition.seals_healing_when_alone` (checked by `CombatManager._check_heal_seal()`, called from `_on_enemy_defeated()`) triggers the instant an enemy becomes the last one standing in the fight - i.e. every enemy present at combat start other than itself is dead. For Joe that means the moment his third and final bug falls while he's still alive, regardless of order. It sets a new `CombatUnitState.heal_sealed` flag on the player, permanently for the rest of that combat, which is then checked at all three places player healing can happen: `player_use_item()` (health potions - blocked before the item is even consumed, so nothing's wasted), the `HEAL` branch of `player_use_ability()`, and `heal_player()` (the shared entry point artifacts like Moonstone Charm and Warlord's Renewal already heal through) - so "no potions, no artifacts, no abilities" all come from one flag and three matching guards rather than three separate mechanics. Defeating Joe himself guarantees a new artifact, **Bug Catcher's Net** (`+6 Speed`, passive, `random_drop_eligible = false` like every other named boss drop).
 
 ### The Whispering Hollow, and two new guild missions
 

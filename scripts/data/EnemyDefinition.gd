@@ -84,3 +84,12 @@ enum BehaviorType { AGGRESSIVE, DEFENSIVE, RANDOM }
 @export var haste_spell_chance: float = 0.0 ## Chance per turn to buff its own Speed instead of attacking, while not already hasted. 0 = never.
 @export var haste_multiplier: float = 2.0 ## Speed multiplier while hasted, e.g. 2.0 = double Speed.
 @export var haste_duration_rounds: int = 4
+
+## --- Heal seal (Bug Catcher Joe's special: turns hostile once its swarm is
+## gone) - true means this unit permanently seals the player's healing (no
+## items, abilities or artifact heals) for the rest of combat the moment it
+## becomes the last enemy still standing in the fight, i.e. every other enemy
+## present at combat start has been defeated. Checked in
+## CombatManager._check_heal_seal(), called from _on_enemy_defeated(). ---
+@export var seals_healing_when_alone: bool = false
+@export_multiline var heal_seal_message: String = "" ## Shown when the seal triggers. Falls back to a generic line if empty.

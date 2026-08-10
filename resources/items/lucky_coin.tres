@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "lucky_coin"
+display_name = "Lucky Coin"
+description = "A strange, worn coin, minted by no kingdom anyone recognizes. Too old to spend, but a collector might pay for the curiosity."
+category = 3
+rarity = 0
+icon_color = Color(0.85, 0.7, 0.25, 1)
+equip_slot = ""
+is_ranged = false
+stat_modifiers = null
+heal_amount = 0
+resource_amount = 0
+value = 15
+droppable = true
+sell_price = 15

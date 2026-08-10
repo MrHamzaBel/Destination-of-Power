@@ -176,6 +176,21 @@ shape = SubResource("InteractShape")
 [node name="EnemyVisual" parent="BeeSwarmInteract" instance=ExtResource("7_enemy")]
 scale = Vector2(0.8, 0.8)
 
+[node name="LakeShallowsInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-280, 100)
+script = ExtResource("6_interactable")
+display_name = "Lake Shallows"
+kind = 4
+item_id = "lucky_coin"
+item_quantity = 1
+one_shot = true
+story_flag_id = "outskirts_lake_coin_found"
+
+[node name="Shape" type="CollisionShape2D" parent="LakeShallowsInteract"]
+shape = SubResource("InteractShape")
+
 [node name="DeeperForestPathInteract" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0

@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 105
+max_resource = 0
+attack = 15
+intelligence = 3
+defense = 11
+speed = 9
+
+[resource]
+script = ExtResource("1_enemy")
+id = "joe_bug_catcher"
+display_name = "Bug Catcher Joe"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_healing_potion",
+"chance": 0.5
+}]
+behavior_type = 0
+level = 6
+xp_reward = 38
+currency_reward = 14
+body_color = Color(0.45, 0.38, 0.22, 1)
+shape_points = PackedVector2Array(-11, -20, 11, -20, 14, -2, 11, 18, -11, 18, -14, -2)
+intro_quote = "\"...You found my spot.\" The old man's face goes cold. \"Nobody finds my spot.\" He gives a sharp whistle, and the underbrush around him starts to move."
+guaranteed_artifact_id = "bug_catchers_net"
+seals_healing_when_alone = true
+heal_seal_message = "\"That's IT!\" Joe roars as his last bug falls. \"Fine - you want to do this the hard way!\" He hurls a fistful of stinging powder at you. Your wounds won't close for the rest of this fight!"

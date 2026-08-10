@@ -150,6 +150,11 @@ func player_use_ability(ability_id: String) -> void:
 		AbilityDefinition.AbilityType.DEFEND:
 			_perform_player_defend(ability.defense_bonus_percent)
 		AbilityDefinition.AbilityType.HEAL:
+			if player_unit.heal_sealed:
+				player_unit.current_resource += ability.resource_cost # Refund - the seal blocks the heal outright, not just its effect.
+				_log("The seal on your wounds flares - %s does nothing!" % ability.display_name)
+				_finish_action()
+				return
 			player_unit.current_health = min(player_unit.max_health, player_unit.current_health + ability.heal_amount)
 			_log("%s uses %s and heals %d." % [player_unit.display_name, ability.display_name, ability.heal_amount])
 			_finish_action()
@@ -168,6 +173,9 @@ func player_use_item(item_id: String) -> void:
 	var item_def := ItemRegistry.get_item(item_id)
 	if item_def == null or item_def.category != ItemDefinition.Category.CONSUMABLE:
 		return
+	if item_def.heal_amount > 0 and player_unit.heal_sealed:
+		_log("The seal on your wounds flares - %s won't help you here." % item_def.display_name)
+		return
 	if RunManager.run == null or not RunManager.run.remove_item(item_id, 1):
 		return
 	player_unit.current_health = min(player_unit.max_health, player_unit.current_health + item_def.heal_amount)
@@ -185,6 +193,10 @@ func end_turn() -> void:
 
 func heal_player(amount: int, source_label: String = "") -> void:
 	if player_unit == null:
+		return
+	if player_unit.heal_sealed:
+		var suffix_blocked := " (%s)" % source_label if source_label != "" else ""
+		_log("The seal on your wounds flares - the healing%s has no effect!" % suffix_blocked)
 		return
 	player_unit.current_health = min(player_unit.max_health, player_unit.current_health + amount)
 	var suffix := " (%s)" % source_label if source_label != "" else ""
@@ -754,6 +766,29 @@ func _on_enemy_defeated(enemy: CombatUnitState) -> void:
 			last_rewards["levels_gained"] = gained
 			for lvl in levels_gained:
 				_log("Level up! %s reached level %d and gained %d stat points." % [player_unit.display_name, lvl, RunManager.STAT_POINTS_PER_LEVEL])
+
+	_check_heal_seal()
+
+## Bug Catcher Joe's special: the moment its whole swarm is gone and it's the
+## only enemy left standing in the fight, EnemyDefinition.seals_healing_when_alone
+## seals the player's healing for the rest of combat (see player_use_item(),
+## the HEAL branch of player_use_ability(), and heal_player()). Checked after
+## every defeat rather than tied to a specific enemy dying, since it doesn't
+## matter which of the minions falls last.
+func _check_heal_seal() -> void:
+	var alive := get_alive_enemies()
+	if alive.size() != 1:
+		return
+	var last_standing := alive[0]
+	if last_standing.enemy_def == null or not last_standing.enemy_def.seals_healing_when_alone:
+		return
+	if player_unit.heal_sealed:
+		return
+	player_unit.heal_sealed = true
+	var msg := last_standing.enemy_def.heal_seal_message
+	if msg == "":
+		msg = "%s snarls, and a stifling pressure settles over your wounds - your healing is sealed for the rest of this fight!" % last_standing.display_name
+	_log(msg)
 
 func _check_health_low(unit: CombatUnitState) -> void:
 	if unit.max_health <= 0 or unit.health_low_triggered:

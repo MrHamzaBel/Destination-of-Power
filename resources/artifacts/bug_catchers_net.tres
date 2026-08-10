@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "bug_catchers_net"
+display_name = "Bug Catcher's Net"
+description = "Joe's own tool of the trade, still twitching faintly. Quickens your reflexes - a solid boost to Speed."
+rarity = 1
+icon_color = Color(0.55, 0.7, 0.25, 1)
+effect_id = "bug_catchers_net"
+effect_values = {
+"speed_bonus": 6
+}
+stacking_allowed = false
+class_restrictions = Array[String]([])
+random_drop_eligible = false

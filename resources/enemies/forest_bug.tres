@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 14
+max_resource = 0
+attack = 5
+intelligence = 0
+defense = 2
+speed = 13
+
+[resource]
+script = ExtResource("1_enemy")
+id = "forest_bug"
+display_name = "Swarming Bug"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = []
+behavior_type = 0
+level = 3
+xp_reward = 3
+currency_reward = 0
+body_color = Color(0.5, 0.65, 0.15, 1)
+shape_points = PackedVector2Array(-10, 2, -6, -8, 0, -10, 6, -8, 10, 2, 4, 8, -4, 8)

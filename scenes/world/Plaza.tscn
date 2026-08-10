@@ -193,6 +193,37 @@ shape = SubResource("InteractShape")
 color = Color(0.4, 0.3, 0.2, 1)
 polygon = PackedVector2Array(-16, -12, 16, -12, 16, 12, -16, 12)
 
+[node name="StreetPerformerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(180, -150)
+script = ExtResource("6_interactable")
+display_name = "Street Performer"
+kind = 0
+message = "A street performer juggles chipped clay cups for a thin crowd, spinning tales between throws: \"...and THAT, friends, is how the old king lost his crown to a thief who was never caught!\" A hat lies out for coins - you decide against it."
+
+[node name="Shape" type="CollisionShape2D" parent="StreetPerformerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="StreetPerformerVisual" type="Polygon2D" parent="StreetPerformerInteract"]
+color = Color(0.6, 0.3, 0.45, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="FountainCoinsInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, -30)
+script = ExtResource("6_interactable")
+display_name = "Fountain Floor"
+kind = 4
+item_id = "lucky_coin"
+item_quantity = 1
+one_shot = true
+story_flag_id = "plaza_fountain_coin_found"
+
+[node name="Shape" type="CollisionShape2D" parent="FountainCoinsInteract"]
+shape = SubResource("InteractShape")
+
 [node name="ExitToTwoWayAlley" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0

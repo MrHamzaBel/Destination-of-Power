@@ -194,6 +194,57 @@ shape = SubResource("InteractShape")
 [node name="EnemyVisual" parent="WolfPackInteract" instance=ExtResource("7_enemy")]
 scale = Vector2(1.2, 1.2)
 
+[node name="BerryBushInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-150, -120)
+script = ExtResource("6_interactable")
+display_name = "Berry Bush"
+kind = 4
+item_id = "wild_berries"
+item_quantity = 2
+one_shot = true
+story_flag_id = "deep_forest_berries_picked"
+
+[node name="Shape" type="CollisionShape2D" parent="BerryBushInteract"]
+shape = SubResource("InteractShape")
+
+[node name="BerryBushVisual" type="Polygon2D" parent="BerryBushInteract"]
+color = Color(0.2, 0.32, 0.14, 1)
+polygon = PackedVector2Array(-16, 14, -20, -8, -6, -20, 8, -18, 18, -4, 14, 16, 0, 20)
+
+[node name="OldSignInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(220, 160)
+script = ExtResource("6_interactable")
+display_name = "Weathered Sign"
+kind = 0
+message = "A crooked wooden sign, half-swallowed by moss: \"PRIVATE - TRAPS SET - TURN BACK.\" Someone clearly doesn't want visitors deeper in these woods."
+
+[node name="Shape" type="CollisionShape2D" parent="OldSignInteract"]
+shape = SubResource("InteractShape")
+
+[node name="OldSignVisual" type="Polygon2D" parent="OldSignInteract"]
+color = Color(0.45, 0.35, 0.22, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="HiddenTrailInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(450, 260)
+script = ExtResource("6_interactable")
+display_name = "Hidden Trail"
+kind = 2
+exit_target_scene = "res://scenes/world/BugCatchersGrove.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="HiddenTrailInteract"]
+shape = SubResource("InteractShape")
+
+[node name="HiddenTrailVisual" type="Polygon2D" parent="HiddenTrailInteract"]
+color = Color(0.55, 0.65, 0.35, 0.5)
+polygon = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+
 [node name="ExitToOutskirts" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0

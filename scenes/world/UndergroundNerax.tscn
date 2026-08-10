@@ -248,6 +248,41 @@ shape = SubResource("InteractShape")
 color = Color(0.5, 0.42, 0.32, 1)
 polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
 
+[node name="HiddenStashInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(150, -200)
+script = ExtResource("6_interactable")
+display_name = "Hidden Stash"
+kind = 4
+item_id = "minor_mana_potion"
+item_quantity = 2
+one_shot = true
+story_flag_id = "underground_stash_found"
+
+[node name="Shape" type="CollisionShape2D" parent="HiddenStashInteract"]
+shape = SubResource("InteractShape")
+
+[node name="HiddenStashVisual" type="Polygon2D" parent="HiddenStashInteract"]
+color = Color(0.3, 0.26, 0.2, 1)
+polygon = PackedVector2Array(-12, -10, 12, -10, 12, 10, -12, 10)
+
+[node name="WarningScrawlInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-150, 220)
+script = ExtResource("6_interactable")
+display_name = "Warning Scrawl"
+kind = 0
+message = "Scratched into the stone in a hurried hand: \"HE HEALS. DON'T LET UP. DON'T LET HIM CATCH HIS BREATH.\" Whoever wrote it about the man in the back didn't stick around long enough to sign it."
+
+[node name="Shape" type="CollisionShape2D" parent="WarningScrawlInteract"]
+shape = SubResource("InteractShape")
+
+[node name="WarningScrawlVisual" type="Polygon2D" parent="WarningScrawlInteract"]
+color = Color(0.55, 0.5, 0.45, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
 [node name="Player" parent="." instance=ExtResource("2_player")]
 unique_name_in_owner = true
 position = Vector2(0, -200)

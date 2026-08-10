@@ -24,6 +24,9 @@ size = Vector2(30, 30)
 [sub_resource type="CircleShape2D" id="RobberBodyShape"]
 radius = 16.0
 
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 36.0
+
 [node name="DeeperAlley" type="Node2D"]
 script = ExtResource("1_script")
 
@@ -172,6 +175,25 @@ shape = SubResource("GapShapeH")
 [node name="ExitVisual" type="Polygon2D" parent="ExitToUnderground"]
 color = Color(0.35, 0.25, 0.5, 0.55)
 polygon = PackedVector2Array(-70, -10, 70, -10, 70, 10, -70, 10)
+
+[node name="StashedSatchelInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(150, -150)
+script = ExtResource("7_interactable")
+display_name = "Stashed Satchel"
+kind = 4
+item_id = "minor_healing_potion"
+item_quantity = 1
+one_shot = true
+story_flag_id = "deeper_alley_satchel_found"
+
+[node name="Shape" type="CollisionShape2D" parent="StashedSatchelInteract"]
+shape = SubResource("InteractShape")
+
+[node name="StashedSatchelVisual" type="Polygon2D" parent="StashedSatchelInteract"]
+color = Color(0.35, 0.28, 0.18, 1)
+polygon = PackedVector2Array(-12, -10, 12, -10, 12, 10, -12, 10)
 
 [node name="Robber" type="CharacterBody2D" parent="."]
 collision_layer = 1

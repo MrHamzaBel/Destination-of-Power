@@ -278,6 +278,22 @@ shape = SubResource("InteractShape")
 color = Color(0.35, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
 
+[node name="TrophyWallInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 160)
+script = ExtResource("6_interactable")
+display_name = "Trophy Wall"
+kind = 0
+message = "A modest trophy wall near the back: a chipped bear claw, a scrap of wolf pelt, and a hand-lettered card that just says \"KEEP GOING.\" Whoever's been adding to it clearly believes in you."
+
+[node name="Shape" type="CollisionShape2D" parent="TrophyWallInteract"]
+shape = SubResource("InteractShape")
+
+[node name="TrophyWallVisual" type="Polygon2D" parent="TrophyWallInteract"]
+color = Color(0.42, 0.32, 0.2, 1)
+polygon = PackedVector2Array(-18, -12, 18, -12, 18, 12, -18, 12)
+
 [node name="LoungeDoorFacade" type="Polygon2D" parent="."]
 position = Vector2(220, -190)
 color = Color(0.4, 0.3, 0.24, 1)

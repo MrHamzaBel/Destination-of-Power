@@ -22,6 +22,8 @@ static func create(effect_id: String) -> ArtifactEffectBase:
 			return WarlordsRenewalEffect.new()
 		"heart_of_the_hollow":
 			return HeartOfTheHollowEffect.new()
+		"bug_catchers_net":
+			return BugCatchersNetEffect.new()
 		_:
 			push_warning("ArtifactEffectFactory: unknown effect_id '%s'" % effect_id)
 			return null

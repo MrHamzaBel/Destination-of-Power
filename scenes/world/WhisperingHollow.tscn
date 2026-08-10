@@ -167,6 +167,25 @@ shape = SubResource("InteractShape")
 [node name="EnemyVisual" parent="HollowWardenInteract" instance=ExtResource("7_enemy")]
 scale = Vector2(1.6, 1.6)
 
+[node name="MinersPackInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-300, 160)
+script = ExtResource("6_interactable")
+display_name = "Old Miner's Pack"
+kind = 4
+item_id = "minor_healing_potion"
+item_quantity = 1
+one_shot = true
+story_flag_id = "hollow_miners_pack_found"
+
+[node name="Shape" type="CollisionShape2D" parent="MinersPackInteract"]
+shape = SubResource("InteractShape")
+
+[node name="MinersPackVisual" type="Polygon2D" parent="MinersPackInteract"]
+color = Color(0.4, 0.32, 0.22, 1)
+polygon = PackedVector2Array(-12, -10, 12, -10, 12, 10, -12, 10)
+
 [node name="ExitToFarReaches" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0

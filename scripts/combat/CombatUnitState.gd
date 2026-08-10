@@ -35,6 +35,7 @@ var speed_debuff_turns_remaining: int = 0
 var charge_progress: int = 0 ## Counts toward EnemyDefinition.charges_before_attack.
 var has_enraged: bool = false ## One-time guard for EnemyDefinition's enrage-at-low-health phase.
 var has_absorbed_hit: bool = false ## One-time guard for EnemyDefinition.absorbs_first_hit.
+var heal_sealed: bool = false ## True once EnemyDefinition.seals_healing_when_alone has triggered - blocks every healing source for the rest of combat (see CombatManager).
 
 func is_alive() -> bool:
 	return current_health > 0
