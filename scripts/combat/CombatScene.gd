@@ -22,6 +22,7 @@ func _ready() -> void:
 
 	hud.bind(combat_manager)
 	combat_manager.roster_changed.connect(_spawn_enemy_visuals)
+	combat_manager.enemy_visual_defeated.connect(_on_enemy_visual_defeated)
 
 	combat_manager.start(SceneManager.pending_combat_enemy_ids, SceneManager.pending_combat_ally_ids)
 	_spawn_enemy_visuals()
@@ -36,7 +37,22 @@ func _spawn_enemy_visuals() -> void:
 		enemy_container.add_child(visual)
 		visual.position = Vector2(i * 100, 0)
 		visual.setup(enemy.enemy_def)
+		if not enemy.is_alive():
+			visual.mark_defeated()
 		i += 1
+
+## enemy_units keeps a stable index order all combat long (dead units stay in
+## the array, just with current_health == 0 - see get_alive_enemies()), and
+## _spawn_enemy_visuals() builds enemy_container's children in that same
+## order, so the two stay 1:1 lined up outside of a roster_changed rebuild
+## (which already reapplies mark_defeated() to anyone already dead above).
+func _on_enemy_visual_defeated(enemy: CombatUnitState) -> void:
+	var index := combat_manager.enemy_units.find(enemy)
+	if index < 0 or index >= enemy_container.get_child_count():
+		return
+	var visual := enemy_container.get_child(index) as EnemyCharacter
+	if visual != null:
+		visual.mark_defeated()
 
 func _spawn_ally_visuals() -> void:
 	for child in ally_container.get_children():

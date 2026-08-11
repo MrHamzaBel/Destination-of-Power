@@ -18,9 +18,11 @@ enum Kind { MESSAGE, COMBAT, EXIT, HEAL, ITEM, TRADE, DIALOGUE, GUILD_RECEPTIONI
 @export var required_guild_rank_order: int = -1 ## EXIT only: -1 = unrestricted, else minimum GuildRankDefinition.order needed.
 @export_multiline var locked_message: String = "" ## EXIT only: shown instead of transitioning when the rank requirement isn't met.
 @export var trade_item_id: String = "" ## TRADE only: item sold.
-@export var trade_price: int = 0 ## TRADE only: gold cost (before any artifact/guild price modifiers).
+@export var trade_price: int = 0 ## TRADE only: gold cost (before any guild price discount).
 @export var lounge_pricing: bool = false ## TRADE only: also apply the player's guild rank discount to the price.
 @export_multiline var trade_flavor_text: String = "" ## TRADE only: optional line appended to the purchase notification.
+@export var sell_bonus_item_ids: Array[String] = [] ## TRADE only: item ids this vendor pays a premium for (see sell_bonus_multiplier) - e.g. a curio trader paying extra for trophies. Empty = no specialty, this vendor just pays the base price like any other.
+@export var sell_bonus_multiplier: float = 1.5 ## TRADE only: price multiplier applied when selling one of sell_bonus_item_ids to this vendor.
 @export_multiline var dialogue_prompt: String = "" ## DIALOGUE only: the yes/no/decline question.
 @export_multiline var dialogue_yes_text: String = ""
 @export_multiline var dialogue_no_text: String = ""

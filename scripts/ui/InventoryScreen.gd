@@ -26,6 +26,7 @@ const EQUIP_SLOTS: Array[String] = ["weapon", "offhand", "armor"]
 @onready var artifact_detail_rarity: Label = %ArtifactDetailRarity
 @onready var artifact_detail_desc: Label = %ArtifactDetailDesc
 @onready var artifact_detail_info: Label = %ArtifactDetailInfo
+@onready var artifact_use_button: Button = %ArtifactUseButton
 
 @onready var character_info_label: Label = %CharacterInfoLabel
 @onready var char_stat_points_label: Label = %CharStatPointsLabel
@@ -44,6 +45,7 @@ func _ready() -> void:
 	equip_button.pressed.connect(_on_equip_pressed)
 	use_button.pressed.connect(_on_use_pressed)
 	drop_button.pressed.connect(_on_drop_pressed)
+	artifact_use_button.pressed.connect(_on_use_artifact_pressed)
 	hp_point_button.pressed.connect(_on_stat_point_pressed.bind("hp"))
 	attack_point_button.pressed.connect(_on_stat_point_pressed.bind("attack"))
 	defense_point_button.pressed.connect(_on_stat_point_pressed.bind("defense"))
@@ -247,6 +249,8 @@ func _select_artifact(artifact_id: String) -> void:
 		artifact_detail_rarity.text = ""
 		artifact_detail_desc.text = ""
 		artifact_detail_info.text = ""
+		artifact_use_button.disabled = true
+		artifact_use_button.text = "Use"
 		return
 
 	artifact_detail_name.text = artifact_def.display_name
@@ -262,7 +266,23 @@ func _select_artifact(artifact_id: String) -> void:
 		info_lines.append("Does not stack.")
 	if not artifact_def.class_restrictions.is_empty():
 		info_lines.append("Class restricted: %s" % ", ".join(artifact_def.class_restrictions))
+	if artifact_def.usable:
+		var already_used := RunManager.has_used_artifact(artifact_id)
+		info_lines.append("Already used this run." if already_used else "Usable - once per run.")
+		artifact_use_button.disabled = already_used
+		artifact_use_button.text = "Already Used" if already_used else "Use"
+	else:
+		artifact_use_button.disabled = true
+		artifact_use_button.text = "Use"
 	artifact_detail_info.text = "\n".join(info_lines)
+
+func _on_use_artifact_pressed() -> void:
+	if _selected_artifact_id == "":
+		return
+	if RunManager.use_artifact(_selected_artifact_id):
+		EventBus.inventory_changed.emit()
+		refresh()
+		_select_artifact(_selected_artifact_id)
 
 # --- Character tab -------------------------------------------------------------
 ## Same stats/equipment/artifacts/quests readout and stat-point spending as

@@ -253,14 +253,14 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -180.0
-offset_top = -160.0
-offset_right = 180.0
-offset_bottom = 160.0
+offset_left = -230.0
+offset_top = -180.0
+offset_right = 230.0
+offset_bottom = 180.0
 
 [node name="AbilitiesVBox" type="VBoxContainer" parent="AbilitiesPanel"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="AbilitiesPanel/AbilitiesVBox"]
 layout_mode = 2
@@ -275,7 +275,7 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 10
 
 [node name="AbilitiesClose" type="Button" parent="AbilitiesPanel/AbilitiesVBox"]
 unique_name_in_owner = true

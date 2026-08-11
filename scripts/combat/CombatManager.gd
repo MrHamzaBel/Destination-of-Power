@@ -21,6 +21,7 @@ signal stats_changed
 signal turn_changed(unit: CombatUnitState)
 signal combat_finished(victory: bool)
 signal roster_changed ## Emitted when enemies are added mid-combat (e.g. an enrage summon) - CombatScene re-spawns visuals in response.
+signal enemy_visual_defeated(enemy: CombatUnitState) ## Emitted the moment one specific enemy dies - CombatScene marks its visual so a multi-enemy fight always shows which one just fell instead of leaving a dead enemy rendered as if still standing.
 
 const CRIT_MULTIPLIER: float = 1.5
 ## Damage-formula safety bounds: attack-over-defense can boost damage up to
@@ -722,6 +723,7 @@ func _decide_enemy_defends(enemy: CombatUnitState) -> bool:
 func _on_enemy_defeated(enemy: CombatUnitState) -> void:
 	_log("%s is defeated!" % enemy.display_name)
 	_defeated_this_combat.append(enemy)
+	enemy_visual_defeated.emit(enemy)
 	if RunManager.run == null:
 		return
 	RunManager.run.defeated_enemy_names.append(enemy.display_name)

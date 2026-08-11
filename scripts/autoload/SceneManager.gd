@@ -34,6 +34,8 @@ var pending_combat_ally_ids: Array[String] = [] ## Read by CombatScene on _ready
 var return_scene_after_combat: String = BACK_ALLEY
 var advances_encounter_on_victory: bool = false ## True when this fight is the current run encounter slot.
 var arriving_from_scene_path: String = "" ## Read by ExplorationArea to spawn near the entrance actually used, not a fixed point.
+var pending_combat_return_position: Vector2 = Vector2.ZERO ## Set by ExplorationArea.start_combat() to the player's position the instant a fight begins - read (and cleared) by ExplorationArea._apply_arrival_spawn() so returning from combat puts the player back exactly where they were standing, not the scene's default entry point.
+var has_pending_combat_return_position: bool = false
 
 func _ready() -> void:
 	_fade_layer = CanvasLayer.new()
@@ -48,10 +50,36 @@ func _ready() -> void:
 func _attach_fade_layer() -> void:
 	get_tree().root.add_child.call_deferred(_fade_layer)
 
-func goto_scene(path: String) -> void:
+## instant = true skips the fade entirely - used when a cutscene's own
+## _finish() (LoreIntro, CityGuardArrival/Farewell, MaskedManEncounter) hands
+## off to the next scene, so the cut lands right as the text closes instead
+## of flashing to black first. With the real background art placeholder now
+## behind the text (see CutsceneBackground), that flash reads as a visible
+## black screen rather than the near-invisible black-to-black fade it used
+## to be back when the cutscene background was itself just flat black.
+func goto_scene(path: String, instant: bool = false) -> void:
 	print("SceneManager: switching to ", path)
 	arriving_from_scene_path = RunManager.run.current_scene_path if RunManager.run != null else ""
+	# Defensive: a lingering paused tree (e.g. a notification dismissed by an
+	# unusual path) has no business surviving into a fresh scene.
+	get_tree().paused = false
+	if instant:
+		# Deferred, not immediate: goto_scene() is typically called from
+		# inside a signal callback (a button press, _unhandled_input), and
+		# swapping the tree's current_scene mid-callback is unsafe - Godot
+		# errors with "Parent node is busy adding/removing children" since
+		# the caller's own node is usually still partway through being
+		# processed by that same signal. call_deferred() runs it once the
+		# tree is done with whatever's currently in flight instead.
+		call_deferred("_change_scene_deferred", path)
+		return
 	var tween := create_tween()
+	# The new scene's own _ready() can show a notification immediately (e.g.
+	# UndergroundNerax's first-visit line), which pauses the tree - without
+	# this, that pause would freeze this tween mid-fade, leaving the fade
+	# rect stuck fully opaque (a black screen) until something unrelated
+	# happened to unpause it.
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(_fade_rect, "color:a", 1.0, 0.15)
 	tween.tween_callback(func():
 		var err := get_tree().change_scene_to_file(path)
@@ -60,9 +88,14 @@ func goto_scene(path: String) -> void:
 	)
 	tween.tween_property(_fade_rect, "color:a", 0.0, 0.2)
 
-func start_combat(enemy_ids: Array[String], return_scene: String = BACK_ALLEY, advances_encounter: bool = false, ally_ids: Array[String] = []) -> void:
+func _change_scene_deferred(path: String) -> void:
+	var err := get_tree().change_scene_to_file(path)
+	if err != OK:
+		push_error("SceneManager: failed to load scene '%s' (%s)" % [path, err])
+
+func start_combat(enemy_ids: Array[String], return_scene: String = BACK_ALLEY, advances_encounter: bool = false, ally_ids: Array[String] = [], instant: bool = false) -> void:
 	pending_combat_enemy_ids = enemy_ids
 	pending_combat_ally_ids = ally_ids
 	return_scene_after_combat = return_scene
 	advances_encounter_on_victory = advances_encounter
-	goto_scene(COMBAT_SCENE)
+	goto_scene(COMBAT_SCENE, instant)

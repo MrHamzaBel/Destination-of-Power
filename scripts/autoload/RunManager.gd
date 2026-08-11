@@ -68,6 +68,11 @@ func start_new_run(class_id: String) -> void:
 	run.current_health = starting_stats.max_health
 	run.current_resource = starting_stats.max_resource
 
+	# Defensive: a defeat mid-combat skips the scene that would normally
+	# consume this (see ExplorationArea._apply_arrival_spawn()), so a stale
+	# position from the previous run has no business surviving into a new one.
+	SceneManager.has_pending_combat_return_position = false
+
 	SaveManager.save_run(run)
 	EventBus.run_started.emit()
 	print("RunManager: started new run as %s (seed %d)" % [class_id, run.run_seed])
@@ -304,3 +309,25 @@ func increment_counter(key: String, amount: int = 1) -> int:
 	var value := get_counter(key) + amount
 	run.counters[key] = value
 	return value
+
+## Usable artifacts (ArtifactDefinition.usable) - manually triggered once per
+## run rather than firing off a combat hook. Tracked the same way every other
+## one-shot run event is (RunData.story_flags), so no new save field/migration
+## is needed.
+func has_used_artifact(artifact_id: String) -> bool:
+	return run != null and bool(run.story_flags.get("artifact_used_%s" % artifact_id, false))
+
+func use_artifact(artifact_id: String) -> bool:
+	if run == null or not run.has_artifact(artifact_id) or has_used_artifact(artifact_id):
+		return false
+	var def := ArtifactRegistry.get_artifact(artifact_id)
+	if def == null or not def.usable:
+		return false
+	var effect := ArtifactSystem.get_effect(artifact_id)
+	if effect == null:
+		return false
+	var stacks: int = int(run.artifacts.get(artifact_id, 1))
+	effect.on_manually_used({"run": run}, def, stacks)
+	run.story_flags["artifact_used_%s" % artifact_id] = true
+	save_current_run()
+	return true

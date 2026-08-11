@@ -36,3 +36,13 @@ func _apply_visual(shape_points: PackedVector2Array, color: Color, display_name:
 		polygon.visible = true
 		sprite.visible = false
 	name_label.text = display_name
+
+## Clear "this one's out" feedback for a multi-combatant fight: fades and
+## grays the whole visual and appends a tag to the name label, instead of
+## either vanishing instantly or (the old behavior) staying fully rendered
+## as if still alive after its HP hits zero.
+func mark_defeated() -> void:
+	name_label.text += " (Defeated)"
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "modulate", Color(0.45, 0.42, 0.42, 0.45), 0.5)

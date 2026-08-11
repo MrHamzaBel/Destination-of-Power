@@ -24,6 +24,8 @@ static func create(effect_id: String) -> ArtifactEffectBase:
 			return HeartOfTheHollowEffect.new()
 		"bug_catchers_net":
 			return BugCatchersNetEffect.new()
+		"flat_stat_bonus":
+			return FlatStatBonusEffect.new()
 		_:
 			push_warning("ArtifactEffectFactory: unknown effect_id '%s'" % effect_id)
 			return null

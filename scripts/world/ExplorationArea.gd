@@ -53,8 +53,18 @@ func _on_area_ready() -> void:
 ## whose exit_target_scene matches where the player arrived from, no new
 ## per-scene data needed. Falls back to the scene's authored Player position
 ## (the default, used when arriving from anywhere without such a match - the
-## very start of a run, after combat, etc.) when nothing matches.
+## very start of a run, etc.) when nothing matches.
+##
+## Returning from combat takes priority over all of that: start_combat()
+## below records exactly where the player was standing the instant the fight
+## began, so win or flee, they end up back on that exact spot instead of
+## wherever this scene's nearest matching EXIT happens to be.
 func _apply_arrival_spawn() -> void:
+	if SceneManager.has_pending_combat_return_position:
+		SceneManager.has_pending_combat_return_position = false
+		player.global_position = SceneManager.pending_combat_return_position
+		return
+
 	var from_path := SceneManager.arriving_from_scene_path
 	if from_path == "":
 		return
@@ -97,7 +107,7 @@ func _on_interactable_triggered(interactable: Interactable) -> void:
 			hud.show_notification(interactable.message)
 		Interactable.Kind.COMBAT:
 			var return_scene := interactable.victory_return_scene if interactable.victory_return_scene != "" else get_scene_path()
-			SceneManager.start_combat(interactable.enemy_ids, return_scene)
+			start_combat(interactable.enemy_ids, return_scene)
 		Interactable.Kind.EXIT:
 			if interactable.required_guild_rank_order >= 0:
 				var rank_def := RunManager.get_guild_rank_def()
@@ -126,29 +136,45 @@ func _on_interactable_triggered(interactable: Interactable) -> void:
 		Interactable.Kind.GUILD_RECEPTIONIST:
 			_handle_guild_receptionist(interactable)
 
-## Sells trade_item_id for trade_price gold, adjusted by Thorned Coin's price
-## multiplier if the player holds it - exercises the multiplier hook that
-## artifact has always defined but nothing previously called.
+## Never buys on the spot: shows a Yes/No confirm first (same
+## DialogueChoicePopup every other prompt uses) so browsing a vendor and
+## walking away costs nothing.
 func _handle_trade(interactable: Interactable) -> void:
 	if RunManager.run == null:
 		return
-	if _try_sell_to_vendor():
+	if _try_sell_to_vendor(interactable):
 		return
 	var item_def := ItemRegistry.get_item(interactable.trade_item_id)
 	if item_def == null:
 		return
+	if dialogue_popup == null:
+		push_warning("ExplorationArea: %s is a TRADE interactable but this scene has no DialoguePopup." % interactable.display_name)
+		return
 
+	var price := _compute_trade_price(interactable)
+	dialogue_popup.show_prompt(
+		"%s - %d gold. Buy it?" % [item_def.display_name, price],
+		"Buy", "Not now", ""
+	)
+	dialogue_popup.choice_made.connect(_on_trade_confirmed.bind(interactable, price), CONNECT_ONE_SHOT)
+
+## The Lounge's rank-discount applies the same way regardless of when it's
+## read, so the confirm prompt and the actual purchase always show/charge
+## the identical number.
+func _compute_trade_price(interactable: Interactable) -> int:
 	var price := interactable.trade_price
-	if RunManager.run.has_artifact("thorned_coin"):
-		var effect := ArtifactSystem.get_effect("thorned_coin")
-		var artifact_def := ArtifactRegistry.get_artifact("thorned_coin")
-		if effect != null and artifact_def != null and effect.has_method("get_shop_price_multiplier"):
-			var stacks: int = int(RunManager.run.artifacts.get("thorned_coin", 1))
-			price = int(round(float(price) * effect.get_shop_price_multiplier(artifact_def, stacks)))
 	if interactable.lounge_pricing:
 		var rank_def := RunManager.get_guild_rank_def()
 		if rank_def != null:
 			price = int(round(float(price) * (1.0 - rank_def.tax_discount_percent / 100.0)))
+	return price
+
+func _on_trade_confirmed(choice_index: int, interactable: Interactable, price: int) -> void:
+	if choice_index != 0 or RunManager.run == null:
+		return
+	var item_def := ItemRegistry.get_item(interactable.trade_item_id)
+	if item_def == null:
+		return
 
 	if RunManager.run.currency < price:
 		hud.show_notification("Not enough gold - %s costs %d gold." % [item_def.display_name, price])
@@ -163,25 +189,52 @@ func _handle_trade(interactable: Interactable) -> void:
 		notice += " " + interactable.trade_flavor_text
 	hud.show_notification(notice)
 
-## Any TRADE-kind vendor doubles as a generic buyer: if the player is
-## carrying an item with a positive ItemDefinition.sell_price (e.g. a trophy
-## like the bear skin), interacting sells it on the spot instead of buying
-## from that vendor - "sellable at every vendor" needs no per-vendor
-## configuration. Deliberately a separate field from ItemDefinition.value
-## (which every piece of equipment already has set as flavor/worth) so this
-## doesn't retroactively make the player's gear sellable everywhere.
-func _try_sell_to_vendor() -> bool:
+## Any TRADE-kind vendor doubles as a generic buyer: every droppable,
+## non-equipped item in the player's pack is sellable somewhere, for a base
+## price (ItemDefinition.sell_price if explicitly set - e.g. a trophy like
+## the bear skin - otherwise its plain ItemDefinition.value). A vendor can
+## also name specific items it pays a premium for via
+## Interactable.sell_bonus_item_ids/sell_bonus_multiplier (e.g. the
+## Underground Trader paying extra for curios) - if the player is carrying
+## one of those, it's sold first; otherwise whatever's sellable is sold in
+## inventory order, same as before. Equipped gear is never touched, so
+## interacting with a vendor can never quietly sell your only weapon.
+func _try_sell_to_vendor(interactable: Interactable) -> bool:
+	var equipped_ids: Array = RunManager.run.equipped.values()
+	var fallback_id := ""
+	var fallback_def: ItemDefinition = null
+	var fallback_price := 0
 	for stack in RunManager.run.inventory:
 		var item_id: String = stack.get("item_id", "")
+		if equipped_ids.has(item_id):
+			continue
 		var item_def := ItemRegistry.get_item(item_id)
-		if item_def != null and item_def.sell_price > 0:
-			RunManager.run.remove_item(item_id, 1)
-			RunManager.run.currency += item_def.sell_price
-			RunManager.save_current_run()
-			hud.refresh_stats()
-			hud.show_notification("Sold %s for %d gold. (%d gold now)" % [item_def.display_name, item_def.sell_price, RunManager.run.currency])
-			return true
+		if item_def == null or not item_def.droppable:
+			continue
+		var base_price := item_def.sell_price if item_def.sell_price > 0 else item_def.value
+		if base_price <= 0:
+			continue
+		# A vendor's specialty item, if the player has one, always sells first.
+		if interactable.sell_bonus_item_ids.has(item_id):
+			return _sell_item_to_vendor(interactable, item_id, item_def, base_price)
+		if fallback_id == "":
+			fallback_id = item_id
+			fallback_def = item_def
+			fallback_price = base_price
+	if fallback_id != "":
+		return _sell_item_to_vendor(interactable, fallback_id, fallback_def, fallback_price)
 	return false
+
+func _sell_item_to_vendor(interactable: Interactable, item_id: String, item_def: ItemDefinition, base_price: int) -> bool:
+	var price := base_price
+	if interactable.sell_bonus_item_ids.has(item_id):
+		price = int(round(float(base_price) * interactable.sell_bonus_multiplier))
+	RunManager.run.remove_item(item_id, 1)
+	RunManager.run.currency += price
+	RunManager.save_current_run()
+	hud.refresh_stats()
+	hud.show_notification("Sold %s for %d gold. (%d gold now)" % [item_def.display_name, price, RunManager.run.currency])
+	return true
 
 ## Shows the yes/no/decline popup for a DIALOGUE interactable. If quest_id is
 ## set and already active/completed, a status line is shown instead of
@@ -288,7 +341,16 @@ func _on_rush_aggroed(enemy: RushingEnemy) -> void:
 
 func _on_rush_triggered(enemy: RushingEnemy) -> void:
 	var return_scene := enemy.victory_return_scene if enemy.victory_return_scene != "" else get_scene_path()
-	SceneManager.start_combat(enemy.enemy_ids, return_scene)
+	start_combat(enemy.enemy_ids, return_scene)
+
+## Every combat trigger should route through here instead of calling
+## SceneManager.start_combat() directly, so "return to exactly where you
+## were standing" (see _apply_arrival_spawn()) works everywhere without each
+## call site needing to remember to record the player's position itself.
+func start_combat(enemy_ids: Array[String], return_scene: String = "", advances_encounter: bool = false, ally_ids: Array[String] = []) -> void:
+	SceneManager.pending_combat_return_position = player.global_position
+	SceneManager.has_pending_combat_return_position = true
+	SceneManager.start_combat(enemy_ids, return_scene if return_scene != "" else get_scene_path(), advances_encounter, ally_ids)
 
 ## --- Pause / inventory overlay ---------------------------------------------
 

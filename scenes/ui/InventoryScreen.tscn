@@ -209,7 +209,13 @@ unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
 theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
-text = ""
+
+[node name="ArtifactUseButton" type="Button" parent="CenterContainer/Panel/VBox/Tabs/Artifacts/ArtifactDetailsPanel/ArtifactDetailsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+disabled = true
+text = "Use"
 
 [node name="Character" type="VBoxContainer" parent="CenterContainer/Panel/VBox/Tabs"]
 visible = false

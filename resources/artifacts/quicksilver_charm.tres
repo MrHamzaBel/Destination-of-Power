@@ -4,15 +4,15 @@
 
 [resource]
 script = ExtResource("1_art")
-id = "thorned_coin"
-display_name = "Thorned Coin"
-description = "A coin wrapped in thorny vines, warm to the touch."
-rarity = 1
-icon_color = Color(0.8, 0.65, 0.2, 1)
-effect_id = "thorned_coin"
+id = "quicksilver_charm"
+display_name = "Quicksilver Charm"
+description = "A trinket that hums faintly, always a half-step ahead of itself. A small, steady boost to Speed."
+rarity = 0
+icon_color = Color(0.75, 0.78, 0.85, 1)
+effect_id = "flat_stat_bonus"
 effect_values = {
-"gold_amount": 40
+"stat": "speed",
+"amount": 3
 }
 stacking_allowed = true
 class_restrictions = Array[String]([])
-usable = true

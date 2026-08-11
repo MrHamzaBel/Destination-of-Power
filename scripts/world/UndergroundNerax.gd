@@ -59,4 +59,4 @@ func _check_boss_trigger() -> void:
 		return
 	if RunManager.get_counter("underground_thugs_defeated") < BOSS_TRIGGER_COUNT:
 		return
-	SceneManager.start_combat(["underground_boss"], get_scene_path())
+	start_combat(["underground_boss"], get_scene_path())

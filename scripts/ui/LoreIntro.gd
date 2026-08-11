@@ -8,6 +8,7 @@ const LORE_PATH: String = "res://resources/lore/nerax_intro.tres"
 @onready var hint_label: Label = %HintLabel
 @onready var skip_button: Button = %SkipButton
 @onready var advance_area: Button = %AdvanceArea
+@onready var background: CutsceneBackground = %Background
 
 var _lore: LoreScript
 var _index: int = -1
@@ -15,6 +16,7 @@ var _finished: bool = false
 
 func _ready() -> void:
 	_lore = load(LORE_PATH)
+	background.set_texture(_lore.background_texture if _lore != null else null)
 	skip_button.pressed.connect(_on_skip_pressed)
 	advance_area.pressed.connect(_advance)
 	_advance()
@@ -44,4 +46,4 @@ func _finish() -> void:
 	if _finished:
 		return
 	_finished = true
-	SceneManager.goto_scene(SceneManager.BACK_ALLEY)
+	SceneManager.goto_scene(SceneManager.BACK_ALLEY, true)

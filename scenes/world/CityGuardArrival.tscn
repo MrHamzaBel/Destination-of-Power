@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://bcityguardarrival01"]
+[gd_scene load_steps=4 format=3 uid="uid://bcityguardarrival01"]
 
 [ext_resource type="Script" path="res://scripts/world/CityGuardArrival.gd" id="1_script"]
 [ext_resource type="Theme" path="res://resources/ui/nerax_theme.tres" id="2_theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/CutsceneBackground.tscn" id="3_backdrop"]
 
 [node name="CityGuardArrival" type="Control"]
 layout_mode = 3
@@ -11,12 +12,9 @@ anchor_bottom = 1.0
 theme = ExtResource("2_theme")
 script = ExtResource("1_script")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" parent="." instance=ExtResource("3_backdrop")]
+unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color(0.035, 0.03, 0.05, 1)
 
 [node name="AdvanceArea" type="Button" parent="."]
 unique_name_in_owner = true

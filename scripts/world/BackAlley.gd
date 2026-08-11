@@ -57,7 +57,7 @@ func _trigger_rat_den() -> void:
 		RunManager.run.story_flags["rat_den_pending_boss"] = true
 		RunManager.run.counters.erase("rat_den_pending_kills")
 		RunManager.save_current_run()
-		SceneManager.start_combat(["rat_boss", "alley_rat", "alley_rat"], get_scene_path())
+		start_combat(["rat_boss", "alley_rat", "alley_rat"], get_scene_path())
 		return
 
 	var rat_count := 2 if randf() < 0.5 else 1
@@ -67,7 +67,7 @@ func _trigger_rat_den() -> void:
 	RunManager.run.story_flags["rat_den_pending_boss"] = false
 	RunManager.run.counters["rat_den_pending_kills"] = rat_count
 	RunManager.save_current_run()
-	SceneManager.start_combat(ids, get_scene_path())
+	start_combat(ids, get_scene_path())
 
 func _resolve_pending_rat_fight() -> void:
 	if RunManager.run == null:

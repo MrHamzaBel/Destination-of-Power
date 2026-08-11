@@ -116,6 +116,17 @@ horizontal_alignment = 1
 visible = false
 text = "Press E to interact"
 
+[node name="NotificationAdvanceArea" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+flat = true
+text = ""
+visible = false
+
 [node name="NotificationPanel" type="PanelContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
@@ -134,3 +145,19 @@ layout_mode = 2
 autowrap_mode = 3
 horizontal_alignment = 1
 text = "Notification"
+
+[node name="NotificationHintLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 104.0
+offset_bottom = 124.0
+offset_left = 240.0
+offset_right = -240.0
+mouse_filter = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.6, 0.58, 0.66, 1)
+theme_override_font_sizes/font_size = 13
+visible = false
+text = "Click, press Space/Enter to continue..."

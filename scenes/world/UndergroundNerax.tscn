@@ -219,6 +219,8 @@ kind = 5
 trade_item_id = "minor_mana_potion"
 trade_price = 6
 trade_flavor_text = "\"Don't ask where I get the ingredients,\" the trader mutters, sliding the vial across."
+sell_bonus_item_ids = Array[String](["bear_skin", "crystal_shard", "iridescent_beetle_shell", "lucky_coin"])
+sell_bonus_multiplier = 1.4
 
 [node name="Shape" type="CollisionShape2D" parent="ManaTraderInteract"]
 shape = SubResource("InteractShape")

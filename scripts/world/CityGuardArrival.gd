@@ -12,6 +12,7 @@ const REVENGE_ALLY_IDS: Array[String] = ["city_guard"]
 @onready var hint_label: Label = %HintLabel
 @onready var skip_button: Button = %SkipButton
 @onready var advance_area: Button = %AdvanceArea
+@onready var background: CutsceneBackground = %Background
 
 var _lore: LoreScript
 var _index: int = -1
@@ -22,6 +23,7 @@ func _ready() -> void:
 		RunManager.run.story_flags["met_city_guard"] = true
 		RunManager.save_current_run()
 	_lore = load(LORE_PATH)
+	background.set_texture(_lore.background_texture if _lore != null else null)
 	skip_button.pressed.connect(_on_skip_pressed)
 	advance_area.pressed.connect(_advance)
 	_advance()
@@ -51,4 +53,4 @@ func _finish() -> void:
 	if _finished:
 		return
 	_finished = true
-	SceneManager.start_combat(REVENGE_ENEMY_IDS, SceneManager.CITY_GUARD_FAREWELL, false, REVENGE_ALLY_IDS)
+	SceneManager.start_combat(REVENGE_ENEMY_IDS, SceneManager.CITY_GUARD_FAREWELL, false, REVENGE_ALLY_IDS, true)

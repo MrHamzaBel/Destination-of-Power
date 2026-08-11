@@ -33,6 +33,12 @@ func on_item_used(_context: Dictionary, _def: ArtifactDefinition, _stacks: int) 
 func on_health_low(_context: Dictionary, _def: ArtifactDefinition, _stacks: int) -> void:
 	pass
 
+## Only called for ArtifactDefinition.usable == true artifacts, via
+## RunManager.use_artifact() - the player manually triggering the effect
+## (e.g. Thorned Coin's gold burst) rather than it firing off a combat hook.
+func on_manually_used(_context: Dictionary, _def: ArtifactDefinition, _stacks: int) -> void:
+	pass
+
 ## Optional constant stat modifier applied while the artifact is held
 ## (e.g. Broken Crown's max health/defense trade-off). Return null for
 ## purely event-driven artifacts.

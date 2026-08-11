@@ -1,0 +1,72 @@
+[gd_scene format=3 uid="uid://dy3d6lylaft3u"]
+
+[ext_resource type="Script" path="res://scripts/ui/CutsceneBackground.gd" id="1_script"]
+
+[sub_resource type="Gradient" id="Gradient_sky"]
+colors = PackedColorArray(0.07, 0.06, 0.13, 1, 0.22, 0.16, 0.18, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture_sky"]
+gradient = SubResource("Gradient_sky")
+fill_to = Vector2(0, 1)
+
+[node name="CutsceneBackground" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_script")
+mouse_filter = 2
+
+[node name="GradientRect" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = SubResource("GradientTexture_sky")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="PlaceholderShapes" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="FarHill1" type="Polygon2D" parent="PlaceholderShapes"]
+color = Color(0.1, 0.08, 0.12, 1)
+polygon = PackedVector2Array(-20, 720, -20, 560, 160, 500, 340, 550, 520, 500, 520, 720)
+
+[node name="FarHill2" type="Polygon2D" parent="PlaceholderShapes"]
+color = Color(0.1, 0.08, 0.12, 1)
+polygon = PackedVector2Array(600, 720, 600, 540, 780, 480, 960, 530, 1160, 470, 1300, 520, 1300, 720)
+
+[node name="NearSilhouette1" type="Polygon2D" parent="PlaceholderShapes"]
+color = Color(0.05, 0.04, 0.06, 1)
+polygon = PackedVector2Array(-20, 720, -20, 620, 60, 600, 60, 640, 140, 640, 140, 610, 220, 630, 220, 720)
+
+[node name="NearSilhouette2" type="Polygon2D" parent="PlaceholderShapes"]
+color = Color(0.05, 0.04, 0.06, 1)
+polygon = PackedVector2Array(980, 720, 980, 610, 1060, 590, 1060, 630, 1140, 630, 1140, 600, 1220, 615, 1300, 600, 1300, 720)
+
+[node name="Moon" type="Polygon2D" parent="PlaceholderShapes"]
+position = Vector2(1080, 140)
+color = Color(0.55, 0.52, 0.42, 0.55)
+polygon = PackedVector2Array(-30, 0, -21, -21, 0, -30, 21, -21, 30, 0, 21, 21, 0, 30, -21, 21)
+
+[node name="ArtRect" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+visible = false
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0.25)

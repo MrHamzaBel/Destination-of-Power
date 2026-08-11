@@ -214,6 +214,10 @@ func _set_actions_enabled(enabled: bool) -> void:
 	for button in [attack_button, abilities_button, items_button, defend_button, end_turn_button]:
 		button.disabled = not enabled
 
+## Card-based skill list, one self-contained clickable panel per ability -
+## color-coded left accent + cost badge by AbilityDefinition.AbilityType, so
+## any new ability/spell a class picks up later slots into the same visual
+## language automatically instead of needing per-ability styling.
 func _open_abilities() -> void:
 	for child in abilities_list.get_children():
 		child.queue_free()
@@ -224,26 +228,96 @@ func _open_abilities() -> void:
 		var ability := AbilityRegistry.get_ability(ability_id)
 		if ability == null:
 			continue
-		var row := HBoxContainer.new()
-		var btn := Button.new()
-		btn.text = "%s (%d %s)" % [ability.display_name, ability.resource_cost, _combat.resource_name()]
-		btn.focus_mode = Control.FOCUS_ALL
-		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.disabled = ability.resource_cost > _combat.player_unit.current_resource
-		btn.tooltip_text = ability.description
-		btn.pressed.connect(func():
-			_combat.player_use_ability(ability.id)
-			abilities_panel.visible = false
-		)
-		row.add_child(btn)
-		var desc := Label.new()
-		desc.text = ability.description
-		desc.autowrap_mode = TextServer.AUTOWRAP_WORD
-		desc.custom_minimum_size = Vector2(260, 0)
-		desc.add_theme_color_override("font_color", Color(0.7, 0.68, 0.78, 1))
-		abilities_list.add_child(row)
-		abilities_list.add_child(desc)
+		abilities_list.add_child(_build_ability_card(ability))
 	abilities_panel.visible = true
+
+func _build_ability_card(ability: AbilityDefinition) -> Control:
+	var affordable := ability.resource_cost <= _combat.player_unit.current_resource
+	var accent := _ability_type_color(ability.ability_type)
+
+	var card := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.16, 0.15, 0.2, 1) if affordable else Color(0.13, 0.12, 0.14, 1)
+	style.set_corner_radius_all(10)
+	style.set_border_width_all(2)
+	style.border_color = accent if affordable else Color(0.32, 0.3, 0.34, 1)
+	style.content_margin_left = 14.0
+	style.content_margin_right = 14.0
+	style.content_margin_top = 10.0
+	style.content_margin_bottom = 10.0
+	card.add_theme_stylebox_override("panel", style)
+	card.mouse_filter = Control.MOUSE_FILTER_STOP
+	card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if affordable else Control.CURSOR_FORBIDDEN
+	card.tooltip_text = ability.description
+
+	var hbox := HBoxContainer.new()
+	hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hbox.add_theme_constant_override("separation", 12)
+	card.add_child(hbox)
+
+	var icon := PanelContainer.new()
+	icon.custom_minimum_size = Vector2(6, 0)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var icon_style := StyleBoxFlat.new()
+	icon_style.bg_color = accent if affordable else Color(0.4, 0.38, 0.42, 1)
+	icon_style.set_corner_radius_all(3)
+	icon.add_theme_stylebox_override("panel", icon_style)
+	hbox.add_child(icon)
+
+	var vbox := VBoxContainer.new()
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hbox.add_child(vbox)
+
+	var title_row := HBoxContainer.new()
+	title_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(title_row)
+
+	var name_label := Label.new()
+	name_label.text = ability.display_name
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	name_label.add_theme_font_size_override("font_size", 17)
+	if not affordable:
+		name_label.add_theme_color_override("font_color", Color(0.55, 0.52, 0.56, 1))
+	title_row.add_child(name_label)
+
+	var cost_badge := Label.new()
+	cost_badge.text = "%d %s" % [ability.resource_cost, _combat.resource_name()]
+	cost_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cost_badge.add_theme_font_size_override("font_size", 13)
+	cost_badge.add_theme_color_override("font_color", accent if affordable else Color(0.55, 0.52, 0.56, 1))
+	title_row.add_child(cost_badge)
+
+	var desc := Label.new()
+	desc.text = ability.description
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD
+	desc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	desc.add_theme_font_size_override("font_size", 13)
+	desc.add_theme_color_override("font_color", Color(0.7, 0.68, 0.78, 1) if affordable else Color(0.5, 0.48, 0.52, 1))
+	vbox.add_child(desc)
+
+	if affordable:
+		card.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				_combat.player_use_ability(ability.id)
+				abilities_panel.visible = false
+		)
+	return card
+
+func _ability_type_color(ability_type: AbilityDefinition.AbilityType) -> Color:
+	match ability_type:
+		AbilityDefinition.AbilityType.ATTACK:
+			return Color(0.85, 0.4, 0.32, 1)
+		AbilityDefinition.AbilityType.HEAL:
+			return Color(0.4, 0.8, 0.45, 1)
+		AbilityDefinition.AbilityType.BUFF:
+			return Color(0.4, 0.62, 0.95, 1)
+		AbilityDefinition.AbilityType.DEFEND:
+			return Color(0.75, 0.68, 0.35, 1)
+		AbilityDefinition.AbilityType.UTILITY:
+			return Color(0.72, 0.42, 0.88, 1)
+	return Color(0.6, 0.6, 0.62, 1)
 
 func _open_items() -> void:
 	for child in items_list.get_children():

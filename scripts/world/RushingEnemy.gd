@@ -24,6 +24,11 @@ var _triggered: bool = false
 
 func _ready() -> void:
 	add_to_group("rushing_enemies")
+	# Notifications (e.g. the aggro rush_notification below) now pause the
+	# tree until dismissed - without this, a chasing enemy would freeze
+	# mid-pursuit the instant it spots the player, only resuming once the
+	# player dismisses a message they may not even have noticed yet.
+	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func setup_target(player: Node2D) -> void:
 	_player = player

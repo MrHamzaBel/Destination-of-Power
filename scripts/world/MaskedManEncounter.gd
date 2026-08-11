@@ -19,6 +19,7 @@ const SHUTUP_LORE_PATH: String = "res://resources/lore/masked_man_shutup.tres"
 @onready var skip_button: Button = %SkipButton
 @onready var advance_area: Button = %AdvanceArea
 @onready var choice_popup: DialogueChoicePopup = %ChoicePopup
+@onready var background: CutsceneBackground = %Background
 
 var _lore: LoreScript
 var _index: int = -1
@@ -31,6 +32,7 @@ func _ready() -> void:
 		RunManager.run.story_flags["forest_portal_seen"] = true
 		RunManager.save_current_run()
 	_lore = load(INTRO_LORE_PATH)
+	background.set_texture(_lore.background_texture if _lore != null else null)
 	skip_button.pressed.connect(_on_skip_pressed)
 	advance_area.pressed.connect(_advance)
 	_advance()
@@ -84,10 +86,11 @@ func _on_choice_made(choice_index: int) -> void:
 		_lore = load(SHUTUP_LORE_PATH)
 	else:
 		_lore = load(LEAVES_LORE_PATH)
+	background.set_texture(_lore.background_texture if _lore != null else null)
 	_advance()
 
 func _finish() -> void:
 	if _finished:
 		return
 	_finished = true
-	SceneManager.goto_scene(SceneManager.DEEP_FOREST)
+	SceneManager.goto_scene(SceneManager.DEEP_FOREST, true)

@@ -1,12 +1,13 @@
 class_name ThornedCoinEffect
 extends ArtifactEffectBase
-## Thorned Coin: gain more gold from combat rewards, but shop prices are also
-## increased (price multiplier is exposed for a future shop system).
+## Thorned Coin: a usable relic, not a passive one - once per run, spend it
+## for an immediate burst of gold. Simple and direct by design, unlike the
+## conditional/event-driven artifacts: pick it up, cash it in whenever you
+## want the gold more than you want to keep holding it.
 
-func on_enemy_defeated(context: Dictionary, def: ArtifactDefinition, stacks: int) -> void:
-	var multiplier: float = 1.0 + float(def.effect_values.get("gold_bonus_percent", 0.25)) * stacks
-	if context.has("currency_reward"):
-		context["currency_reward"] = int(round(float(context["currency_reward"]) * multiplier))
-
-func get_shop_price_multiplier(def: ArtifactDefinition, stacks: int) -> float:
-	return 1.0 + float(def.effect_values.get("price_increase_percent", 0.15)) * stacks
+func on_manually_used(context: Dictionary, def: ArtifactDefinition, stacks: int) -> void:
+	var run: RunData = context.get("run")
+	if run == null:
+		return
+	var amount: int = int(def.effect_values.get("gold_amount", 40)) * stacks
+	run.currency += amount
