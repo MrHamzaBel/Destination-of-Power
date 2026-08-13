@@ -1,0 +1,275 @@
+[gd_scene load_steps=13 format=3 uid="uid://binnernerax01"]
+
+[ext_resource type="Script" path="res://scripts/world/InnerNerax.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/entities/EnemyCharacter.tscn" id="7_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueChoicePopup.tscn" id="8_dialogue"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(520, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeBottomSeg"]
+size = Vector2(200, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeV"]
+size = Vector2(20, 520)
+
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(100, 20)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 36.0
+
+[node name="InnerNerax" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.28, 0.27, 0.32, 1)
+polygon = PackedVector2Array(-250, -250, 250, -250, 250, 250, -250, 250)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.34, 0.33, 0.4, 1)
+polygon = PackedVector2Array(-240, -240, 240, -240, 240, 240, -240, 240)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -250)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.16, 0.15, 0.19, 1)
+polygon = PackedVector2Array(-260, -10, 260, -10, 260, 10, -260, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-150, 250)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
+color = Color(0.16, 0.15, 0.19, 1)
+polygon = PackedVector2Array(-100, -10, 100, -10, 100, 10, -100, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(150, 250)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+color = Color(0.16, 0.15, 0.19, 1)
+polygon = PackedVector2Array(-100, -10, 100, -10, 100, 10, -100, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-250, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallLeft"]
+color = Color(0.16, 0.15, 0.19, 1)
+polygon = PackedVector2Array(-10, -260, 10, -260, 10, 260, -10, 260)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WallShapeV")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(250, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.16, 0.15, 0.19, 1)
+polygon = PackedVector2Array(-10, -260, 10, -260, 10, 260, -10, 260)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeV")
+
+[node name="Fountain" type="Polygon2D" parent="."]
+position = Vector2(0, -60)
+color = Color(0.45, 0.5, 0.58, 1)
+polygon = PackedVector2Array(-30, -30, 30, -30, 30, 30, -30, 30)
+
+[node name="FountainInset" type="Polygon2D" parent="."]
+position = Vector2(0, -60)
+color = Color(0.4, 0.62, 0.75, 0.85)
+polygon = PackedVector2Array(-20, -20, 20, -20, 20, 20, -20, 20)
+
+[node name="DistrictMarkerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, -130)
+script = ExtResource("6_interactable")
+display_name = "Inner District Marker"
+kind = 0
+message = "A stone marker beside the fountain reads \"INNER NERAX MARKET - RESIDENTS AND ESCORTED BUSINESS.\" Compared to the outer city, everything here is quieter, cleaner, and considerably more expensive."
+
+[node name="Shape" type="CollisionShape2D" parent="DistrictMarkerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="DistrictMarkerVisual" type="Polygon2D" parent="DistrictMarkerInteract"]
+color = Color(0.5, 0.5, 0.55, 1)
+polygon = PackedVector2Array(-12, -16, 12, -16, 12, 16, -12, 16)
+
+[node name="ApothecaryInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-170, -140)
+script = ExtResource("6_interactable")
+display_name = "Apothecary"
+kind = 5
+trade_item_id = "sunfruit_tonic"
+trade_price = 15
+trade_flavor_text = "\"Grown in the district's own orchards,\" the apothecary says. \"You won't find its like past the gate.\""
+
+[node name="Shape" type="CollisionShape2D" parent="ApothecaryInteract"]
+shape = SubResource("InteractShape")
+
+[node name="StallVisual" type="Polygon2D" parent="ApothecaryInteract"]
+color = Color(0.5, 0.35, 0.25, 1)
+polygon = PackedVector2Array(-30, -20, 30, -20, 30, 20, -30, 20)
+
+[node name="ApothecaryVisual" parent="ApothecaryInteract" instance=ExtResource("7_enemy")]
+
+[node name="AlchemistInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(170, -140)
+script = ExtResource("6_interactable")
+display_name = "Alchemist"
+kind = 5
+trade_item_id = "honeyed_draught"
+trade_price = 16
+trade_flavor_text = "\"Careful with the dosage,\" the alchemist warns, \"it's stronger than it tastes.\""
+
+[node name="Shape" type="CollisionShape2D" parent="AlchemistInteract"]
+shape = SubResource("InteractShape")
+
+[node name="StallVisual" type="Polygon2D" parent="AlchemistInteract"]
+color = Color(0.4, 0.32, 0.5, 1)
+polygon = PackedVector2Array(-30, -20, 30, -20, 30, 20, -30, 20)
+
+[node name="AlchemistVisual" parent="AlchemistInteract" instance=ExtResource("7_enemy")]
+
+[node name="WineMerchantInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-170, 40)
+script = ExtResource("6_interactable")
+display_name = "Wine Merchant"
+kind = 5
+trade_item_id = "spiced_wine"
+trade_price = 22
+trade_flavor_text = "\"A good vintage,\" the merchant says, \"and a rare thing to find outside the inner wall.\""
+
+[node name="Shape" type="CollisionShape2D" parent="WineMerchantInteract"]
+shape = SubResource("InteractShape")
+
+[node name="StallVisual" type="Polygon2D" parent="WineMerchantInteract"]
+color = Color(0.45, 0.2, 0.22, 1)
+polygon = PackedVector2Array(-30, -20, 30, -20, 30, 20, -30, 20)
+
+[node name="WineMerchantVisual" parent="WineMerchantInteract" instance=ExtResource("7_enemy")]
+
+[node name="StreetVendorInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(170, 40)
+script = ExtResource("6_interactable")
+display_name = "Street Vendor"
+kind = 5
+trade_item_id = "candied_nuts"
+trade_price = 4
+trade_flavor_text = "\"Freshly roasted,\" the vendor calls out, \"a coin a twist!\""
+
+[node name="Shape" type="CollisionShape2D" parent="StreetVendorInteract"]
+shape = SubResource("InteractShape")
+
+[node name="StallVisual" type="Polygon2D" parent="StreetVendorInteract"]
+color = Color(0.55, 0.42, 0.24, 1)
+polygon = PackedVector2Array(-30, -20, 30, -20, 30, 20, -30, 20)
+
+[node name="StreetVendorVisual" parent="StreetVendorInteract" instance=ExtResource("7_enemy")]
+
+[node name="InnerGuardLeftInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-70, 190)
+script = ExtResource("6_interactable")
+display_name = "Inner Guard"
+kind = 0
+message = "\"Keep to the square,\" the guard says, eyeing your gear. \"Residents don't take kindly to adventurers wandering the side streets.\""
+
+[node name="Shape" type="CollisionShape2D" parent="InnerGuardLeftInteract"]
+shape = SubResource("InteractShape")
+
+[node name="Visual" type="Polygon2D" parent="InnerGuardLeftInteract"]
+color = Color(0.4, 0.42, 0.5, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="InnerGuardRightInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(70, 190)
+script = ExtResource("6_interactable")
+display_name = "Inner Guard"
+kind = 0
+message = "\"Spend your coin and move on,\" the second guard says, arms crossed. \"That's the arrangement the guild worked out with the district.\""
+
+[node name="Shape" type="CollisionShape2D" parent="InnerGuardRightInteract"]
+shape = SubResource("InteractShape")
+
+[node name="Visual" type="Polygon2D" parent="InnerGuardRightInteract"]
+color = Color(0.42, 0.4, 0.48, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="ExitToGate" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 250)
+script = ExtResource("6_interactable")
+display_name = "Back Through the Gate"
+kind = 2
+exit_target_scene = "res://scenes/world/InnerWallSouth.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToGate"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToGate"]
+color = Color(0.55, 0.45, 0.75, 0.5)
+polygon = PackedVector2Array(-50, -10, 50, -10, 50, 10, -50, 10)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(0, 200)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -260
+limit_top = -260
+limit_right = 260
+limit_bottom = 260
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true
+
+[node name="DialoguePopup" parent="UILayer" instance=ExtResource("8_dialogue")]
+unique_name_in_owner = true

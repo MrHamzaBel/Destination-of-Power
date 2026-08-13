@@ -192,6 +192,35 @@ func end_turn() -> void:
 	_log("%s passes the turn." % player_unit.display_name)
 	_finish_action()
 
+## Swiftie Boots' signature mechanic: only offered while the player is
+## strictly faster (effective Speed, so freeze/haste debuffs count) than
+## every living enemy in the fight - a slower or evenly-matched party can't
+## outrun anyone, mirroring how the dodge/damage formulas never let the
+## weaker side "win."
+func player_can_flee() -> bool:
+	if not is_player_turn():
+		return false
+	if RunManager.run == null or not RunManager.run.has_artifact("swiftie_boots"):
+		return false
+	var enemies := get_alive_enemies()
+	if enemies.is_empty():
+		return false
+	var player_speed := player_unit.get_effective_speed()
+	for e in enemies:
+		if player_speed <= e.get_effective_speed():
+			return false
+	return true
+
+## Ends combat as a clean escape instead of a win/loss - no loot, no exp, no
+## artifact roll (see _finish_combat's fled param), but current health/resource
+## still carries forward same as any other combat exit.
+func player_attempt_flee() -> void:
+	if not player_can_flee():
+		return
+	_log("%s is faster than every foe here and slips away from the fight!" % player_unit.display_name)
+	last_rewards["player_fled"] = true
+	_finish_combat(true, true)
+
 func heal_player(amount: int, source_label: String = "") -> void:
 	if player_unit == null:
 		return
@@ -810,14 +839,14 @@ func _check_combat_end() -> bool:
 		return true
 	return false
 
-func _finish_combat(victory: bool) -> void:
+func _finish_combat(victory: bool, fled: bool = false) -> void:
 	awaiting_player_input = false
 	if RunManager.run != null:
 		RunManager.run.current_health = player_unit.current_health
 		RunManager.run.current_resource = player_unit.current_resource
-	var context := {"combat": self, "victory": victory}
+	var context := {"combat": self, "victory": victory, "fled": fled}
 	EventBus.combat_ended.emit(context)
-	if victory:
+	if victory and not fled:
 		_grant_rewards()
 	if RunManager.run != null:
 		RunManager.save_current_run()
@@ -836,7 +865,7 @@ func _grant_rewards() -> void:
 					RunManager.run.add_item(item_id, 1)
 					(last_rewards["items"] as Array).append(item_id)
 	# Nothing was actually defeated (e.g. every enemy fled) - no surprise loot either.
-	if not _defeated_this_combat.is_empty() and _rng.randf() < 0.20:
+	if not _defeated_this_combat.is_empty() and _rng.randf() < 0.15:
 		var artifact := ArtifactRegistry.get_random(_rng, RunManager.run.class_id)
 		if artifact != null and (artifact.stacking_allowed or not RunManager.run.has_artifact(artifact.id)):
 			RunManager.run.add_artifact(artifact.id)

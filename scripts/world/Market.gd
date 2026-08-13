@@ -6,7 +6,7 @@ func get_scene_path() -> String:
 	return SceneManager.MARKET
 
 func get_objective_text() -> String:
-	return "Head south through the market to the gate, or back north to the plaza."
+	return "Head south through the market to the gate, back north to the plaza, or up the ward stairs to the east."
 
 func _on_area_ready() -> void:
 	var vendor_visual := get_node_or_null("MarketVendorInteract/MarketVendorVisual") as EnemyCharacter

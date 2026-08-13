@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "honeyed_draught"
+display_name = "Honeyed Draught"
+description = "A thick, amber draught sold by the inner city's alchemists. Restores a generous amount of your class resource."
+category = 2
+rarity = 1
+icon_color = Color(0.85, 0.65, 0.15, 1)
+equip_slot = ""
+is_ranged = false
+stat_modifiers = null
+heal_amount = 0
+resource_amount = 30
+value = 16
+droppable = true

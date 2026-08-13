@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bmarketnerax01"]
+[gd_scene load_steps=14 format=3 uid="uid://bmarketnerax01"]
 
 [ext_resource type="Script" path="res://scripts/world/Market.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
@@ -11,9 +11,6 @@
 
 [sub_resource type="RectangleShape2D" id="WallShapeHSeg"]
 size = Vector2(150, 20)
-
-[sub_resource type="RectangleShape2D" id="WallShapeV"]
-size = Vector2(20, 720)
 
 [sub_resource type="RectangleShape2D" id="WallShapeVSeg"]
 size = Vector2(20, 290)
@@ -113,17 +110,29 @@ polygon = PackedVector2Array(-10, -145, 10, -145, 10, 145, -10, 145)
 [node name="Shape" type="CollisionShape2D" parent="WallLeftBottom"]
 shape = SubResource("WallShapeVSeg")
 
-[node name="WallRight" type="StaticBody2D" parent="."]
+[node name="WallRightTop" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(230, 0)
+position = Vector2(230, -215)
 
-[node name="Visual" type="Polygon2D" parent="WallRight"]
+[node name="Visual" type="Polygon2D" parent="WallRightTop"]
 color = Color(0.16, 0.13, 0.1, 1)
-polygon = PackedVector2Array(-10, -360, 10, -360, 10, 360, -10, 360)
+polygon = PackedVector2Array(-10, -145, 10, -145, 10, 145, -10, 145)
 
-[node name="Shape" type="CollisionShape2D" parent="WallRight"]
-shape = SubResource("WallShapeV")
+[node name="Shape" type="CollisionShape2D" parent="WallRightTop"]
+shape = SubResource("WallShapeVSeg")
+
+[node name="WallRightBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(230, 215)
+
+[node name="Visual" type="Polygon2D" parent="WallRightBottom"]
+color = Color(0.16, 0.13, 0.1, 1)
+polygon = PackedVector2Array(-10, -145, 10, -145, 10, 145, -10, 145)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRightBottom"]
+shape = SubResource("WallShapeVSeg")
 
 [node name="House1" type="StaticBody2D" parent="."]
 collision_layer = 1
@@ -316,6 +325,22 @@ shape = SubResource("GapShapeV")
 
 [node name="ExitVisual" type="Polygon2D" parent="ExitToGarrison"]
 color = Color(0.55, 0.15, 0.15, 0.5)
+polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
+
+[node name="ExitToUpperWard" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(230, 0)
+script = ExtResource("6_interactable")
+display_name = "Ward Stairs"
+kind = 2
+exit_target_scene = "res://scenes/world/NeraxUpperWard.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToUpperWard"]
+shape = SubResource("GapShapeV")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToUpperWard"]
+color = Color(0.55, 0.45, 0.75, 0.5)
 polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
 
 [node name="ExitToPlaza" type="Area2D" parent="."]

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "bulwark_plate"
+display_name = "Bulwark Plate"
+description = "A heavy fragment of reinforced plating, still dented from whatever it stopped. A solid boost to Defense."
+rarity = 1
+icon_color = Color(0.5, 0.5, 0.55, 1)
+effect_id = "flat_stat_bonus"
+effect_values = {
+"stat": "defense",
+"amount": 5
+}
+stacking_allowed = true
+class_restrictions = Array[String]([])

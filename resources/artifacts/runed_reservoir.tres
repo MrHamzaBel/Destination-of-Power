@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "runed_reservoir"
+display_name = "Runed Reservoir"
+description = "A small vessel of etched glass that never seems to run dry. A solid boost to your maximum resource pool."
+rarity = 1
+icon_color = Color(0.35, 0.6, 0.85, 1)
+effect_id = "flat_stat_bonus"
+effect_values = {
+"stat": "max_resource",
+"amount": 15
+}
+stacking_allowed = true
+class_restrictions = Array[String]([])

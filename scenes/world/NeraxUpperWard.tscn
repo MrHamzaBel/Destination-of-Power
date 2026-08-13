@@ -1,0 +1,219 @@
+[gd_scene load_steps=11 format=3 uid="uid://bupperward01"]
+
+[ext_resource type="Script" path="res://scripts/world/NeraxUpperWard.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueChoicePopup.tscn" id="7_dialogue"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeHSeg"]
+size = Vector2(150, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVFull"]
+size = Vector2(20, 420)
+
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(160, 20)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 36.0
+
+[node name="NeraxUpperWard" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.3, 0.27, 0.24, 1)
+polygon = PackedVector2Array(-230, -200, 230, -200, 230, 200, -230, 200)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.37, 0.33, 0.29, 1)
+polygon = PackedVector2Array(-220, -190, 220, -190, 220, 190, -220, 190)
+
+[node name="WallTopLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-155, -200)
+
+[node name="Visual" type="Polygon2D" parent="WallTopLeft"]
+color = Color(0.18, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-75, -10, 75, -10, 75, 10, -75, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTopLeft"]
+shape = SubResource("WallShapeHSeg")
+
+[node name="WallTopRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(155, -200)
+
+[node name="Visual" type="Polygon2D" parent="WallTopRight"]
+color = Color(0.18, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-75, -10, 75, -10, 75, 10, -75, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTopRight"]
+shape = SubResource("WallShapeHSeg")
+
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-155, 200)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
+color = Color(0.18, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-75, -10, 75, -10, 75, 10, -75, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeHSeg")
+
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(155, 200)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+color = Color(0.18, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-75, -10, 75, -10, 75, 10, -75, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeHSeg")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-230, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallLeft"]
+color = Color(0.18, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-10, -210, 10, -210, 10, 210, -10, 210)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WallShapeVFull")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(230, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.18, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-10, -210, 10, -210, 10, 210, -10, 210)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeVFull")
+
+[node name="Lamp1" type="Polygon2D" parent="."]
+position = Vector2(-190, -160)
+color = Color(0.9, 0.78, 0.35, 0.85)
+polygon = PackedVector2Array(-5, -5, 5, -5, 5, 5, -5, 5)
+
+[node name="Lamp2" type="Polygon2D" parent="."]
+position = Vector2(190, 160)
+color = Color(0.9, 0.78, 0.35, 0.85)
+polygon = PackedVector2Array(-5, -5, 5, -5, 5, 5, -5, 5)
+
+[node name="HollowEyedBeggarInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-160, -60)
+script = ExtResource("6_interactable")
+display_name = "Hollow-Eyed Beggar"
+kind = 0
+message = "A hollow-eyed man huddles against the wall, palm out, saying nothing."
+
+[node name="Shape" type="CollisionShape2D" parent="HollowEyedBeggarInteract"]
+shape = SubResource("InteractShape")
+
+[node name="Visual" type="Polygon2D" parent="HollowEyedBeggarInteract"]
+color = Color(0.42, 0.38, 0.34, 1)
+polygon = PackedVector2Array(-9, -12, 9, -12, 12, 2, 10, 16, -10, 16, -12, 2)
+
+[node name="ShiveringBeggarInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-160, 0)
+script = ExtResource("6_interactable")
+display_name = "Shivering Beggar"
+kind = 0
+message = "A thin figure shivers under a threadbare blanket, arms wrapped around their knees."
+
+[node name="Shape" type="CollisionShape2D" parent="ShiveringBeggarInteract"]
+shape = SubResource("InteractShape")
+
+[node name="Visual" type="Polygon2D" parent="ShiveringBeggarInteract"]
+color = Color(0.4, 0.42, 0.46, 1)
+polygon = PackedVector2Array(-9, -12, 9, -12, 12, 2, 10, 16, -10, 16, -12, 2)
+
+[node name="OldSoldierBeggarInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-160, 60)
+script = ExtResource("6_interactable")
+display_name = "Grizzled Old Man"
+kind = 0
+message = "A grizzled old man sits against the wall, a worn pack at his side, watching the street with sharp, tired eyes."
+
+[node name="Shape" type="CollisionShape2D" parent="OldSoldierBeggarInteract"]
+shape = SubResource("InteractShape")
+
+[node name="Visual" type="Polygon2D" parent="OldSoldierBeggarInteract"]
+color = Color(0.48, 0.4, 0.3, 1)
+polygon = PackedVector2Array(-9, -12, 9, -12, 12, 2, 10, 16, -10, 16, -12, 2)
+
+[node name="GateStairsExit" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, -200)
+script = ExtResource("6_interactable")
+display_name = "Steps to the Inner Wall"
+kind = 2
+exit_target_scene = "res://scenes/world/InnerWallSouth.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="GateStairsExit"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="GateStairsExit"]
+color = Color(0.55, 0.45, 0.75, 0.5)
+polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
+
+[node name="MarketExit" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 200)
+script = ExtResource("6_interactable")
+display_name = "Back to the Market"
+kind = 2
+exit_target_scene = "res://scenes/world/Market.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="MarketExit"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="MarketExit"]
+color = Color(0.85, 0.75, 0.35, 0.5)
+polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(0, 150)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -240
+limit_top = -210
+limit_right = 240
+limit_bottom = 210
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true
+
+[node name="DialoguePopup" parent="UILayer" instance=ExtResource("7_dialogue")]
+unique_name_in_owner = true

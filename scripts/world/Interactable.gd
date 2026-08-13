@@ -17,6 +17,7 @@ enum Kind { MESSAGE, COMBAT, EXIT, HEAL, ITEM, TRADE, DIALOGUE, GUILD_RECEPTIONI
 @export var exit_target_scene: String = "" ## EXIT only: scene to load. Falls back to the encounter screen if unset.
 @export var required_guild_rank_order: int = -1 ## EXIT only: -1 = unrestricted, else minimum GuildRankDefinition.order needed.
 @export_multiline var locked_message: String = "" ## EXIT only: shown instead of transitioning when the rank requirement isn't met.
+@export var toll_gold_amount: int = 0 ## EXIT only: if the rank requirement isn't met, offers to pay this much gold to pass anyway instead of just blocking. 0 = no toll option.
 @export var trade_item_id: String = "" ## TRADE only: item sold.
 @export var trade_price: int = 0 ## TRADE only: gold cost (before any guild price discount).
 @export var lounge_pricing: bool = false ## TRADE only: also apply the player's guild rank discount to the price.

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "vitality_idol"
+display_name = "Vitality Idol"
+description = "A small stone idol, worn smooth by countless hands seeking luck. A solid boost to maximum Health."
+rarity = 1
+icon_color = Color(0.5, 0.75, 0.45, 1)
+effect_id = "flat_stat_bonus"
+effect_values = {
+"stat": "max_health",
+"amount": 30
+}
+stacking_allowed = true
+class_restrictions = Array[String]([])

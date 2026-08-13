@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "windrunner_sash"
+display_name = "Windrunner Sash"
+description = "A light sash that seems to catch a breeze that isn't there. A solid boost to Speed."
+rarity = 1
+icon_color = Color(0.55, 0.8, 0.75, 1)
+effect_id = "flat_stat_bonus"
+effect_values = {
+"stat": "speed",
+"amount": 5
+}
+stacking_allowed = true
+class_restrictions = Array[String]([])

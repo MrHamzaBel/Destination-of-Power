@@ -26,6 +26,9 @@ const DEEP_FOREST: String = "res://scenes/world/DeepForest.tscn"
 const WHISPERING_HOLLOW: String = "res://scenes/world/WhisperingHollow.tscn"
 const GARRISON_WARD: String = "res://scenes/world/GarrisonWard.tscn"
 const BUG_CATCHERS_GROVE: String = "res://scenes/world/BugCatchersGrove.tscn"
+const NERAX_UPPER_WARD: String = "res://scenes/world/NeraxUpperWard.tscn"
+const INNER_WALL_SOUTH: String = "res://scenes/world/InnerWallSouth.tscn"
+const INNER_NERAX: String = "res://scenes/world/InnerNerax.tscn"
 
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect

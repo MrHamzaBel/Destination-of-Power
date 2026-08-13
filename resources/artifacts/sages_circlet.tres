@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "sages_circlet"
+display_name = "Sage's Circlet"
+description = "A thin circlet etched with fading runes, still faintly warm. A solid boost to Intelligence."
+rarity = 1
+icon_color = Color(0.45, 0.4, 0.8, 1)
+effect_id = "flat_stat_bonus"
+effect_values = {
+"stat": "intelligence",
+"amount": 5
+}
+stacking_allowed = true
+class_restrictions = Array[String]([])

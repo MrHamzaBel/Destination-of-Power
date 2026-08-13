@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "champions_gauntlet"
+display_name = "Champion's Gauntlet"
+description = "A dented gauntlet from some forgotten arena champion. A solid boost to Attack."
+rarity = 1
+icon_color = Color(0.75, 0.3, 0.25, 1)
+effect_id = "flat_stat_bonus"
+effect_values = {
+"stat": "attack",
+"amount": 5
+}
+stacking_allowed = true
+class_restrictions = Array[String]([])

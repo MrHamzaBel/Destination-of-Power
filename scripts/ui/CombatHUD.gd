@@ -27,6 +27,7 @@ const TURN_ORDER_FUTURE_SIZE: int = 36
 @onready var items_button: Button = %ItemsButton
 @onready var defend_button: Button = %DefendButton
 @onready var end_turn_button: Button = %EndTurnButton
+@onready var run_button: Button = %RunButton
 
 @onready var abilities_panel: PanelContainer = %AbilitiesPanel
 @onready var abilities_list: VBoxContainer = %AbilitiesList
@@ -55,9 +56,11 @@ func bind(combat: CombatManager) -> void:
 	items_button.pressed.connect(_open_items)
 	defend_button.pressed.connect(func(): _combat.player_defend())
 	end_turn_button.pressed.connect(func(): _combat.end_turn())
+	run_button.pressed.connect(func(): _combat.player_attempt_flee())
 	abilities_close.pressed.connect(func(): abilities_panel.visible = false)
 	items_close.pressed.connect(func(): items_panel.visible = false)
 
+	run_button.visible = false
 	result_panel.visible = false
 	abilities_panel.visible = false
 	items_panel.visible = false
@@ -129,6 +132,7 @@ func _on_turn_changed(unit: CombatUnitState) -> void:
 	else:
 		turn_label.text = "%s is acting...%s" % [unit.display_name, burst]
 		_set_actions_enabled(false)
+	run_button.visible = _combat.player_can_flee()
 	_refresh_turn_order()
 
 ## Rebuilds the "speed wheel" - the upcoming turn order, current actor first,
@@ -211,7 +215,7 @@ func _turn_icon_texture(unit: CombatUnitState) -> Texture2D:
 	return null
 
 func _set_actions_enabled(enabled: bool) -> void:
-	for button in [attack_button, abilities_button, items_button, defend_button, end_turn_button]:
+	for button in [attack_button, abilities_button, items_button, defend_button, end_turn_button, run_button]:
 		button.disabled = not enabled
 
 ## Card-based skill list, one self-contained clickable panel per ability -
@@ -347,7 +351,20 @@ func _open_items() -> void:
 
 func _on_combat_finished(victory: bool) -> void:
 	_set_actions_enabled(false)
+	run_button.visible = false
 	result_panel.visible = true
+	var fled := bool(_combat.last_rewards.get("player_fled", false))
+
+	if fled:
+		result_title.text = "Got Away!"
+		result_title.add_theme_color_override("font_color", Color(0.85, 0.75, 0.35, 1))
+		result_summary.text = "Faster than every foe there, you slip away from the fight before it can finish."
+		result_button.text = "Continue"
+		for connection in result_button.pressed.get_connections():
+			result_button.pressed.disconnect(connection["callable"])
+		result_button.pressed.connect(func(): _on_result_confirmed(victory, true))
+		return
+
 	result_title.text = "Victory!" if victory else "Defeated..."
 	result_title.add_theme_color_override("font_color", Color(0.4, 0.85, 0.4, 1) if victory else Color(0.85, 0.3, 0.3, 1))
 
@@ -385,9 +402,9 @@ func _on_combat_finished(victory: bool) -> void:
 		result_button.pressed.disconnect(connection["callable"])
 	result_button.pressed.connect(func(): _on_result_confirmed(victory))
 
-func _on_result_confirmed(victory: bool) -> void:
+func _on_result_confirmed(victory: bool, fled: bool = false) -> void:
 	if victory:
-		if SceneManager.advances_encounter_on_victory and RunManager.run != null:
+		if not fled and SceneManager.advances_encounter_on_victory and RunManager.run != null:
 			RunManager.run.current_encounter_index += 1
 			RunManager.save_current_run()
 		SceneManager.goto_scene(SceneManager.return_scene_after_combat)

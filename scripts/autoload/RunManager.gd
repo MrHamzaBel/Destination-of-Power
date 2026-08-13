@@ -7,7 +7,8 @@ const STAT_NAMES: Array[String] = ["hp", "attack", "defense", "speed", "intellig
 const EXP_BASE_REQUIREMENT: int = 100
 const EXP_GROWTH_PER_LEVEL: float = 1.1 ## Each level requires 10% more exp than the previous one.
 const STAT_POINTS_PER_LEVEL: int = 2
-const MANA_PER_INTELLIGENCE: int = 10 ## Class resource pool (mana/stamina/energy) = intelligence * this.
+const MANA_PER_INTELLIGENCE: int = 10 ## Class resource pool (mana/stamina/energy) = intelligence * this + attack * STAMINA_PER_ATTACK.
+const STAMINA_PER_ATTACK: int = 5 ## Secondary resource-pool contribution from Attack, so a build that never invests in Intelligence (a Knight leaning purely into Attack, say) still grows a usable pool instead of being stuck near the base value.
 const GUILD_PROGRESS_BASE: float = 20.0
 const GUILD_PROGRESS_GROWTH: float = 1.25 ## Each guild rank needs 25% more standing than the previous one.
 
@@ -118,7 +119,7 @@ func get_class_def() -> ClassDefinition:
 ## Combines class base stats, equipped item modifiers, passive artifact
 ## modifiers and allocated level-up points into the character's current
 ## effective stat block. The class resource pool (mana/stamina/energy) is
-## always derived from the final Intelligence value, not stored directly.
+## always derived from the final Intelligence and Attack values, not stored directly.
 func compute_current_stats() -> StatBlock:
 	var class_def := get_class_def()
 	var stats := StatBlock.new()
@@ -151,7 +152,7 @@ func compute_current_stats() -> StatBlock:
 	stats.speed += int(run.allocated_stats.get("speed", 0))
 	stats.intelligence += int(run.allocated_stats.get("intelligence", 0))
 
-	stats.max_resource += stats.intelligence * MANA_PER_INTELLIGENCE
+	stats.max_resource += stats.intelligence * MANA_PER_INTELLIGENCE + stats.attack * STAMINA_PER_ATTACK
 
 	return stats
 

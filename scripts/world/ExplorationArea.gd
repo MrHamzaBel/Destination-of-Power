@@ -112,7 +112,10 @@ func _on_interactable_triggered(interactable: Interactable) -> void:
 			if interactable.required_guild_rank_order >= 0:
 				var rank_def := RunManager.get_guild_rank_def()
 				if rank_def == null or rank_def.order < interactable.required_guild_rank_order:
-					hud.show_notification(interactable.locked_message if interactable.locked_message != "" else "You don't have the rank for this yet.")
+					if interactable.toll_gold_amount > 0:
+						_offer_toll(interactable)
+					else:
+						hud.show_notification(interactable.locked_message if interactable.locked_message != "" else "You don't have the rank for this yet.")
 					return
 			var target := interactable.exit_target_scene if interactable.exit_target_scene != "" else SceneManager.ENCOUNTER_SCREEN
 			SceneManager.goto_scene(target)
@@ -135,6 +138,34 @@ func _on_interactable_triggered(interactable: Interactable) -> void:
 			_open_dialogue(interactable)
 		Interactable.Kind.GUILD_RECEPTIONIST:
 			_handle_guild_receptionist(interactable)
+
+## An EXIT gated by guild rank can also name a gold toll (Interactable.
+## toll_gold_amount) as a second way through for anyone who hasn't reached
+## the required rank yet - e.g. the guarded gate into Nerax's inner wall,
+## passable at B-Rank or by paying 100 gold each time. Declining just leaves
+## the player on this side, same as any other locked door.
+func _offer_toll(interactable: Interactable) -> void:
+	if dialogue_popup == null:
+		hud.show_notification(interactable.locked_message if interactable.locked_message != "" else "You don't have the rank for this yet.")
+		return
+	var base_message := interactable.locked_message if interactable.locked_message != "" else "You don't have the rank for this yet."
+	dialogue_popup.show_prompt(
+		"%s Pay %d gold to pass anyway?" % [base_message, interactable.toll_gold_amount],
+		"Pay %d gold" % interactable.toll_gold_amount, "Turn back", ""
+	)
+	dialogue_popup.choice_made.connect(_on_toll_choice.bind(interactable), CONNECT_ONE_SHOT)
+
+func _on_toll_choice(choice_index: int, interactable: Interactable) -> void:
+	if choice_index != 0 or RunManager.run == null:
+		return
+	if RunManager.run.currency < interactable.toll_gold_amount:
+		hud.show_notification("You don't have %d gold." % interactable.toll_gold_amount)
+		return
+	RunManager.run.currency -= interactable.toll_gold_amount
+	RunManager.save_current_run()
+	hud.refresh_stats()
+	var target := interactable.exit_target_scene if interactable.exit_target_scene != "" else SceneManager.ENCOUNTER_SCREEN
+	SceneManager.goto_scene(target)
 
 ## Never buys on the spot: shows a Yes/No confirm first (same
 ## DialogueChoicePopup every other prompt uses) so browsing a vendor and

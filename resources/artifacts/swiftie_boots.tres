@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "swiftie_boots"
+display_name = "Swiftie Boots"
+description = "A retired adventurer's own boots, given freely. A small boost to Speed - and while you're faster than every foe in a fight, you can choose to simply run instead of finishing it."
+rarity = 1
+icon_color = Color(0.65, 0.5, 0.3, 1)
+effect_id = "flat_stat_bonus"
+effect_values = {
+"stat": "speed",
+"amount": 1
+}
+stacking_allowed = false
+class_restrictions = Array[String]([])
+random_drop_eligible = false

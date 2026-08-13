@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "sunfruit_tonic"
+display_name = "Sunfruit Tonic"
+description = "A bright, syrupy tonic brewed from inner-city orchard fruit. Mends wounds far better than anything sold in the outer city."
+category = 2
+rarity = 1
+icon_color = Color(0.95, 0.55, 0.15, 1)
+equip_slot = ""
+is_ranged = false
+stat_modifiers = null
+heal_amount = 30
+resource_amount = 0
+value = 15
+droppable = true
