@@ -33,6 +33,7 @@ var _hair_color_index: int = 0
 var _character_name: String = ""
 
 var _saved_profile: CharacterProfile = null ## Snapshot used by Reset.
+var _edit_return_scene: String = "" ## Set when reached via SceneManager.start_appearance_edit() (e.g. the Inner Nerax clothing shop) instead of the normal main-menu flow - locks the name field and routes Save/Back back here instead of the Main Menu.
 
 func _ready() -> void:
 	_renderer = CharacterAppearanceRenderer.new()
@@ -40,6 +41,12 @@ func _ready() -> void:
 
 	_saved_profile = RunManager.character_profile
 	_load_from_profile(_saved_profile)
+
+	_edit_return_scene = SceneManager.pending_appearance_return_scene
+	SceneManager.pending_appearance_return_scene = ""
+	if _edit_return_scene != "":
+		name_edit.editable = false
+		save_button.text = "Save Look"
 
 	_build_color_row(skin_color_row, AppearanceRegistry.skin_colors, _skin_color_index, func(i): _skin_color_index = i; _refresh())
 	_build_color_row(hair_color_row, AppearanceRegistry.hair_colors, _hair_color_index, func(i): _hair_color_index = i; _refresh())
@@ -212,7 +219,7 @@ func _on_save_pressed() -> void:
 	var profile := _build_current_profile()
 	RunManager.save_character(profile)
 	_saved_profile = profile
-	SceneManager.goto_scene(SceneManager.MAIN_MENU)
+	SceneManager.goto_scene(_edit_return_scene if _edit_return_scene != "" else SceneManager.MAIN_MENU)
 
 func _on_back_pressed() -> void:
-	SceneManager.goto_scene(SceneManager.MAIN_MENU)
+	SceneManager.goto_scene(_edit_return_scene if _edit_return_scene != "" else SceneManager.MAIN_MENU)

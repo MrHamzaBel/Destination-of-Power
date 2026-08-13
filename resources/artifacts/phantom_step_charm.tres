@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "phantom_step_charm"
+display_name = "Phantom Step Charm"
+description = "A pale glass charm that never quite sits still in your palm, sold only in the inner market. A substantial boost to Speed - never found in the wild."
+rarity = 3
+icon_color = Color(0.7, 0.8, 0.9, 1)
+effect_id = "flat_stat_bonus"
+effect_values = {
+"stat": "speed",
+"amount": 8
+}
+stacking_allowed = true
+class_restrictions = Array[String]([])
+random_drop_eligible = false

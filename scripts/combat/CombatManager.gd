@@ -174,6 +174,9 @@ func player_use_item(item_id: String) -> void:
 	var item_def := ItemRegistry.get_item(item_id)
 	if item_def == null or item_def.category != ItemDefinition.Category.CONSUMABLE:
 		return
+	if not item_def.combat_usable:
+		_log("%s isn't something you can use mid-fight." % item_def.display_name)
+		return
 	if item_def.heal_amount > 0 and player_unit.heal_sealed:
 		_log("The seal on your wounds flares - %s won't help you here." % item_def.display_name)
 		return

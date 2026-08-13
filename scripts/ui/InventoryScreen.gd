@@ -197,6 +197,8 @@ func _on_use_pressed() -> void:
 	var stats := RunManager.compute_current_stats()
 	RunManager.run.current_health = min(stats.max_health, RunManager.run.current_health + item_def.heal_amount)
 	RunManager.run.current_resource = min(stats.max_resource, RunManager.run.current_resource + item_def.resource_amount)
+	if item_def.grants_all_stats_bonus > 0:
+		RunManager.grant_all_stats_bonus(item_def.grants_all_stats_bonus)
 	RunManager.run.remove_item(_selected_item_id, 1)
 	EventBus.item_used.emit({"item_id": _selected_item_id, "combat": null})
 	EventBus.inventory_changed.emit()

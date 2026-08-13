@@ -181,6 +181,9 @@ func _handle_trade(interactable: Interactable) -> void:
 	if dialogue_popup == null:
 		push_warning("ExplorationArea: %s is a TRADE interactable but this scene has no DialoguePopup." % interactable.display_name)
 		return
+	if interactable.purchase_flag_id != "" and bool(RunManager.run.story_flags.get(interactable.purchase_flag_id, false)):
+		hud.show_notification("\"Already sold, I'm afraid,\" they say. \"That one was one of a kind.\"")
+		return
 
 	var price := _compute_trade_price(interactable)
 	dialogue_popup.show_prompt(
@@ -213,6 +216,8 @@ func _on_trade_confirmed(choice_index: int, interactable: Interactable, price: i
 
 	RunManager.run.currency -= price
 	RunManager.run.add_item(interactable.trade_item_id, 1)
+	if interactable.purchase_flag_id != "":
+		RunManager.run.story_flags[interactable.purchase_flag_id] = true
 	RunManager.save_current_run()
 	hud.refresh_stats()
 	var notice := "Bought %s for %d gold. (%d gold left)" % [item_def.display_name, price, RunManager.run.currency]

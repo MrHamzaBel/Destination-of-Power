@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "ironclad_signet"
+display_name = "Ironclad Signet"
+description = "A heavy signet ring, cast rather than forged, sold only in the inner market. A substantial boost to Defense - never found in the wild."
+rarity = 3
+icon_color = Color(0.55, 0.58, 0.65, 1)
+effect_id = "flat_stat_bonus"
+effect_values = {
+"stat": "defense",
+"amount": 8
+}
+stacking_allowed = true
+class_restrictions = Array[String]([])
+random_drop_eligible = false

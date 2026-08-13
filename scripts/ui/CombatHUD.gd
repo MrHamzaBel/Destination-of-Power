@@ -333,6 +333,8 @@ func _open_items() -> void:
 		var item_def := ItemRegistry.get_item(stack.get("item_id", ""))
 		if item_def == null or item_def.category != ItemDefinition.Category.CONSUMABLE:
 			continue
+		if not item_def.combat_usable:
+			continue
 		any_consumable = true
 		var quantity: int = int(stack.get("quantity", 0))
 		var btn := Button.new()

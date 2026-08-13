@@ -202,6 +202,18 @@ func allocate_stat_point(stat_name: String) -> bool:
 	save_current_run()
 	return true
 
+## Permanently adds `amount` to every core stat at once (attack/defense/speed/
+## intelligence, plus `amount` HP "points" - each worth StatBlock.HP_STAT_MULTIPLIER
+## raw health, same convention allocate_stat_point("hp") uses) - bypasses the
+## usual unspent-points gate entirely, since this is meant for a rare one-off
+## item (the All-Stat Elixir) rather than the normal level-up flow.
+func grant_all_stats_bonus(amount: int) -> void:
+	if run == null or amount <= 0:
+		return
+	for stat_name in STAT_NAMES:
+		run.allocated_stats[stat_name] = int(run.allocated_stats.get(stat_name, 0)) + amount
+	save_current_run()
+
 # --- Quests -----------------------------------------------------------------
 
 func is_quest_active(quest_id: String) -> bool:

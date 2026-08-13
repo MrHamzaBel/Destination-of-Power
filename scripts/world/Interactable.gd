@@ -24,6 +24,7 @@ enum Kind { MESSAGE, COMBAT, EXIT, HEAL, ITEM, TRADE, DIALOGUE, GUILD_RECEPTIONI
 @export_multiline var trade_flavor_text: String = "" ## TRADE only: optional line appended to the purchase notification.
 @export var sell_bonus_item_ids: Array[String] = [] ## TRADE only: item ids this vendor pays a premium for (see sell_bonus_multiplier) - e.g. a curio trader paying extra for trophies. Empty = no specialty, this vendor just pays the base price like any other.
 @export var sell_bonus_multiplier: float = 1.5 ## TRADE only: price multiplier applied when selling one of sell_bonus_item_ids to this vendor.
+@export var purchase_flag_id: String = "" ## TRADE only: if set, this item can only ever be bought once per run - the flag is set on a successful purchase (unlike story_flag_id, which fires the moment the interactable is triggered at all). "" = normal, repeatable stock.
 @export_multiline var dialogue_prompt: String = "" ## DIALOGUE only: the yes/no/decline question.
 @export_multiline var dialogue_yes_text: String = ""
 @export_multiline var dialogue_no_text: String = ""

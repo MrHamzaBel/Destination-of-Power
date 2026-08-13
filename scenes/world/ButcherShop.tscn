@@ -1,0 +1,240 @@
+[gd_scene load_steps=12 format=3 uid="uid://bbutchershop01"]
+
+[ext_resource type="Script" path="res://scripts/world/ButcherShop.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueChoicePopup.tscn" id="7_dialogue"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(340, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeBottomSeg"]
+size = Vector2(120, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeV"]
+size = Vector2(20, 260)
+
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(80, 20)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 32.0
+
+[node name="ButcherShop" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.32, 0.22, 0.2, 1)
+polygon = PackedVector2Array(-160, -120, 160, -120, 160, 120, -160, 120)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.4, 0.28, 0.25, 1)
+polygon = PackedVector2Array(-150, -110, 150, -110, 150, 110, -150, 110)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -120)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.14, 0.1, 0.09, 1)
+polygon = PackedVector2Array(-170, -10, 170, -10, 170, 10, -170, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-100, 120)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
+color = Color(0.14, 0.1, 0.09, 1)
+polygon = PackedVector2Array(-60, -10, 60, -10, 60, 10, -60, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(100, 120)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+color = Color(0.14, 0.1, 0.09, 1)
+polygon = PackedVector2Array(-60, -10, 60, -10, 60, 10, -60, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-160, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallLeft"]
+color = Color(0.14, 0.1, 0.09, 1)
+polygon = PackedVector2Array(-10, -130, 10, -130, 10, 130, -10, 130)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WallShapeV")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(160, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.14, 0.1, 0.09, 1)
+polygon = PackedVector2Array(-10, -130, 10, -130, 10, 130, -10, 130)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeV")
+
+[node name="CuredHamInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-105, -70)
+script = ExtResource("6_interactable")
+display_name = "Cured Ham"
+kind = 5
+trade_item_id = "cured_ham"
+trade_price = 6
+trade_flavor_text = "\"Good and salty,\" the butcher says. \"Won't do you any good mid-brawl, mind - sit down and enjoy it.\""
+
+[node name="Shape" type="CollisionShape2D" parent="CuredHamInteract"]
+shape = SubResource("InteractShape")
+
+[node name="CuredHamVisual" type="Polygon2D" parent="CuredHamInteract"]
+color = Color(0.75, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-10, -8, 10, -8, 10, 8, -10, 8)
+
+[node name="RoastMuttonInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-35, -70)
+script = ExtResource("6_interactable")
+display_name = "Roast Mutton"
+kind = 5
+trade_item_id = "roast_mutton"
+trade_price = 11
+trade_flavor_text = "\"Off the spit an hour ago,\" the butcher says proudly."
+
+[node name="Shape" type="CollisionShape2D" parent="RoastMuttonInteract"]
+shape = SubResource("InteractShape")
+
+[node name="RoastMuttonVisual" type="Polygon2D" parent="RoastMuttonInteract"]
+color = Color(0.65, 0.35, 0.3, 1)
+polygon = PackedVector2Array(-10, -8, 10, -8, 10, 8, -10, 8)
+
+[node name="PrimeBeefInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(35, -70)
+script = ExtResource("6_interactable")
+display_name = "Prime Beef Cut"
+kind = 5
+trade_item_id = "prime_beef_cut"
+trade_price = 18
+trade_flavor_text = "\"Best cut in the district,\" the butcher says, \"and priced like it.\""
+
+[node name="Shape" type="CollisionShape2D" parent="PrimeBeefInteract"]
+shape = SubResource("InteractShape")
+
+[node name="PrimeBeefVisual" type="Polygon2D" parent="PrimeBeefInteract"]
+color = Color(0.6, 0.22, 0.2, 1)
+polygon = PackedVector2Array(-10, -8, 10, -8, 10, 8, -10, 8)
+
+[node name="WildBoarRibsInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(105, -70)
+script = ExtResource("6_interactable")
+display_name = "Wild Boar Ribs"
+kind = 5
+trade_item_id = "wild_boar_ribs"
+trade_price = 28
+trade_flavor_text = "\"Smoked overnight,\" the butcher says. \"My specialty. Worth every coin.\""
+
+[node name="Shape" type="CollisionShape2D" parent="WildBoarRibsInteract"]
+shape = SubResource("InteractShape")
+
+[node name="WildBoarRibsVisual" type="Polygon2D" parent="WildBoarRibsInteract"]
+color = Color(0.5, 0.28, 0.18, 1)
+polygon = PackedVector2Array(-10, -8, 10, -8, 10, 8, -10, 8)
+
+[node name="RegularCustomerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-60, 10)
+script = ExtResource("6_interactable")
+display_name = "Regular Customer"
+kind = 0
+message = "\"Same order as always,\" the woman tells the butcher, not even looking up. \"Third generation coming here, you know. My grandmother swore by this place.\""
+
+[node name="Shape" type="CollisionShape2D" parent="RegularCustomerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="RegularCustomerVisual" type="Polygon2D" parent="RegularCustomerInteract"]
+color = Color(0.55, 0.4, 0.3, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="DeliveryBoyInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(60, 10)
+script = ExtResource("6_interactable")
+display_name = "Delivery Boy"
+kind = 0
+message = "A boy hefts a crate twice his size toward the back room. \"Careful with the ice block!\" the butcher calls after him. \"That's not cheap either!\""
+
+[node name="Shape" type="CollisionShape2D" parent="DeliveryBoyInteract"]
+shape = SubResource("InteractShape")
+
+[node name="DeliveryBoyVisual" type="Polygon2D" parent="DeliveryBoyInteract"]
+color = Color(0.5, 0.42, 0.3, 1)
+polygon = PackedVector2Array(-7, -14, 7, -14, 9, -1, 8, 12, -8, 12, -9, -1)
+
+[node name="StreetExit" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 120)
+script = ExtResource("6_interactable")
+display_name = "Back to the Street"
+kind = 2
+exit_target_scene = "res://scenes/world/InnerNeraxShops.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="StreetExit"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="StreetExit"]
+color = Color(0.85, 0.65, 0.25, 0.5)
+polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(0, 90)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -170
+limit_top = -130
+limit_right = 170
+limit_bottom = 130
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true
+
+[node name="DialoguePopup" parent="UILayer" instance=ExtResource("7_dialogue")]
+unique_name_in_owner = true

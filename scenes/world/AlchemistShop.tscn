@@ -1,0 +1,239 @@
+[gd_scene load_steps=12 format=3 uid="uid://balchemistshop01"]
+
+[ext_resource type="Script" path="res://scripts/world/AlchemistShop.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueChoicePopup.tscn" id="7_dialogue"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(340, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeBottomSeg"]
+size = Vector2(120, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeV"]
+size = Vector2(20, 260)
+
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(80, 20)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 32.0
+
+[node name="AlchemistShop" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.24, 0.2, 0.3, 1)
+polygon = PackedVector2Array(-160, -120, 160, -120, 160, 120, -160, 120)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.3, 0.26, 0.38, 1)
+polygon = PackedVector2Array(-150, -110, 150, -110, 150, 110, -150, 110)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -120)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.12, 0.1, 0.16, 1)
+polygon = PackedVector2Array(-170, -10, 170, -10, 170, 10, -170, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-100, 120)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
+color = Color(0.12, 0.1, 0.16, 1)
+polygon = PackedVector2Array(-60, -10, 60, -10, 60, 10, -60, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(100, 120)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+color = Color(0.12, 0.1, 0.16, 1)
+polygon = PackedVector2Array(-60, -10, 60, -10, 60, 10, -60, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-160, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallLeft"]
+color = Color(0.12, 0.1, 0.16, 1)
+polygon = PackedVector2Array(-10, -130, 10, -130, 10, 130, -10, 130)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WallShapeV")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(160, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.12, 0.1, 0.16, 1)
+polygon = PackedVector2Array(-10, -130, 10, -130, 10, 130, -10, 130)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeV")
+
+[node name="HealingPotionInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-90, -70)
+script = ExtResource("6_interactable")
+display_name = "Minor Healing Potion"
+kind = 5
+trade_item_id = "minor_healing_potion"
+trade_price = 10
+trade_flavor_text = "\"Standard stock,\" the alchemist says, \"but distilled properly, unlike the alley trader's.\""
+
+[node name="Shape" type="CollisionShape2D" parent="HealingPotionInteract"]
+shape = SubResource("InteractShape")
+
+[node name="HealingPotionVisual" type="Polygon2D" parent="HealingPotionInteract"]
+color = Color(0.8, 0.2, 0.3, 1)
+polygon = PackedVector2Array(-8, -10, 8, -10, 8, 10, -8, 10)
+
+[node name="ManaPotionInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, -70)
+script = ExtResource("6_interactable")
+display_name = "Minor Mana Potion"
+kind = 5
+trade_item_id = "minor_mana_potion"
+trade_price = 10
+trade_flavor_text = "\"Restocked fresh this morning,\" the alchemist says."
+
+[node name="Shape" type="CollisionShape2D" parent="ManaPotionInteract"]
+shape = SubResource("InteractShape")
+
+[node name="ManaPotionVisual" type="Polygon2D" parent="ManaPotionInteract"]
+color = Color(0.3, 0.4, 0.85, 1)
+polygon = PackedVector2Array(-8, -10, 8, -10, 8, 10, -8, 10)
+
+[node name="AllStatElixirInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(90, -70)
+script = ExtResource("6_interactable")
+display_name = "All-Stat Elixir"
+kind = 5
+trade_item_id = "all_stat_elixir"
+trade_price = 150
+trade_flavor_text = "\"A decade of work in that bottle,\" the alchemist says quietly. \"I'll never make another. Use it well.\""
+purchase_flag_id = "all_stat_elixir_bought"
+
+[node name="Shape" type="CollisionShape2D" parent="AllStatElixirInteract"]
+shape = SubResource("InteractShape")
+
+[node name="AllStatElixirVisual" type="Polygon2D" parent="AllStatElixirInteract"]
+color = Color(0.75, 0.35, 0.85, 1)
+polygon = PackedVector2Array(-9, -12, 9, -12, 9, 12, -9, 12)
+
+[node name="ApprenticeInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-90, 15)
+script = ExtResource("6_interactable")
+display_name = "Apprentice"
+kind = 0
+message = "A young apprentice grinds something pungent in a mortar, sneezes, and grinds some more. \"Master says I'll be trusted with the good stuff eventually,\" she mutters, mostly to herself."
+
+[node name="Shape" type="CollisionShape2D" parent="ApprenticeInteract"]
+shape = SubResource("InteractShape")
+
+[node name="ApprenticeVisual" type="Polygon2D" parent="ApprenticeInteract"]
+color = Color(0.5, 0.4, 0.55, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="RegularCustomerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 15)
+script = ExtResource("6_interactable")
+display_name = "Regular Customer"
+kind = 0
+message = "\"He's the only one in the city who can brew a decent sleeping draught,\" a well-dressed customer confides. \"Worth the walk up here, every time.\""
+
+[node name="Shape" type="CollisionShape2D" parent="RegularCustomerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="RegularCustomerVisual" type="Polygon2D" parent="RegularCustomerInteract"]
+color = Color(0.45, 0.35, 0.5, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="SkepticalVisitorInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(90, 15)
+script = ExtResource("6_interactable")
+display_name = "Skeptical Visitor"
+kind = 0
+message = "\"A decade to brew one bottle?\" a visitor mutters, eyeing the elixir on the shelf. \"I'll believe that when I see someone actually buy it.\""
+
+[node name="Shape" type="CollisionShape2D" parent="SkepticalVisitorInteract"]
+shape = SubResource("InteractShape")
+
+[node name="SkepticalVisitorVisual" type="Polygon2D" parent="SkepticalVisitorInteract"]
+color = Color(0.4, 0.38, 0.42, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="StreetExit" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 120)
+script = ExtResource("6_interactable")
+display_name = "Back to the Street"
+kind = 2
+exit_target_scene = "res://scenes/world/InnerNeraxShops.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="StreetExit"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="StreetExit"]
+color = Color(0.85, 0.65, 0.25, 0.5)
+polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(0, 90)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -170
+limit_top = -130
+limit_right = 170
+limit_bottom = 130
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true
+
+[node name="DialoguePopup" parent="UILayer" instance=ExtResource("7_dialogue")]
+unique_name_in_owner = true

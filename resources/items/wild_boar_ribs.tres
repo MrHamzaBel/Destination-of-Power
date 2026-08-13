@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "wild_boar_ribs"
+display_name = "Wild Boar Ribs"
+description = "A full rack of ribs, smoked overnight - the butcher's specialty. Mends more than anything else sold in the city, but eating it is a whole affair, not something you'd manage between sword swings."
+category = 2
+rarity = 1
+icon_color = Color(0.5, 0.28, 0.18, 1)
+equip_slot = ""
+is_ranged = false
+stat_modifiers = null
+heal_amount = 55
+resource_amount = 0
+combat_usable = false
+value = 28
+droppable = true

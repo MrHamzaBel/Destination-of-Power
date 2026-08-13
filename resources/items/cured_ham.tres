@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "cured_ham"
+display_name = "Cured Ham"
+description = "A modest slice off a whole cured leg, sold by the inner market's butcher. Filling, but you'll want to sit down to eat it properly - no good mid-fight."
+category = 2
+rarity = 0
+icon_color = Color(0.75, 0.4, 0.4, 1)
+equip_slot = ""
+is_ranged = false
+stat_modifiers = null
+heal_amount = 12
+resource_amount = 0
+combat_usable = false
+value = 6
+droppable = true

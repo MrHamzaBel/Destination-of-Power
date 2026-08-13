@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "prime_beef_cut"
+display_name = "Prime Beef Cut"
+description = "The butcher's finest cut, marbled and expensive. Mends far more than any battlefield ration, but it needs a fire and time you won't have mid-fight."
+category = 2
+rarity = 1
+icon_color = Color(0.6, 0.22, 0.2, 1)
+equip_slot = ""
+is_ranged = false
+stat_modifiers = null
+heal_amount = 35
+resource_amount = 0
+combat_usable = false
+value = 18
+droppable = true

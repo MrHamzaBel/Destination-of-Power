@@ -1,0 +1,184 @@
+[gd_scene load_steps=12 format=3 uid="uid://bclothingshop01"]
+
+[ext_resource type="Script" path="res://scripts/world/ClothingShop.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueChoicePopup.tscn" id="7_dialogue"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(320, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeBottomSeg"]
+size = Vector2(110, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeV"]
+size = Vector2(20, 240)
+
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(80, 20)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 32.0
+
+[node name="ClothingShop" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.3, 0.24, 0.3, 1)
+polygon = PackedVector2Array(-150, -110, 150, -110, 150, 110, -150, 110)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.37, 0.3, 0.38, 1)
+polygon = PackedVector2Array(-140, -100, 140, -100, 140, 100, -140, 100)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -110)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.16, 0.12, 0.16, 1)
+polygon = PackedVector2Array(-160, -10, 160, -10, 160, 10, -160, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-95, 110)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
+color = Color(0.16, 0.12, 0.16, 1)
+polygon = PackedVector2Array(-55, -10, 55, -10, 55, 10, -55, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(95, 110)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+color = Color(0.16, 0.12, 0.16, 1)
+polygon = PackedVector2Array(-55, -10, 55, -10, 55, 10, -55, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-150, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallLeft"]
+color = Color(0.16, 0.12, 0.16, 1)
+polygon = PackedVector2Array(-10, -120, 10, -120, 10, 120, -10, 120)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WallShapeV")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(150, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.16, 0.12, 0.16, 1)
+polygon = PackedVector2Array(-10, -120, 10, -120, 10, 120, -10, 120)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeV")
+
+[node name="TailorInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, -60)
+script = ExtResource("6_interactable")
+display_name = "Tailor"
+kind = 0
+message = "\"Looking for a new look?\" the tailor asks, tape measure draped over one shoulder."
+
+[node name="Shape" type="CollisionShape2D" parent="TailorInteract"]
+shape = SubResource("InteractShape")
+
+[node name="TailorVisual" type="Polygon2D" parent="TailorInteract"]
+color = Color(0.55, 0.3, 0.5, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="FellowCustomerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-80, 20)
+script = ExtResource("6_interactable")
+display_name = "Fellow Customer"
+kind = 0
+message = "A customer turns this way and that in front of a mirror, entirely unbothered by your presence. \"Does this shade suit me, or is it too much?\" they ask no one in particular."
+
+[node name="Shape" type="CollisionShape2D" parent="FellowCustomerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="FellowCustomerVisual" type="Polygon2D" parent="FellowCustomerInteract"]
+color = Color(0.5, 0.42, 0.55, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="SeamstressApprenticeInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(80, 20)
+script = ExtResource("6_interactable")
+display_name = "Seamstress's Apprentice"
+kind = 0
+message = "An apprentice pins a hem, mouth full of needles, and gives you a muffled but friendly nod without looking up."
+
+[node name="Shape" type="CollisionShape2D" parent="SeamstressApprenticeInteract"]
+shape = SubResource("InteractShape")
+
+[node name="SeamstressApprenticeVisual" type="Polygon2D" parent="SeamstressApprenticeInteract"]
+color = Color(0.45, 0.38, 0.48, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="StreetExit" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 110)
+script = ExtResource("6_interactable")
+display_name = "Back to the Street"
+kind = 2
+exit_target_scene = "res://scenes/world/InnerNeraxShops.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="StreetExit"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="StreetExit"]
+color = Color(0.85, 0.65, 0.25, 0.5)
+polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(0, 85)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -160
+limit_top = -120
+limit_right = 160
+limit_bottom = 120
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true
+
+[node name="DialoguePopup" parent="UILayer" instance=ExtResource("7_dialogue")]
+unique_name_in_owner = true

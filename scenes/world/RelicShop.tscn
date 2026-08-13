@@ -1,0 +1,305 @@
+[gd_scene load_steps=12 format=3 uid="uid://brelicshop01"]
+
+[ext_resource type="Script" path="res://scripts/world/RelicShop.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueChoicePopup.tscn" id="7_dialogue"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(400, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeBottomSeg"]
+size = Vector2(140, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeV"]
+size = Vector2(20, 300)
+
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(100, 20)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 30.0
+
+[node name="RelicShop" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.26, 0.24, 0.18, 1)
+polygon = PackedVector2Array(-190, -140, 190, -140, 190, 140, -190, 140)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.33, 0.3, 0.22, 1)
+polygon = PackedVector2Array(-180, -130, 180, -130, 180, 130, -180, 130)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -140)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.13, 0.11, 0.08, 1)
+polygon = PackedVector2Array(-200, -10, 200, -10, 200, 10, -200, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-120, 140)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
+color = Color(0.13, 0.11, 0.08, 1)
+polygon = PackedVector2Array(-70, -10, 70, -10, 70, 10, -70, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(120, 140)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+color = Color(0.13, 0.11, 0.08, 1)
+polygon = PackedVector2Array(-70, -10, 70, -10, 70, 10, -70, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-190, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallLeft"]
+color = Color(0.13, 0.11, 0.08, 1)
+polygon = PackedVector2Array(-10, -150, 10, -150, 10, 150, -10, 150)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WallShapeV")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(190, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.13, 0.11, 0.08, 1)
+polygon = PackedVector2Array(-10, -150, 10, -150, 10, 150, -10, 150)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeV")
+
+[node name="WornSwordInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-150, -95)
+script = ExtResource("6_interactable")
+display_name = "Worn Sword"
+kind = 5
+trade_item_id = "worn_sword"
+trade_price = 15
+
+[node name="Shape" type="CollisionShape2D" parent="WornSwordInteract"]
+shape = SubResource("InteractShape")
+
+[node name="WornSwordVisual" type="Polygon2D" parent="WornSwordInteract"]
+color = Color(0.6, 0.6, 0.65, 1)
+polygon = PackedVector2Array(-4, -16, 4, -16, 4, 16, -4, 16)
+
+[node name="WoodenShieldInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-80, -95)
+script = ExtResource("6_interactable")
+display_name = "Wooden Shield"
+kind = 5
+trade_item_id = "wooden_shield"
+trade_price = 12
+
+[node name="Shape" type="CollisionShape2D" parent="WoodenShieldInteract"]
+shape = SubResource("InteractShape")
+
+[node name="WoodenShieldVisual" type="Polygon2D" parent="WoodenShieldInteract"]
+color = Color(0.5, 0.36, 0.22, 1)
+polygon = PackedVector2Array(-10, -12, 10, -12, 10, 12, -10, 12)
+
+[node name="TornLeatherArmorInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-10, -95)
+script = ExtResource("6_interactable")
+display_name = "Torn Leather Armor"
+kind = 5
+trade_item_id = "torn_leather_armor"
+trade_price = 10
+
+[node name="Shape" type="CollisionShape2D" parent="TornLeatherArmorInteract"]
+shape = SubResource("InteractShape")
+
+[node name="TornLeatherArmorVisual" type="Polygon2D" parent="TornLeatherArmorInteract"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(-10, -14, 10, -14, 10, 14, -10, 14)
+
+[node name="BasicDaggerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(60, -95)
+script = ExtResource("6_interactable")
+display_name = "Basic Dagger"
+kind = 5
+trade_item_id = "basic_dagger"
+trade_price = 8
+
+[node name="Shape" type="CollisionShape2D" parent="BasicDaggerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="BasicDaggerVisual" type="Polygon2D" parent="BasicDaggerInteract"]
+color = Color(0.62, 0.62, 0.66, 1)
+polygon = PackedVector2Array(-3, -10, 3, -10, 3, 10, -3, 10)
+
+[node name="ShortBowInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(130, -95)
+script = ExtResource("6_interactable")
+display_name = "Short Bow"
+kind = 5
+trade_item_id = "short_bow"
+trade_price = 15
+
+[node name="Shape" type="CollisionShape2D" parent="ShortBowInteract"]
+shape = SubResource("InteractShape")
+
+[node name="ShortBowVisual" type="Polygon2D" parent="ShortBowInteract"]
+color = Color(0.55, 0.4, 0.24, 1)
+polygon = PackedVector2Array(-3, -16, 3, -16, 3, 16, -3, 16)
+
+[node name="IroncladSignetInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-50, -20)
+script = ExtResource("6_interactable")
+display_name = "Ironclad Signet"
+kind = 5
+trade_item_id = "ironclad_signet"
+trade_price = 200
+trade_flavor_text = "\"Never dropped by anything you'll ever fight,\" the curator says. \"That's what you're paying for.\""
+
+[node name="Shape" type="CollisionShape2D" parent="IroncladSignetInteract"]
+shape = SubResource("InteractShape")
+
+[node name="IroncladSignetVisual" type="Polygon2D" parent="IroncladSignetInteract"]
+color = Color(0.55, 0.58, 0.65, 1)
+polygon = PackedVector2Array(-9, -9, 9, -9, 9, 9, -9, 9)
+
+[node name="PhantomStepCharmInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(50, -20)
+script = ExtResource("6_interactable")
+display_name = "Phantom Step Charm"
+kind = 5
+trade_item_id = "phantom_step_charm"
+trade_price = 200
+trade_flavor_text = "\"Imported,\" the curator says vaguely, in a tone that discourages follow-up questions."
+
+[node name="Shape" type="CollisionShape2D" parent="PhantomStepCharmInteract"]
+shape = SubResource("InteractShape")
+
+[node name="PhantomStepCharmVisual" type="Polygon2D" parent="PhantomStepCharmInteract"]
+color = Color(0.7, 0.8, 0.9, 1)
+polygon = PackedVector2Array(-9, -9, 9, -9, 9, 9, -9, 9)
+
+[node name="BrowsingCustomerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-120, 55)
+script = ExtResource("6_interactable")
+display_name = "Browsing Customer"
+kind = 0
+message = "\"Just looking,\" a customer says quickly, hands clasped behind their back well away from the shelves. \"Everything in here looks like it bites.\""
+
+[node name="Shape" type="CollisionShape2D" parent="BrowsingCustomerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="BrowsingCustomerVisual" type="Polygon2D" parent="BrowsingCustomerInteract"]
+color = Color(0.5, 0.46, 0.36, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="CuratorInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 55)
+script = ExtResource("6_interactable")
+display_name = "Curator"
+kind = 0
+message = "\"Everything's authenticated,\" the curator says, polishing a display case that doesn't need it. \"I don't sell fakes. I sell overpriced, but never fake.\""
+
+[node name="Shape" type="CollisionShape2D" parent="CuratorInteract"]
+shape = SubResource("InteractShape")
+
+[node name="CuratorVisual" type="Polygon2D" parent="CuratorInteract"]
+color = Color(0.45, 0.4, 0.3, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="OffDutyGuardInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(120, 55)
+script = ExtResource("6_interactable")
+display_name = "Off-Duty Guard"
+kind = 0
+message = "A guard out of uniform turns a dagger over in his hands, clearly more interested in browsing than actually buying. \"Just window shopping,\" he says, not very convincingly."
+
+[node name="Shape" type="CollisionShape2D" parent="OffDutyGuardInteract"]
+shape = SubResource("InteractShape")
+
+[node name="OffDutyGuardVisual" type="Polygon2D" parent="OffDutyGuardInteract"]
+color = Color(0.4, 0.42, 0.5, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="StreetExit" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 140)
+script = ExtResource("6_interactable")
+display_name = "Back to the Street"
+kind = 2
+exit_target_scene = "res://scenes/world/InnerNeraxShops.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="StreetExit"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="StreetExit"]
+color = Color(0.85, 0.65, 0.25, 0.5)
+polygon = PackedVector2Array(-50, -10, 50, -10, 50, 10, -50, 10)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(0, 105)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -200
+limit_top = -150
+limit_right = 200
+limit_bottom = 150
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true
+
+[node name="DialoguePopup" parent="UILayer" instance=ExtResource("7_dialogue")]
+unique_name_in_owner = true

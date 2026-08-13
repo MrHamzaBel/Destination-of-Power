@@ -3,12 +3,20 @@ extends ExplorationArea
 ## selling consumables found nowhere in the outer city, two guards keeping
 ## order, and a fountain at its center. Reached only by rank or toll (see
 ## InnerWallSouth.gd) - the district's prices assume that exclusivity.
+##
+## The fountain is a real hub, not just a centerpiece - a way leads off in
+## every direction. South goes back through the gate (the only way in).
+## North is blocked by soldiers marching to the royal castle (a plain
+## repeatable MESSAGE, not a real EXIT - "still moving upwards" is meant to
+## read as an ongoing procession you can check on, not a one-shot flag).
+## West is a locked-off residential lane, reserved for later. East leads to
+## the shopping street (InnerNeraxShops.tscn).
 
 func get_scene_path() -> String:
 	return SceneManager.INNER_NERAX
 
 func get_objective_text() -> String:
-	return "The inner market. Browse the stalls, or head back through the gate."
+	return "The inner market. Shops lie east, soldiers block the road north - or head back south through the gate."
 
 func _on_area_ready() -> void:
 	_tint_vendor("ApothecaryInteract/ApothecaryVisual", Color(0.95, 0.55, 0.15, 1), "Apothecary")

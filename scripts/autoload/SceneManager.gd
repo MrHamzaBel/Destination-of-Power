@@ -29,6 +29,11 @@ const BUG_CATCHERS_GROVE: String = "res://scenes/world/BugCatchersGrove.tscn"
 const NERAX_UPPER_WARD: String = "res://scenes/world/NeraxUpperWard.tscn"
 const INNER_WALL_SOUTH: String = "res://scenes/world/InnerWallSouth.tscn"
 const INNER_NERAX: String = "res://scenes/world/InnerNerax.tscn"
+const INNER_NERAX_SHOPS: String = "res://scenes/world/InnerNeraxShops.tscn"
+const BUTCHER_SHOP: String = "res://scenes/world/ButcherShop.tscn"
+const ALCHEMIST_SHOP: String = "res://scenes/world/AlchemistShop.tscn"
+const CLOTHING_SHOP: String = "res://scenes/world/ClothingShop.tscn"
+const RELIC_SHOP: String = "res://scenes/world/RelicShop.tscn"
 
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect
@@ -39,6 +44,7 @@ var advances_encounter_on_victory: bool = false ## True when this fight is the c
 var arriving_from_scene_path: String = "" ## Read by ExplorationArea to spawn near the entrance actually used, not a fixed point.
 var pending_combat_return_position: Vector2 = Vector2.ZERO ## Set by ExplorationArea.start_combat() to the player's position the instant a fight begins - read (and cleared) by ExplorationArea._apply_arrival_spawn() so returning from combat puts the player back exactly where they were standing, not the scene's default entry point.
 var has_pending_combat_return_position: bool = false
+var pending_appearance_return_scene: String = "" ## Set by start_appearance_edit() - read by CharacterCreator._ready() so Save/Back return here instead of the Main Menu, and the name field is locked, when it's reached mid-run from a clothing shop rather than the main menu flow.
 
 func _ready() -> void:
 	_fade_layer = CanvasLayer.new()
@@ -102,3 +108,12 @@ func start_combat(enemy_ids: Array[String], return_scene: String = BACK_ALLEY, a
 	return_scene_after_combat = return_scene
 	advances_encounter_on_victory = advances_encounter
 	goto_scene(COMBAT_SCENE, instant)
+
+## Opens CharacterCreator mid-run to restyle the player's appearance (e.g. the
+## Inner Nerax clothing shop) instead of the normal main-menu character
+## creation flow - CharacterCreator._ready() checks pending_appearance_return_scene
+## to lock the name field and route Save/Back back to return_scene instead of
+## the Main Menu.
+func start_appearance_edit(return_scene: String) -> void:
+	pending_appearance_return_scene = return_scene
+	goto_scene(CHARACTER_CREATOR)

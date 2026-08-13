@@ -1,0 +1,213 @@
+[gd_scene load_steps=10 format=3 uid="uid://binnershops01"]
+
+[ext_resource type="Script" path="res://scripts/world/InnerNeraxShops.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(740, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVSeg"]
+size = Vector2(20, 110)
+
+[sub_resource type="RectangleShape2D" id="GapShapeV"]
+size = Vector2(20, 100)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 36.0
+
+[node name="InnerNeraxShops" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.3, 0.28, 0.26, 1)
+polygon = PackedVector2Array(-350, -150, 350, -150, 350, 150, -350, 150)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.37, 0.34, 0.31, 1)
+polygon = PackedVector2Array(-340, -140, 340, -140, 340, 140, -340, 140)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -150)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.16, 0.14, 0.12, 1)
+polygon = PackedVector2Array(-370, -10, 370, -10, 370, 10, -370, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, 150)
+
+[node name="Visual" type="Polygon2D" parent="WallBottom"]
+color = Color(0.16, 0.14, 0.12, 1)
+polygon = PackedVector2Array(-370, -10, 370, -10, 370, 10, -370, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottom"]
+shape = SubResource("WallShapeH")
+
+[node name="WallLeftTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-350, -105)
+
+[node name="Visual" type="Polygon2D" parent="WallLeftTop"]
+color = Color(0.16, 0.14, 0.12, 1)
+polygon = PackedVector2Array(-10, -55, 10, -55, 10, 55, -10, 55)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeftTop"]
+shape = SubResource("WallShapeVSeg")
+
+[node name="WallLeftBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-350, 105)
+
+[node name="Visual" type="Polygon2D" parent="WallLeftBottom"]
+color = Color(0.16, 0.14, 0.12, 1)
+polygon = PackedVector2Array(-10, -55, 10, -55, 10, 55, -10, 55)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeftBottom"]
+shape = SubResource("WallShapeVSeg")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(350, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.16, 0.14, 0.12, 1)
+polygon = PackedVector2Array(-10, -160, 10, -160, 10, 160, -10, 160)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeH")
+
+[node name="ButcherFacade" type="Polygon2D" parent="."]
+position = Vector2(-220, -150)
+color = Color(0.45, 0.28, 0.24, 1)
+polygon = PackedVector2Array(-60, -30, 60, -30, 60, 30, -60, 30)
+
+[node name="ButcherDoor" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-220, -105)
+script = ExtResource("6_interactable")
+display_name = "The Fatted Cleaver"
+kind = 2
+exit_target_scene = "res://scenes/world/ButcherShop.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ButcherDoor"]
+shape = SubResource("InteractShape")
+
+[node name="ButcherDoorVisual" type="Polygon2D" parent="ButcherDoor"]
+color = Color(0.55, 0.4, 0.24, 1)
+polygon = PackedVector2Array(-14, -18, 14, -18, 14, 18, -14, 18)
+
+[node name="AlchemistShopFacade" type="Polygon2D" parent="."]
+position = Vector2(150, -150)
+color = Color(0.32, 0.26, 0.42, 1)
+polygon = PackedVector2Array(-60, -30, 60, -30, 60, 30, -60, 30)
+
+[node name="AlchemistShopDoor" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(150, -105)
+script = ExtResource("6_interactable")
+display_name = "The Gilded Retort"
+kind = 2
+exit_target_scene = "res://scenes/world/AlchemistShop.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="AlchemistShopDoor"]
+shape = SubResource("InteractShape")
+
+[node name="AlchemistShopDoorVisual" type="Polygon2D" parent="AlchemistShopDoor"]
+color = Color(0.55, 0.4, 0.24, 1)
+polygon = PackedVector2Array(-14, -18, 14, -18, 14, 18, -14, 18)
+
+[node name="ClothingShopFacade" type="Polygon2D" parent="."]
+position = Vector2(-220, 150)
+color = Color(0.4, 0.3, 0.4, 1)
+polygon = PackedVector2Array(-60, -30, 60, -30, 60, 30, -60, 30)
+
+[node name="ClothingShopDoor" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-220, 105)
+script = ExtResource("6_interactable")
+display_name = "Silks & Seams"
+kind = 2
+exit_target_scene = "res://scenes/world/ClothingShop.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ClothingShopDoor"]
+shape = SubResource("InteractShape")
+
+[node name="ClothingShopDoorVisual" type="Polygon2D" parent="ClothingShopDoor"]
+color = Color(0.55, 0.4, 0.24, 1)
+polygon = PackedVector2Array(-14, -18, 14, -18, 14, 18, -14, 18)
+
+[node name="RelicShopFacade" type="Polygon2D" parent="."]
+position = Vector2(150, 150)
+color = Color(0.42, 0.36, 0.2, 1)
+polygon = PackedVector2Array(-60, -30, 60, -30, 60, 30, -60, 30)
+
+[node name="RelicShopDoor" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(150, 105)
+script = ExtResource("6_interactable")
+display_name = "The Curious Case"
+kind = 2
+exit_target_scene = "res://scenes/world/RelicShop.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="RelicShopDoor"]
+shape = SubResource("InteractShape")
+
+[node name="RelicShopDoorVisual" type="Polygon2D" parent="RelicShopDoor"]
+color = Color(0.55, 0.4, 0.24, 1)
+polygon = PackedVector2Array(-14, -18, 14, -18, 14, 18, -14, 18)
+
+[node name="ExitToFountain" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-350, 0)
+script = ExtResource("6_interactable")
+display_name = "Back to the Fountain"
+kind = 2
+exit_target_scene = "res://scenes/world/InnerNerax.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToFountain"]
+shape = SubResource("GapShapeV")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToFountain"]
+color = Color(0.55, 0.45, 0.75, 0.5)
+polygon = PackedVector2Array(-10, -50, 10, -50, 10, 50, -10, 50)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(-300, 0)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -360
+limit_top = -160
+limit_right = 360
+limit_bottom = 160
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true
