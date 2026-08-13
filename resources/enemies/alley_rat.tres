@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
 [ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://resources/enemies/Rat.png" id="3_tex"]
 
 [sub_resource type="Resource" id="SubResource_1"]
 script = ExtResource("2_stats")
@@ -28,3 +29,4 @@ xp_reward = 5
 currency_reward = 3
 body_color = Color(0.4, 0.35, 0.32, 1)
 shape_points = PackedVector2Array(-10, 4, -12, -2, -8, -8, 0, -10, 8, -8, 12, -2, 10, 4, 10, 10, -10, 10)
+texture = ExtResource("3_tex")

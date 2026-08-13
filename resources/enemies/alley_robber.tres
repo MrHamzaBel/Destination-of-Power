@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
 [ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://resources/enemies/Alley Robber.png" id="3_tex"]
 
 [sub_resource type="Resource" id="SubResource_1"]
 script = ExtResource("2_stats")
@@ -32,3 +33,4 @@ intro_quote = "Sorry about this - nothing personal, just business!"
 flees_after_turns = 5
 flee_steal_percent = 0.2
 on_defeat_story_flag_id = "deep_alley_robber_defeated"
+texture = ExtResource("3_tex")

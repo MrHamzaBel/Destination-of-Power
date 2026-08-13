@@ -5,6 +5,14 @@ extends Node2D
 ## label. Used both as a standing encounter marker in exploration scenes and
 ## as the enemy/ally combatant visual in CombatScene.
 
+## Real art comes in at whatever resolution the artist exported (source
+## images so far range from ~1024x1536 to 1254x1254) - every texture is
+## scaled to this same on-screen height, aspect ratio preserved, so a new
+## piece of art never needs a per-enemy scale tweak to look consistent next
+## to everything else. Per-instance scene "scale" overrides (already tuned
+## against the placeholder polygons' size) keep applying on top of this.
+const SPRITE_TARGET_HEIGHT: float = 64.0
+
 @onready var polygon: Polygon2D = %Polygon
 @onready var sprite: Sprite2D = %Sprite
 @onready var name_label: Label = %NameLabel
@@ -29,6 +37,9 @@ func _apply_visual(shape_points: PackedVector2Array, color: Color, display_name:
 		sprite.texture = tex
 		sprite.visible = true
 		polygon.visible = false
+		var tex_height := float(tex.get_height())
+		var s := SPRITE_TARGET_HEIGHT / tex_height if tex_height > 0.0 else 1.0
+		sprite.scale = Vector2(s, s)
 	else:
 		if shape_points.size() >= 3:
 			polygon.polygon = shape_points

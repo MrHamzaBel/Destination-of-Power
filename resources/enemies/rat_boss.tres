@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
 [ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://resources/enemies/Rat_Boss.png" id="3_tex"]
 
 [sub_resource type="Resource" id="SubResource_1"]
 script = ExtResource("2_stats")
@@ -35,3 +36,4 @@ summon_minion_id = "alley_rat"
 poison_attack_chance = 0.25
 poison_damage_per_turn = 4
 poison_duration_turns = 3
+texture = ExtResource("3_tex")
