@@ -7,14 +7,14 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
 [ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
 
-[sub_resource type="RectangleShape2D" id="WallShapeH"]
-size = Vector2(740, 20)
+[sub_resource type="RectangleShape2D" id="WallShapeV"]
+size = Vector2(20, 320)
 
-[sub_resource type="RectangleShape2D" id="WallShapeVSeg"]
-size = Vector2(20, 110)
+[sub_resource type="RectangleShape2D" id="WallShapeHSeg"]
+size = Vector2(300, 20)
 
-[sub_resource type="RectangleShape2D" id="GapShapeV"]
-size = Vector2(20, 100)
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(100, 20)
 
 [sub_resource type="CircleShape2D" id="InteractShape"]
 radius = 36.0
@@ -30,53 +30,65 @@ polygon = PackedVector2Array(-350, -150, 350, -150, 350, 150, -350, 150)
 color = Color(0.37, 0.34, 0.31, 1)
 polygon = PackedVector2Array(-340, -140, 340, -140, 340, 140, -340, 140)
 
-[node name="WallTop" type="StaticBody2D" parent="."]
+[node name="WallTopLeft" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(0, -150)
+position = Vector2(-200, -150)
 
-[node name="Visual" type="Polygon2D" parent="WallTop"]
+[node name="Visual" type="Polygon2D" parent="WallTopLeft"]
 color = Color(0.16, 0.14, 0.12, 1)
-polygon = PackedVector2Array(-370, -10, 370, -10, 370, 10, -370, 10)
+polygon = PackedVector2Array(-150, -10, 150, -10, 150, 10, -150, 10)
 
-[node name="Shape" type="CollisionShape2D" parent="WallTop"]
-shape = SubResource("WallShapeH")
+[node name="Shape" type="CollisionShape2D" parent="WallTopLeft"]
+shape = SubResource("WallShapeHSeg")
 
-[node name="WallBottom" type="StaticBody2D" parent="."]
+[node name="WallTopRight" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(0, 150)
+position = Vector2(200, -150)
 
-[node name="Visual" type="Polygon2D" parent="WallBottom"]
+[node name="Visual" type="Polygon2D" parent="WallTopRight"]
 color = Color(0.16, 0.14, 0.12, 1)
-polygon = PackedVector2Array(-370, -10, 370, -10, 370, 10, -370, 10)
+polygon = PackedVector2Array(-150, -10, 150, -10, 150, 10, -150, 10)
 
-[node name="Shape" type="CollisionShape2D" parent="WallBottom"]
-shape = SubResource("WallShapeH")
+[node name="Shape" type="CollisionShape2D" parent="WallTopRight"]
+shape = SubResource("WallShapeHSeg")
 
-[node name="WallLeftTop" type="StaticBody2D" parent="."]
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(-350, -105)
+position = Vector2(-200, 150)
 
-[node name="Visual" type="Polygon2D" parent="WallLeftTop"]
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
 color = Color(0.16, 0.14, 0.12, 1)
-polygon = PackedVector2Array(-10, -55, 10, -55, 10, 55, -10, 55)
+polygon = PackedVector2Array(-150, -10, 150, -10, 150, 10, -150, 10)
 
-[node name="Shape" type="CollisionShape2D" parent="WallLeftTop"]
-shape = SubResource("WallShapeVSeg")
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeHSeg")
 
-[node name="WallLeftBottom" type="StaticBody2D" parent="."]
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(-350, 105)
+position = Vector2(200, 150)
 
-[node name="Visual" type="Polygon2D" parent="WallLeftBottom"]
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
 color = Color(0.16, 0.14, 0.12, 1)
-polygon = PackedVector2Array(-10, -55, 10, -55, 10, 55, -10, 55)
+polygon = PackedVector2Array(-150, -10, 150, -10, 150, 10, -150, 10)
 
-[node name="Shape" type="CollisionShape2D" parent="WallLeftBottom"]
-shape = SubResource("WallShapeVSeg")
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeHSeg")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-350, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallLeft"]
+color = Color(0.16, 0.14, 0.12, 1)
+polygon = PackedVector2Array(-10, -160, 10, -160, 10, 160, -10, 160)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WallShapeV")
 
 [node name="WallRight" type="StaticBody2D" parent="."]
 collision_layer = 1
@@ -88,7 +100,7 @@ color = Color(0.16, 0.14, 0.12, 1)
 polygon = PackedVector2Array(-10, -160, 10, -160, 10, 160, -10, 160)
 
 [node name="Shape" type="CollisionShape2D" parent="WallRight"]
-shape = SubResource("WallShapeH")
+shape = SubResource("WallShapeV")
 
 [node name="ButcherFacade" type="Polygon2D" parent="."]
 position = Vector2(-220, -150)
@@ -177,22 +189,37 @@ polygon = PackedVector2Array(-14, -18, 14, -18, 14, 18, -14, 18)
 [node name="ExitToFountain" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0
-position = Vector2(-350, 0)
+position = Vector2(0, 150)
 script = ExtResource("6_interactable")
 display_name = "Back to the Fountain"
 kind = 2
 exit_target_scene = "res://scenes/world/InnerNerax.tscn"
 
 [node name="Shape" type="CollisionShape2D" parent="ExitToFountain"]
-shape = SubResource("GapShapeV")
+shape = SubResource("GapShapeH")
 
 [node name="ExitVisual" type="Polygon2D" parent="ExitToFountain"]
 color = Color(0.55, 0.45, 0.75, 0.5)
-polygon = PackedVector2Array(-10, -50, 10, -50, 10, 50, -10, 50)
+polygon = PackedVector2Array(-50, -10, 50, -10, 50, 10, -50, 10)
+
+[node name="ExitToCentralWard" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, -150)
+script = ExtResource("6_interactable")
+display_name = "Road to the Central Wall"
+kind = 2
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToCentralWard"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToCentralWard"]
+color = Color(0.5, 0.15, 0.15, 0.5)
+polygon = PackedVector2Array(-50, -10, 50, -10, 50, 10, -50, 10)
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 unique_name_in_owner = true
-position = Vector2(-300, 0)
+position = Vector2(0, 100)
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 position_smoothing_enabled = true

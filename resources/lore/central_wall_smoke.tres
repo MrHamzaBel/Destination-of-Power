@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="LoreScript" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/LoreScript.gd" id="1_lore"]
+
+[resource]
+script = ExtResource("1_lore")
+sections = Array[String](["Past the shops, the street opens onto the base of another wall - taller than the one you came through, guarding whatever lies at the true center of Nerax.", "Guards are still pouring through its gate, more of them now, moving with the kind of hurry that isn't for show. Officers shout formations that break apart and reform before they're finished.", "Beyond the wall, past the rooftops, a thin column of dark smoke rises against the sky - too far off to make out the source, close enough that everyone here has clearly already seen it."])

@@ -1,12 +1,13 @@
 extends ExplorationArea
 ## Southside's market way: a long street lined with houses connecting the
-## Plaza (north) to the southern gate out of Nerax (south).
+## Plaza (south) to the gate out of Nerax (north, still called the "southern
+## gate" by locals even though the road turned).
 
 func get_scene_path() -> String:
 	return SceneManager.MARKET
 
 func get_objective_text() -> String:
-	return "Head south through the market to the gate, back north to the plaza, or up the ward stairs to the east."
+	return "Head north through the market to the gate, or south - back to the plaza, or further along the wall to the ward stairs."
 
 func _on_area_ready() -> void:
 	var vendor_visual := get_node_or_null("MarketVendorInteract/MarketVendorVisual") as EnemyCharacter

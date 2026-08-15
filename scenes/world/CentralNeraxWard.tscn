@@ -1,0 +1,195 @@
+[gd_scene load_steps=11 format=3 uid="uid://bcentralneraxward01"]
+
+[ext_resource type="Script" path="res://scripts/world/CentralNeraxWard.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ExplorationHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/InventoryScreen.tscn" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/world/Interactable.gd" id="6_interactable"]
+
+[sub_resource type="RectangleShape2D" id="WallShapeH"]
+size = Vector2(480, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeBottomSeg"]
+size = Vector2(150, 20)
+
+[sub_resource type="RectangleShape2D" id="WallShapeV"]
+size = Vector2(20, 420)
+
+[sub_resource type="RectangleShape2D" id="GapShapeH"]
+size = Vector2(160, 20)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 36.0
+
+[node name="CentralNeraxWard" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ground" type="Polygon2D" parent="."]
+color = Color(0.2, 0.19, 0.2, 1)
+polygon = PackedVector2Array(-230, -200, 230, -200, 230, 200, -230, 200)
+
+[node name="GroundInset" type="Polygon2D" parent="."]
+color = Color(0.26, 0.25, 0.26, 1)
+polygon = PackedVector2Array(-220, -190, 220, -190, 220, 190, -220, 190)
+
+[node name="CentralWallBacking" type="Polygon2D" parent="."]
+position = Vector2(0, -230)
+color = Color(0.17, 0.16, 0.17, 1)
+polygon = PackedVector2Array(-230, -80, 230, -80, 230, 0, -230, 0)
+
+[node name="SmokePlume1" type="Polygon2D" parent="."]
+position = Vector2(-90, -260)
+color = Color(0.4, 0.38, 0.36, 0.55)
+polygon = PackedVector2Array(-30, 20, -14, -20, 6, -34, 26, -14, 18, 14, 0, 30)
+
+[node name="SmokePlume2" type="Polygon2D" parent="."]
+position = Vector2(60, -280)
+color = Color(0.35, 0.33, 0.32, 0.45)
+polygon = PackedVector2Array(-24, 16, -10, -18, 8, -28, 20, -10, 14, 12, 0, 24)
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, -200)
+
+[node name="Visual" type="Polygon2D" parent="WallTop"]
+color = Color(0.13, 0.12, 0.13, 1)
+polygon = PackedVector2Array(-240, -10, 240, -10, 240, 10, -240, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WallShapeH")
+
+[node name="WallBottomLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-150, 200)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
+color = Color(0.18, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-75, -10, 75, -10, 75, 10, -75, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallBottomRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(150, 200)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+color = Color(0.18, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-75, -10, 75, -10, 75, 10, -75, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-230, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallLeft"]
+color = Color(0.18, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-10, -210, 10, -210, 10, 210, -10, 210)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WallShapeV")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(230, 0)
+
+[node name="Visual" type="Polygon2D" parent="WallRight"]
+color = Color(0.18, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-10, -210, 10, -210, 10, 210, -10, 210)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeV")
+
+[node name="SeniorGuardInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, -100)
+script = ExtResource("6_interactable")
+display_name = "Senior Guard"
+kind = 0
+message = "\"District's on lockdown,\" the older guard says, not looking away from the gate. \"Nobody further, not even nobles, until this is sorted. I don't care who you are or what rank the guild gave you.\""
+
+[node name="Shape" type="CollisionShape2D" parent="SeniorGuardInteract"]
+shape = SubResource("InteractShape")
+
+[node name="SeniorGuardVisual" type="Polygon2D" parent="SeniorGuardInteract"]
+color = Color(0.45, 0.4, 0.3, 1)
+polygon = PackedVector2Array(-10, -20, 10, -20, 13, -2, 11, 18, -11, 18, -13, -2)
+
+[node name="RushingGuardLeftInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-90, -20)
+script = ExtResource("6_interactable")
+display_name = "Guard"
+kind = 0
+message = "A guard jogs past without stopping, shouting something back over his shoulder to someone you can't see. Whatever's happening, it's kept everyone here running since you arrived."
+
+[node name="Shape" type="CollisionShape2D" parent="RushingGuardLeftInteract"]
+shape = SubResource("InteractShape")
+
+[node name="RushingGuardLeftVisual" type="Polygon2D" parent="RushingGuardLeftInteract"]
+color = Color(0.4, 0.42, 0.5, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="RushingGuardRightInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(90, -20)
+script = ExtResource("6_interactable")
+display_name = "Guard"
+kind = 0
+message = "Another guard hauls a crate of spears past the gate at a dead run. Nobody spares you a second glance - whatever the smoke means, it matters more than one adventurer standing around."
+
+[node name="Shape" type="CollisionShape2D" parent="RushingGuardRightInteract"]
+shape = SubResource("InteractShape")
+
+[node name="RushingGuardRightVisual" type="Polygon2D" parent="RushingGuardRightInteract"]
+color = Color(0.42, 0.4, 0.48, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
+[node name="StreetExit" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(0, 200)
+script = ExtResource("6_interactable")
+display_name = "Back to the Shops"
+kind = 2
+exit_target_scene = "res://scenes/world/InnerNeraxShops.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="StreetExit"]
+shape = SubResource("GapShapeH")
+
+[node name="ExitVisual" type="Polygon2D" parent="StreetExit"]
+color = Color(0.85, 0.65, 0.25, 0.5)
+polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(0, 150)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+limit_left = -240
+limit_top = -210
+limit_right = 240
+limit_bottom = 210
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UILayer" instance=ExtResource("4_pause")]
+unique_name_in_owner = true
+
+[node name="InventoryScreen" parent="UILayer" instance=ExtResource("5_inventory")]
+unique_name_in_owner = true

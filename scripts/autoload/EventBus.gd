@@ -6,6 +6,7 @@ extends Node
 signal combat_started(context: Dictionary)
 signal turn_started(context: Dictionary)
 signal player_attacked(context: Dictionary)
+signal player_dealt_damage(context: Dictionary) ## Emitted after a player attack's final damage is applied (context: "damage", "target") - unlike player_attacked (pre-mitigation, for artifacts that modify the hit), this is the actual dealt amount, for artifacts that react to it instead (e.g. lifesteal).
 signal player_took_damage(context: Dictionary)
 signal enemy_defeated(context: Dictionary)
 signal combat_ended(context: Dictionary)

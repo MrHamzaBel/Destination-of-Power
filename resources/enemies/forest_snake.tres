@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 180
+max_resource = 0
+attack = 16
+intelligence = 5
+defense = 9
+speed = 8
+
+[resource]
+script = ExtResource("1_enemy")
+id = "forest_snake"
+display_name = "Forest Snake"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_healing_potion",
+"chance": 0.4
+}, {
+"item_id": "minor_mana_potion",
+"chance": 0.3
+}]
+behavior_type = 0
+level = 9
+xp_reward = 80
+currency_reward = 45
+body_color = Color(0.22, 0.4, 0.18, 1)
+shape_points = PackedVector2Array(-24, 8, -14, -10, 4, -16, 20, -6, 26, 8, 14, 16, -4, 14, -16, 18)
+intro_quote = "A deafening hiss splits the trees as the massive serpent rears up, coils tightening, eyes fixed on you."
+guaranteed_artifact_id = "serpents_fang"
+on_defeat_story_flag_id = "forest_snake_defeated"
+aoe_slam_chance = 0.3
+aoe_slam_damage_multiplier = 0.8
+stuns_at_health_percent = 0.5

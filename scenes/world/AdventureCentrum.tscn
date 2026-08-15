@@ -278,6 +278,29 @@ shape = SubResource("InteractShape")
 color = Color(0.35, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
 
+[node name="GuildOfficerInteract" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(100, -150)
+script = ExtResource("6_interactable")
+display_name = "Guild Officer"
+kind = 6
+dialogue_prompt = "\"You've reached B-Rank - good, because we need someone who can actually handle this,\" the officer says, grim. \"A snake out in the forest killed an entire adventuring party. It's not staying put, either - it's moving toward the city. Bring a party if you can, or at least get the guards involved. Don't go in blind. Are you in?\""
+dialogue_yes_text = "\"Good. Whatever you need to prepare, do it - this one's no joke.\" She marks it down. \"Report back once it's dealt with.\""
+dialogue_no_text = "\"Your call. But that thing isn't slowing down, so don't wait too long.\""
+dialogue_decline_text = "\"Fair enough,\" she says, and goes back to her reports."
+dialogue_quest_active_text = "\"Any luck with the snake? Don't push it alone if you don't have to.\""
+quest_id = "snake_slaying"
+required_guild_rank_order = 4
+locked_message = "\"This one's B-Rank and up only,\" she says. \"It's too dangerous to hand out casually.\""
+
+[node name="Shape" type="CollisionShape2D" parent="GuildOfficerInteract"]
+shape = SubResource("InteractShape")
+
+[node name="GuildOfficerVisual" type="Polygon2D" parent="GuildOfficerInteract"]
+color = Color(0.42, 0.36, 0.4, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+
 [node name="TrophyWallInteract" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0

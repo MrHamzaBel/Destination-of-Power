@@ -42,32 +42,37 @@ text = "Paused"
 [node name="ResumeButton" type="Button" parent="CenterContainer/Panel/MainView"]
 unique_name_in_owner = true
 layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
 focus_mode = 2
-text = "Resume"
+text = "▶  Resume"
 
 [node name="CharacterButton" type="Button" parent="CenterContainer/Panel/MainView"]
 unique_name_in_owner = true
 layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
 focus_mode = 2
-text = "Character Info"
+text = "★  Character Info"
 
 [node name="InventoryButton" type="Button" parent="CenterContainer/Panel/MainView"]
 unique_name_in_owner = true
 layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
 focus_mode = 2
-text = "Inventory"
+text = "◆  Inventory"
 
 [node name="SettingsButton" type="Button" parent="CenterContainer/Panel/MainView"]
 unique_name_in_owner = true
 layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
 focus_mode = 2
-text = "Settings"
+text = "⚙  Settings"
 
 [node name="AbandonButton" type="Button" parent="CenterContainer/Panel/MainView"]
 unique_name_in_owner = true
 layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
 focus_mode = 2
-text = "Abandon Run & Return to Menu"
+text = "✕  Abandon Run & Return to Menu"
 
 [node name="InfoView" type="VBoxContainer" parent="CenterContainer/Panel"]
 unique_name_in_owner = true
@@ -142,8 +147,9 @@ text = "INT +1"
 [node name="InfoBackButton" type="Button" parent="CenterContainer/Panel/InfoView"]
 unique_name_in_owner = true
 layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
 focus_mode = 2
-text = "Back"
+text = "◀  Back"
 
 [node name="AbandonConfirmDialog" type="ConfirmationDialog" parent="."]
 unique_name_in_owner = true

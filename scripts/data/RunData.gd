@@ -29,6 +29,7 @@ const SAVE_VERSION: int = 6 ## v6 adds guild_progress.
 @export var guild_rank: String = "" ## "" = not enrolled, else "F".."S" (see GuildRegistry).
 @export var counters: Dictionary = {} ## Generic key(String) -> int counter bag (e.g. "alley_rat_kills").
 @export var guild_progress: int = 0 ## Standing accumulated toward the next guild rank (see RunManager.guild_progress_required()).
+@export var last_combat_ally_casualty_ids: Array[String] = [] ## AllyDefinition ids that died in the most recent combat that had allies present (see CombatManager._finish_combat()) - lets a scene that recruited a one-time ally (e.g. the Flankers) tell afterward whether any of them fell, without CombatManager itself needing to know anything about that scene.
 
 func to_dict() -> Dictionary:
 	return {
@@ -56,6 +57,7 @@ func to_dict() -> Dictionary:
 		"guild_rank": guild_rank,
 		"counters": counters,
 		"guild_progress": guild_progress,
+		"last_combat_ally_casualty_ids": last_combat_ally_casualty_ids,
 	}
 
 static func from_dict(data: Dictionary) -> RunData:
@@ -84,6 +86,7 @@ static func from_dict(data: Dictionary) -> RunData:
 	run.guild_rank = data.get("guild_rank", "")
 	run.counters = data.get("counters", {})
 	run.guild_progress = data.get("guild_progress", 0)
+	run.last_combat_ally_casualty_ids.assign(data.get("last_combat_ally_casualty_ids", []))
 	return run
 
 func add_item(item_id: String, quantity: int = 1) -> void:

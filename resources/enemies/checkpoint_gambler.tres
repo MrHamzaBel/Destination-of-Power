@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 70
+max_resource = 0
+attack = 8
+intelligence = 14
+defense = 6
+speed = 8
+
+[resource]
+script = ExtResource("1_enemy")
+id = "checkpoint_gambler"
+display_name = "Checkpoint Gambler"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_mana_potion",
+"chance": 0.2
+}]
+behavior_type = 0
+level = 7
+xp_reward = 30
+currency_reward = 15
+body_color = Color(0.4, 0.3, 0.42, 1)
+shape_points = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+on_defeat_story_flag_id = "east_mercenaries_defeated"
+gambler_blast_chance = 0.4

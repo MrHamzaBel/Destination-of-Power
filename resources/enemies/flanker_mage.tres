@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 55
+max_resource = 0
+attack = 7
+intelligence = 16
+defense = 6
+speed = 7
+
+[resource]
+script = ExtResource("1_enemy")
+id = "flanker_mage"
+display_name = "Flanker Battlemage"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_mana_potion",
+"chance": 0.25
+}]
+behavior_type = 0
+level = 5
+xp_reward = 25
+currency_reward = 12
+body_color = Color(0.4, 0.28, 0.5, 1)
+shape_points = PackedVector2Array(-9, -18, 9, -18, 12, -2, 10, 16, -10, 16, -12, -2)
+on_defeat_story_flag_id = "flankers_defeated"
+fire_spell_chance = 0.3
+fire_damage_bonus_percent = 50.0
+ice_spell_chance = 0.3
+ice_freeze_chance = 0.5
+ice_freeze_multiplier = 0.5
+ice_freeze_duration_rounds = 2
+poison_attack_chance = 0.3
+poison_damage_per_turn = 5
+poison_duration_turns = 3

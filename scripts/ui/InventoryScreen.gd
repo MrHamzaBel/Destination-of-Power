@@ -28,7 +28,20 @@ const EQUIP_SLOTS: Array[String] = ["weapon", "offhand", "armor"]
 @onready var artifact_detail_info: Label = %ArtifactDetailInfo
 @onready var artifact_use_button: Button = %ArtifactUseButton
 
-@onready var character_info_label: Label = %CharacterInfoLabel
+@onready var char_name_label: Label = %CharNameLabel
+@onready var char_level_badge: Label = %CharLevelBadge
+@onready var char_class_label: Label = %CharClassLabel
+@onready var char_guild_rank_label: Label = %CharGuildRankLabel
+@onready var char_gold_label: Label = %CharGoldLabel
+@onready var char_exp_bar: ProgressBar = %CharExpBar
+@onready var char_exp_label: Label = %CharExpLabel
+@onready var char_health_bar: ProgressBar = %CharHealthBar
+@onready var char_health_value_label: Label = %CharHealthValueLabel
+@onready var char_resource_label: Label = %CharResourceLabel
+@onready var char_resource_bar: ProgressBar = %CharResourceBar
+@onready var char_resource_value_label: Label = %CharResourceValueLabel
+@onready var char_stats_grid: GridContainer = %CharStatsGrid
+@onready var char_quests_list: VBoxContainer = %CharQuestsList
 @onready var char_stat_points_label: Label = %CharStatPointsLabel
 @onready var char_stat_points_row: HBoxContainer = %CharStatPointsRow
 @onready var hp_point_button: Button = %HpPointButton
@@ -197,8 +210,8 @@ func _on_use_pressed() -> void:
 	var stats := RunManager.compute_current_stats()
 	RunManager.run.current_health = min(stats.max_health, RunManager.run.current_health + item_def.heal_amount)
 	RunManager.run.current_resource = min(stats.max_resource, RunManager.run.current_resource + item_def.resource_amount)
-	if item_def.grants_all_stats_bonus > 0:
-		RunManager.grant_all_stats_bonus(item_def.grants_all_stats_bonus)
+	if item_def.grants_stat_bonus_amount > 0:
+		RunManager.grant_stat_bonus(item_def.grants_stat_bonus_type, item_def.grants_stat_bonus_amount)
 	RunManager.run.remove_item(_selected_item_id, 1)
 	EventBus.item_used.emit({"item_id": _selected_item_id, "combat": null})
 	EventBus.inventory_changed.emit()
@@ -292,44 +305,94 @@ func _on_use_artifact_pressed() -> void:
 ## since players open this panel with 'I' far more readily than they find
 ## the pause-menu button, and the level-up stat points specifically need to
 ## be easy to find.
+##
+## Laid out as a real character sheet - name/class/level header with an exp
+## bar, health/resource bars styled the same red/blue as CombatHUD's, a
+## colored stat-card grid (built the same "PanelContainer + accent bar" way
+## CombatHUD._build_ability_card() already does for abilities), and a quest
+## list with color-coded status cards - instead of one giant joined-text
+## Label, which read as a raw info dump rather than part of the game.
+
+const STAT_CARD_COLORS := {
+	"Attack": Color(0.85, 0.4, 0.32, 1),
+	"Defense": Color(0.45, 0.55, 0.75, 1),
+	"Speed": Color(0.45, 0.8, 0.5, 1),
+	"Intelligence": Color(0.65, 0.45, 0.85, 1),
+}
+const QUEST_ACTIVE_COLOR := Color(0.85, 0.75, 0.4, 1)
+const QUEST_COMPLETE_COLOR := Color(0.45, 0.8, 0.5, 1)
 
 func _populate_character() -> void:
+	for child in char_stats_grid.get_children():
+		child.queue_free()
+	for child in char_quests_list.get_children():
+		child.queue_free()
+
 	if RunManager.run == null:
-		character_info_label.text = "No active run."
+		char_name_label.text = "No active run."
+		char_level_badge.text = ""
+		char_class_label.text = ""
+		char_guild_rank_label.text = ""
+		char_gold_label.text = ""
+		char_exp_bar.value = 0
+		char_exp_label.text = ""
+		char_health_bar.value = 0
+		char_health_value_label.text = ""
+		char_resource_label.text = ""
+		char_resource_bar.value = 0
+		char_resource_value_label.text = ""
 		char_stat_points_row.visible = false
 		char_stat_points_label.visible = false
 		return
+
 	var class_def := RunManager.get_class_def()
 	var stats := RunManager.compute_current_stats()
 	var run := RunManager.run
-	var lines: Array[String] = []
-	lines.append("Name: %s" % RunManager.character_profile.character_name)
-	lines.append("Class: %s" % (class_def.display_name if class_def else "?"))
-	lines.append("Level: %d   Exp: %d / %d" % [run.level, run.current_exp, RunManager.exp_required_for_level(run.level)])
-	lines.append("Gold: %d" % run.currency)
+
+	char_name_label.text = RunManager.character_profile.character_name if RunManager.character_profile != null else "?"
+	char_level_badge.text = "Level %d" % run.level
+	char_class_label.text = class_def.display_name if class_def != null else "?"
+	char_gold_label.text = "%d gold" % run.currency
+
 	var rank_def := RunManager.get_guild_rank_def()
-	if rank_def != null:
-		lines.append("Guild Rank: %s (%d%% off guild tax and lounge prices)" % [rank_def.id, int(rank_def.tax_discount_percent)])
-	else:
-		lines.append("Guild Rank: Not enrolled")
-	lines.append("")
-	lines.append("Health: %d / %d" % [run.current_health, stats.max_health])
-	lines.append("%s: %d / %d" % [class_def.resource_label if class_def else "Resource", run.current_resource, stats.max_resource])
-	lines.append("Attack: %d   Intelligence: %d" % [stats.attack, stats.intelligence])
-	lines.append("Defense: %d   Speed: %d" % [stats.defense, stats.speed])
-	lines.append("")
-	lines.append("Quests:")
+	char_guild_rank_label.text = (
+		"%s-Rank (%d%% off tax)" % [rank_def.id, int(rank_def.tax_discount_percent)]
+		if rank_def != null else "Not enrolled"
+	)
+
+	var exp_required := RunManager.exp_required_for_level(run.level)
+	char_exp_bar.max_value = max(1, exp_required)
+	char_exp_bar.value = run.current_exp
+	char_exp_label.text = "%d / %d exp to next level" % [run.current_exp, exp_required]
+
+	char_health_bar.max_value = max(1, stats.max_health)
+	char_health_bar.value = run.current_health
+	char_health_value_label.text = "%d / %d" % [run.current_health, stats.max_health]
+
+	char_resource_label.text = class_def.resource_label if class_def != null else "Resource"
+	char_resource_bar.max_value = max(1, stats.max_resource)
+	char_resource_bar.value = run.current_resource
+	char_resource_value_label.text = "%d / %d" % [run.current_resource, stats.max_resource]
+
+	char_stats_grid.add_child(_build_stat_card("Attack", stats.attack))
+	char_stats_grid.add_child(_build_stat_card("Defense", stats.defense))
+	char_stats_grid.add_child(_build_stat_card("Speed", stats.speed))
+	char_stats_grid.add_child(_build_stat_card("Intelligence", stats.intelligence))
+
 	if run.active_quests.is_empty() and run.completed_quests.is_empty():
-		lines.append("  None yet")
-	for quest_id in run.active_quests:
-		var quest_def := QuestRegistry.get_quest(quest_id)
-		if quest_def != null:
-			lines.append("  [In Progress] %s - %s" % [quest_def.display_name, quest_def.objective_text])
-	for quest_id in run.completed_quests:
-		var quest_def := QuestRegistry.get_quest(quest_id)
-		if quest_def != null:
-			lines.append("  [Complete] %s" % quest_def.display_name)
-	character_info_label.text = "\n".join(lines)
+		var empty_label := Label.new()
+		empty_label.text = "No quests accepted yet."
+		empty_label.add_theme_color_override("font_color", Color(0.6, 0.58, 0.66, 1))
+		char_quests_list.add_child(empty_label)
+	else:
+		for quest_id in run.active_quests:
+			var quest_def := QuestRegistry.get_quest(quest_id)
+			if quest_def != null:
+				char_quests_list.add_child(_build_quest_card(quest_def, true))
+		for quest_id in run.completed_quests:
+			var quest_def := QuestRegistry.get_quest(quest_id)
+			if quest_def != null:
+				char_quests_list.add_child(_build_quest_card(quest_def, false))
 
 	var unspent := run.unspent_stat_points
 	char_stat_points_label.visible = true
@@ -338,6 +401,95 @@ func _populate_character() -> void:
 		"You have %d unspent stat point%s - choose where to put them:" % [unspent, "" if unspent == 1 else "s"]
 		if unspent > 0 else "No unspent stat points."
 	)
+
+func _build_stat_card(stat_label: String, value: int) -> Control:
+	var color: Color = STAT_CARD_COLORS.get(stat_label, Color(0.6, 0.6, 0.62, 1))
+
+	var card := PanelContainer.new()
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.16, 0.15, 0.2, 1)
+	style.set_corner_radius_all(10)
+	style.set_border_width_all(2)
+	style.border_color = color
+	style.content_margin_left = 14.0
+	style.content_margin_right = 14.0
+	style.content_margin_top = 10.0
+	style.content_margin_bottom = 10.0
+	card.add_theme_stylebox_override("panel", style)
+
+	var hbox := HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 12)
+	card.add_child(hbox)
+
+	var accent := PanelContainer.new()
+	accent.custom_minimum_size = Vector2(6, 0)
+	var accent_style := StyleBoxFlat.new()
+	accent_style.bg_color = color
+	accent_style.set_corner_radius_all(3)
+	accent.add_theme_stylebox_override("panel", accent_style)
+	hbox.add_child(accent)
+
+	var vbox := VBoxContainer.new()
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hbox.add_child(vbox)
+
+	var name_label := Label.new()
+	name_label.text = stat_label
+	name_label.add_theme_font_size_override("font_size", 13)
+	name_label.add_theme_color_override("font_color", Color(0.7, 0.68, 0.78, 1))
+	vbox.add_child(name_label)
+
+	var value_label := Label.new()
+	value_label.text = str(value)
+	value_label.add_theme_font_size_override("font_size", 22)
+	vbox.add_child(value_label)
+
+	return card
+
+func _build_quest_card(quest_def: QuestDefinition, is_active: bool) -> Control:
+	var accent := QUEST_ACTIVE_COLOR if is_active else QUEST_COMPLETE_COLOR
+
+	var card := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.16, 0.15, 0.2, 1)
+	style.set_corner_radius_all(8)
+	style.set_border_width_all(2)
+	style.border_color = accent
+	style.content_margin_left = 12.0
+	style.content_margin_right = 12.0
+	style.content_margin_top = 8.0
+	style.content_margin_bottom = 8.0
+	card.add_theme_stylebox_override("panel", style)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 2)
+	card.add_child(vbox)
+
+	var title_row := HBoxContainer.new()
+	vbox.add_child(title_row)
+
+	var name_label := Label.new()
+	name_label.text = quest_def.display_name
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.add_theme_font_size_override("font_size", 15)
+	title_row.add_child(name_label)
+
+	var status_label := Label.new()
+	status_label.text = "In Progress" if is_active else "Complete"
+	status_label.add_theme_font_size_override("font_size", 12)
+	status_label.add_theme_color_override("font_color", accent)
+	title_row.add_child(status_label)
+
+	if is_active and quest_def.objective_text != "":
+		var desc_label := Label.new()
+		desc_label.text = quest_def.objective_text
+		desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+		desc_label.add_theme_font_size_override("font_size", 12)
+		desc_label.add_theme_color_override("font_color", Color(0.7, 0.68, 0.78, 1))
+		vbox.add_child(desc_label)
+
+	return card
 
 func _on_stat_point_pressed(stat_name: String) -> void:
 	if RunManager.allocate_stat_point(stat_name):

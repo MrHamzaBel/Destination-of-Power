@@ -1,0 +1,136 @@
+[gd_scene load_steps=3 format=3 uid="uid://btraderscreen01"]
+
+[ext_resource type="Script" path="res://scripts/ui/TraderScreen.gd" id="1_script"]
+[ext_resource type="Theme" path="res://resources/ui/nerax_theme.tres" id="2_theme"]
+
+[node name="TraderScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.65)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(660, 500)
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderRow" type="HBoxContainer" parent="CenterContainer/Panel/VBox"]
+layout_mode = 2
+
+[node name="VendorNameLabel" type="Label" parent="CenterContainer/Panel/VBox/HeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "Vendor"
+
+[node name="GoldLabel" type="Label" parent="CenterContainer/Panel/VBox/HeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.75, 0.4, 1)
+text = "0 gold"
+
+[node name="CloseButton" type="Button" parent="CenterContainer/Panel/VBox/HeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Close"
+
+[node name="Tabs" type="TabContainer" parent="CenterContainer/Panel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Buy" type="VBoxContainer" parent="CenterContainer/Panel/VBox/Tabs"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BuyItemName" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Buy"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = ""
+
+[node name="BuyItemDesc" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Buy"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+text = ""
+
+[node name="BuyItemPrice" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Buy"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.75, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = ""
+
+[node name="BuyEmptyLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Buy"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+visible = false
+text = "Nothing for sale here."
+
+[node name="BuySpacer" type="Control" parent="CenterContainer/Panel/VBox/Tabs/Buy"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BuyButton" type="Button" parent="CenterContainer/Panel/VBox/Tabs/Buy"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Buy"
+
+[node name="Sell" type="VBoxContainer" parent="CenterContainer/Panel/VBox/Tabs"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="SellHeaderRow" type="HBoxContainer" parent="CenterContainer/Panel/VBox/Tabs/Sell"]
+layout_mode = 2
+
+[node name="SellHint" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Sell/SellHeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+text = "Everything in your pack this vendor will buy:"
+
+[node name="SellAllButton" type="Button" parent="CenterContainer/Panel/VBox/Tabs/Sell/SellHeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 2
+text = "Sell All"
+
+[node name="SellEmptyLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Sell"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+text = "Nothing in your pack this vendor will buy."
+
+[node name="SellScroll" type="ScrollContainer" parent="CenterContainer/Panel/VBox/Tabs/Sell"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SellList" type="VBoxContainer" parent="CenterContainer/Panel/VBox/Tabs/Sell/SellScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4

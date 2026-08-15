@@ -4,18 +4,19 @@
 
 [resource]
 script = ExtResource("1_item")
-id = "all_stat_elixir"
-display_name = "All-Stat Elixir"
-description = "A shimmering elixir the alchemist swears took a decade to perfect. A single dose permanently strengthens every core stat by a small amount. There is exactly one bottle - use it wisely, and only outside of battle."
+id = "elixir_of_insight"
+display_name = "Elixir of Insight"
+description = "A deep violet elixir that seems to swirl on its own. A single dose permanently strengthens your Intelligence. There is exactly one bottle - use it wisely, and only outside of battle."
 category = 2
 rarity = 4
-icon_color = Color(0.75, 0.35, 0.85, 1)
+icon_color = Color(0.55, 0.35, 0.8, 1)
 equip_slot = ""
 is_ranged = false
 stat_modifiers = null
 heal_amount = 0
 resource_amount = 0
 combat_usable = false
-grants_all_stats_bonus = 1
+grants_stat_bonus_type = "intelligence"
+grants_stat_bonus_amount = 3
 value = 150
 droppable = true

@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bplazanerax01"]
+[gd_scene load_steps=17 format=3 uid="uid://bplazanerax01"]
 
 [ext_resource type="Script" path="res://scripts/world/Plaza.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
@@ -16,6 +16,9 @@ size = Vector2(20, 210)
 
 [sub_resource type="RectangleShape2D" id="WallShapeVShort"]
 size = Vector2(20, 140)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVTiny"]
+size = Vector2(20, 35)
 
 [sub_resource type="RectangleShape2D" id="WallShapeBottomSeg"]
 size = Vector2(420, 20)
@@ -43,41 +46,41 @@ polygon = PackedVector2Array(-500, -280, 500, -280, 500, 280, -500, 280)
 color = Color(0.38, 0.365, 0.34, 1)
 polygon = PackedVector2Array(-490, -270, 490, -270, 490, 270, -490, 270)
 
-[node name="WallTop" type="StaticBody2D" parent="."]
+[node name="WallTopLeft" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(0, -280)
+position = Vector2(-300, -280)
 
-[node name="Visual" type="Polygon2D" parent="WallTop"]
+[node name="Visual" type="Polygon2D" parent="WallTopLeft"]
+color = Color(0.16, 0.14, 0.13, 1)
+polygon = PackedVector2Array(-210, -10, 210, -10, 210, 10, -210, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTopLeft"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallTopRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(300, -280)
+
+[node name="Visual" type="Polygon2D" parent="WallTopRight"]
+color = Color(0.16, 0.14, 0.13, 1)
+polygon = PackedVector2Array(-210, -10, 210, -10, 210, 10, -210, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallTopRight"]
+shape = SubResource("WallShapeBottomSeg")
+
+[node name="WallBottom" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(0, 280)
+
+[node name="Visual" type="Polygon2D" parent="WallBottom"]
 color = Color(0.16, 0.14, 0.13, 1)
 polygon = PackedVector2Array(-520, -10, 520, -10, 520, 10, -520, 10)
 
-[node name="Shape" type="CollisionShape2D" parent="WallTop"]
+[node name="Shape" type="CollisionShape2D" parent="WallBottom"]
 shape = SubResource("WallShapeH")
-
-[node name="WallBottomLeft" type="StaticBody2D" parent="."]
-collision_layer = 1
-collision_mask = 1
-position = Vector2(-300, 280)
-
-[node name="Visual" type="Polygon2D" parent="WallBottomLeft"]
-color = Color(0.16, 0.14, 0.13, 1)
-polygon = PackedVector2Array(-210, -10, 210, -10, 210, 10, -210, 10)
-
-[node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
-shape = SubResource("WallShapeBottomSeg")
-
-[node name="WallBottomRight" type="StaticBody2D" parent="."]
-collision_layer = 1
-collision_mask = 1
-position = Vector2(300, 280)
-
-[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
-color = Color(0.16, 0.14, 0.13, 1)
-polygon = PackedVector2Array(-210, -10, 210, -10, 210, 10, -210, 10)
-
-[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
-shape = SubResource("WallShapeBottomSeg")
 
 [node name="WallLeftTop" type="StaticBody2D" parent="."]
 collision_layer = 1
@@ -91,17 +94,29 @@ polygon = PackedVector2Array(-10, -105, 10, -105, 10, 105, -10, 105)
 [node name="Shape" type="CollisionShape2D" parent="WallLeftTop"]
 shape = SubResource("WallShapeVTall")
 
-[node name="WallLeftBottom" type="StaticBody2D" parent="."]
+[node name="WallLeftBottomA" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(-500, 175)
+position = Vector2(-500, 87.5)
 
-[node name="Visual" type="Polygon2D" parent="WallLeftBottom"]
+[node name="Visual" type="Polygon2D" parent="WallLeftBottomA"]
 color = Color(0.16, 0.14, 0.13, 1)
-polygon = PackedVector2Array(-10, -105, 10, -105, 10, 105, -10, 105)
+polygon = PackedVector2Array(-10, -17.5, 10, -17.5, 10, 17.5, -10, 17.5)
 
-[node name="Shape" type="CollisionShape2D" parent="WallLeftBottom"]
-shape = SubResource("WallShapeVTall")
+[node name="Shape" type="CollisionShape2D" parent="WallLeftBottomA"]
+shape = SubResource("WallShapeVTiny")
+
+[node name="WallLeftBottomB" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(-500, 262.5)
+
+[node name="Visual" type="Polygon2D" parent="WallLeftBottomB"]
+color = Color(0.16, 0.14, 0.13, 1)
+polygon = PackedVector2Array(-10, -17.5, 10, -17.5, 10, 17.5, -10, 17.5)
+
+[node name="Shape" type="CollisionShape2D" parent="WallLeftBottomB"]
+shape = SubResource("WallShapeVTiny")
 
 [node name="WallRightTop" type="StaticBody2D" parent="."]
 collision_layer = 1
@@ -115,17 +130,29 @@ polygon = PackedVector2Array(-10, -105, 10, -105, 10, 105, -10, 105)
 [node name="Shape" type="CollisionShape2D" parent="WallRightTop"]
 shape = SubResource("WallShapeVTall")
 
-[node name="WallRightBottom" type="StaticBody2D" parent="."]
+[node name="WallRightBottomA" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(500, 175)
+position = Vector2(500, 87.5)
 
-[node name="Visual" type="Polygon2D" parent="WallRightBottom"]
+[node name="Visual" type="Polygon2D" parent="WallRightBottomA"]
 color = Color(0.16, 0.14, 0.13, 1)
-polygon = PackedVector2Array(-10, -105, 10, -105, 10, 105, -10, 105)
+polygon = PackedVector2Array(-10, -17.5, 10, -17.5, 10, 17.5, -10, 17.5)
 
-[node name="Shape" type="CollisionShape2D" parent="WallRightBottom"]
-shape = SubResource("WallShapeVTall")
+[node name="Shape" type="CollisionShape2D" parent="WallRightBottomA"]
+shape = SubResource("WallShapeVTiny")
+
+[node name="WallRightBottomB" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(500, 262.5)
+
+[node name="Visual" type="Polygon2D" parent="WallRightBottomB"]
+color = Color(0.16, 0.14, 0.13, 1)
+polygon = PackedVector2Array(-10, -17.5, 10, -17.5, 10, 17.5, -10, 17.5)
+
+[node name="Shape" type="CollisionShape2D" parent="WallRightBottomB"]
+shape = SubResource("WallShapeVTiny")
 
 [node name="Fountain" type="StaticBody2D" parent="."]
 collision_layer = 1
@@ -224,6 +251,22 @@ story_flag_id = "plaza_fountain_coin_found"
 [node name="Shape" type="CollisionShape2D" parent="FountainCoinsInteract"]
 shape = SubResource("InteractShape")
 
+[node name="ExitToMercenaryCamp" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(-500, 175)
+script = ExtResource("6_interactable")
+display_name = "Old Campsite"
+kind = 2
+exit_target_scene = "res://scenes/world/MercenaryCamp.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToMercenaryCamp"]
+shape = SubResource("WallShapeVShort")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToMercenaryCamp"]
+color = Color(0.55, 0.5, 0.35, 0.5)
+polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
+
 [node name="ExitToTwoWayAlley" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0
@@ -238,6 +281,22 @@ shape = SubResource("WallShapeVShort")
 
 [node name="ExitVisual" type="Polygon2D" parent="ExitToTwoWayAlley"]
 color = Color(0.85, 0.75, 0.35, 0.5)
+polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
+
+[node name="ExitToEastCheckpoint" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+position = Vector2(500, 175)
+script = ExtResource("6_interactable")
+display_name = "East Road"
+kind = 2
+exit_target_scene = "res://scenes/world/EastCheckpoint.tscn"
+
+[node name="Shape" type="CollisionShape2D" parent="ExitToEastCheckpoint"]
+shape = SubResource("WallShapeVShort")
+
+[node name="ExitVisual" type="Polygon2D" parent="ExitToEastCheckpoint"]
+color = Color(0.55, 0.3, 0.25, 0.5)
 polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
 
 [node name="CityGate" type="Area2D" parent="."]
@@ -337,7 +396,7 @@ polygon = PackedVector2Array(-14, -18, 14, -18, 14, 18, -14, 18)
 [node name="ExitToMarket" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0
-position = Vector2(0, 280)
+position = Vector2(0, -280)
 script = ExtResource("6_interactable")
 display_name = "Southside Market"
 kind = 2

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AllyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/AllyDefinition.gd" id="1_ally"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 45
+max_resource = 0
+attack = 10
+intelligence = 8
+defense = 4
+speed = 10
+
+[resource]
+script = ExtResource("1_ally")
+id = "flanker_healer"
+display_name = "Flanker Ranger"
+description = "Recruited from the old campsite, one job only - fights at your side with a plain auto-attack, same as any other ally (no healing here, that's an enemy-side trick)."
+stats = SubResource("SubResource_1")
+body_color = Color(0.3, 0.42, 0.28, 1)
+shape_points = PackedVector2Array(-8, -17, 8, -17, 11, -1, 9, 15, -9, 15, -11, -1)

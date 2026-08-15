@@ -1,7 +1,28 @@
-[gd_scene load_steps=3 format=3 uid="uid://binventoryscreen01"]
+[gd_scene load_steps=6 format=3 uid="uid://binventoryscreen01"]
 
 [ext_resource type="Script" path="res://scripts/ui/InventoryScreen.gd" id="1_script"]
 [ext_resource type="Theme" path="res://resources/ui/nerax_theme.tres" id="2_theme"]
+
+[sub_resource type="StyleBoxFlat" id="SubResource_health"]
+bg_color = Color(0.75, 0.2, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SubResource_resource"]
+bg_color = Color(0.25, 0.45, 0.85, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SubResource_exp"]
+bg_color = Color(0.8, 0.65, 0.25, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [node name="InventoryScreen" type="Control"]
 layout_mode = 3
@@ -223,16 +244,149 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="InfoScroll" type="ScrollContainer" parent="CenterContainer/Panel/VBox/Tabs/Character"]
+[node name="CharScroll" type="ScrollContainer" parent="CenterContainer/Panel/VBox/Tabs/Character"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="CharacterInfoLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/InfoScroll"]
+[node name="CharVBox" type="VBoxContainer" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="HeaderPanel" type="PanelContainer" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox"]
+layout_mode = 2
+
+[node name="HeaderVBox" type="VBoxContainer" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/HeaderPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="NameRow" type="HBoxContainer" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/HeaderPanel/HeaderVBox"]
+layout_mode = 2
+
+[node name="CharNameLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/HeaderPanel/HeaderVBox/NameRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-autowrap_mode = 3
-text = "..."
+theme_override_font_sizes/font_size = 26
+text = "Name"
+
+[node name="CharLevelBadge" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/HeaderPanel/HeaderVBox/NameRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.75, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "Level 1"
+
+[node name="ClassRankRow" type="HBoxContainer" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/HeaderPanel/HeaderVBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="CharClassLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/HeaderPanel/HeaderVBox/ClassRankRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.75, 0.73, 0.82, 1)
+text = "Class"
+
+[node name="CharGuildRankLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/HeaderPanel/HeaderVBox/ClassRankRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.75, 0.85, 1)
+text = "Not enrolled"
+
+[node name="CharGoldLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/HeaderPanel/HeaderVBox/ClassRankRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.75, 0.4, 1)
+text = "0 gold"
+
+[node name="CharExpBar" type="ProgressBar" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/HeaderPanel/HeaderVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 10)
+show_percentage = false
+theme_override_styles/fill = SubResource("SubResource_exp")
+
+[node name="CharExpLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/HeaderPanel/HeaderVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.65, 0.62, 0.72, 1)
+horizontal_alignment = 1
+text = "0 / 0 exp"
+
+[node name="VitalsPanel" type="PanelContainer" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox"]
+layout_mode = 2
+
+[node name="VitalsVBox" type="VBoxContainer" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/VitalsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HealthRow" type="HBoxContainer" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/VitalsPanel/VitalsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HealthCaption" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/VitalsPanel/VitalsVBox/HealthRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+text = "Health"
+
+[node name="CharHealthBar" type="ProgressBar" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/VitalsPanel/VitalsVBox/HealthRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+show_percentage = false
+theme_override_styles/fill = SubResource("SubResource_health")
+
+[node name="CharHealthValueLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/VitalsPanel/VitalsVBox/HealthRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(70, 0)
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.9, 0.55, 0.55, 1)
+text = "0 / 0"
+
+[node name="ResourceRow" type="HBoxContainer" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/VitalsPanel/VitalsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CharResourceLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/VitalsPanel/VitalsVBox/ResourceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+text = "Resource"
+
+[node name="CharResourceBar" type="ProgressBar" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/VitalsPanel/VitalsVBox/ResourceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+show_percentage = false
+theme_override_styles/fill = SubResource("SubResource_resource")
+
+[node name="CharResourceValueLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox/VitalsPanel/VitalsVBox/ResourceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(70, 0)
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.55, 0.7, 0.95, 1)
+text = "0 / 0"
+
+[node name="CharStatsGrid" type="GridContainer" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="QuestsLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Quests"
+
+[node name="CharQuestsList" type="VBoxContainer" parent="CenterContainer/Panel/VBox/Tabs/Character/CharScroll/CharVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
 
 [node name="CharStatPointsLabel" type="Label" parent="CenterContainer/Panel/VBox/Tabs/Character"]
 unique_name_in_owner = true

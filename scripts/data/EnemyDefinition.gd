@@ -93,3 +93,49 @@ enum BehaviorType { AGGRESSIVE, DEFENSIVE, RANDOM }
 ## CombatManager._check_heal_seal(), called from _on_enemy_defeated(). ---
 @export var seals_healing_when_alone: bool = false
 @export_multiline var heal_seal_message: String = "" ## Shown when the seal triggers. Falls back to a generic line if empty.
+
+## While this enemy is alive, CombatManager.get_current_target()/set_target()
+## force every single-target action (player basic attack, player ATTACK-type
+## ability, ally auto-attack) onto it - a "taunt." This only touches the
+## single-target resolution path: a future AOE ability
+## (AbilityDefinition.target_type == ALL_ENEMIES) would hit every enemy
+## directly via CombatManager.get_alive_enemies() rather than calling
+## get_current_target() at all, so it bypasses taunt automatically once that
+## resolution logic exists - no taunt-side change needed when it's added.
+@export var taunts_all_attacks: bool = false
+
+## --- Fire spell (mage special: bonus damage, no status effect - the offensive counterpart to the ice/poison spells above) ---
+@export var fire_spell_chance: float = 0.0 ## Chance per turn to cast instead of attacking normally. 0 = never.
+@export var fire_damage_bonus_percent: float = 0.0 ## Extra damage over a normal attack, e.g. 50.0 = +50%.
+
+## --- Ally healing (support enemy special: heals its most-injured living ally on a fixed schedule instead of attacking) ---
+@export var heals_allies_every_turns: int = 0 ## Every Nth of this unit's own actions, it heals instead of attacking. 0 = never.
+@export var heal_allies_percent: float = 0.0 ## Fraction of the healed ally's max health restored.
+
+## --- Counter (East Checkpoint "Parry Counter" special: instantly reflects a
+## fraction of any hit landed on this enemy back at whoever landed it) ---
+@export var counters_damage_percent: float = 0.0 ## 0 = no counter. Reflected amount is always at least 1.
+
+## --- Gambler blast (East Checkpoint special: a spell whose damage is fully
+## random each cast, from a total whiff up to a big hit - the swinginess is
+## the point, unlike every other spell's fixed damage-vs-chance shape) ---
+@export var gambler_blast_chance: float = 0.0 ## Chance per turn to cast instead of attacking normally. 0 = never.
+
+## --- Lucky Shot (East Checkpoint special: every normal attack has a flat
+## chance to immediately strike again for a fraction of the first hit) ---
+@export var lucky_shot_chance: float = 0.0 ## 0 = never triggers.
+@export var lucky_shot_bonus_percent: float = 50.0 ## Second hit's damage, as a fraction of the first hit's.
+
+## --- Ward (East Checkpoint "Defender" special: casts a re-appliable, no-
+## turn-limit shield on one living ally - CombatUnitState.shielded, checked
+## by _rolls_shield() alongside the existing one-time absorbs_first_hit) ---
+@export var wards_allies_chance: float = 0.0 ## Chance per turn to cast instead of attacking normally. 0 = never.
+
+## --- AOE slam (boss special: hits every living player-side combatant at once) ---
+@export var aoe_slam_chance: float = 0.0 ## Chance per turn to cast instead of attacking normally. 0 = never.
+@export var aoe_slam_damage_multiplier: float = 1.0 ## Per-target damage, relative to a normal attack.
+
+## --- Piercing stun (boss special: a one-time party-wide stun once health
+## drops to/below this fraction - CombatUnitState.stun_turns_remaining, same
+## one-time-guard shape as the enrage phase above) ---
+@export var stuns_at_health_percent: float = 0.0 ## 0 = never triggers, else the health fraction (0-1) that triggers it.

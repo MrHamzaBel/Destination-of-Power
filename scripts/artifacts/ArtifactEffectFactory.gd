@@ -26,6 +26,10 @@ static func create(effect_id: String) -> ArtifactEffectBase:
 			return BugCatchersNetEffect.new()
 		"flat_stat_bonus":
 			return FlatStatBonusEffect.new()
+		"flankers_signet":
+			return FlankersSignetEffect.new()
+		"serpents_fang":
+			return SerpentsFangEffect.new()
 		_:
 			push_warning("ArtifactEffectFactory: unknown effect_id '%s'" % effect_id)
 			return null

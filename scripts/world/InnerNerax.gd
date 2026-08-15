@@ -5,18 +5,28 @@ extends ExplorationArea
 ## InnerWallSouth.gd) - the district's prices assume that exclusivity.
 ##
 ## The fountain is a real hub, not just a centerpiece - a way leads off in
-## every direction. South goes back through the gate (the only way in).
-## North is blocked by soldiers marching to the royal castle (a plain
-## repeatable MESSAGE, not a real EXIT - "still moving upwards" is meant to
-## read as an ongoing procession you can check on, not a one-shot flag).
-## West is a locked-off residential lane, reserved for later. East leads to
-## the shopping street (InnerNeraxShops.tscn).
+## every direction. South goes back through the gate (the only way in). West
+## and east are both locked-off flavor stubs, reserved for later. North is
+## the real way onward, into the shopping street - the first time, that
+## triggers a one-time cinematic (GuardsRushCutscene.tscn, a column of
+## soldiers rushing to the Royal Castle); every visit after goes straight to
+## InnerNeraxShops.tscn, same "seen it once" gating NeraxOutskirts.gd already
+## uses for the masked man encounter.
+
+@onready var road_north: Interactable = $RoadNorthInteract
 
 func get_scene_path() -> String:
 	return SceneManager.INNER_NERAX
 
 func get_objective_text() -> String:
-	return "The inner market. Shops lie east, soldiers block the road north - or head back south through the gate."
+	return "The inner market. Soldiers rush north - or head back south through the gate."
+
+func _on_interactable_triggered(interactable: Interactable) -> void:
+	if interactable == road_north:
+		var seen := RunManager.run != null and bool(RunManager.run.story_flags.get("guards_rush_seen", false))
+		SceneManager.goto_scene(SceneManager.INNER_NERAX_SHOPS if seen else SceneManager.GUARDS_RUSH_CUTSCENE)
+		return
+	super._on_interactable_triggered(interactable)
 
 func _on_area_ready() -> void:
 	_tint_vendor("ApothecaryInteract/ApothecaryVisual", Color(0.95, 0.55, 0.15, 1), "Apothecary")

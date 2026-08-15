@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 45
+max_resource = 0
+attack = 10
+intelligence = 8
+defense = 4
+speed = 10
+
+[resource]
+script = ExtResource("1_enemy")
+id = "flanker_healer"
+display_name = "Flanker Ranger"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_healing_potion",
+"chance": 0.25
+}]
+behavior_type = 0
+level = 5
+xp_reward = 20
+currency_reward = 10
+body_color = Color(0.3, 0.42, 0.28, 1)
+shape_points = PackedVector2Array(-8, -17, 8, -17, 11, -1, 9, 15, -9, 15, -11, -1)
+on_defeat_story_flag_id = "flankers_defeated"
+heals_allies_every_turns = 3
+heal_allies_percent = 0.25

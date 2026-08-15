@@ -10,6 +10,7 @@ func _ready() -> void:
 	EventBus.combat_started.connect(_on_event.bind("on_combat_started"))
 	EventBus.turn_started.connect(_on_event.bind("on_turn_started"))
 	EventBus.player_attacked.connect(_on_event.bind("on_player_attacked"))
+	EventBus.player_dealt_damage.connect(_on_event.bind("on_player_dealt_damage"))
 	EventBus.player_took_damage.connect(_on_event.bind("on_player_took_damage"))
 	EventBus.enemy_defeated.connect(_on_event.bind("on_enemy_defeated"))
 	EventBus.combat_ended.connect(_on_event.bind("on_combat_ended"))

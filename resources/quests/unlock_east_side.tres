@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/QuestDefinition.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "unlock_east_side"
+display_name = "Unlock the East Side"
+description = "A checkpoint of mercenaries has the road east of the Plaza locked down, shaking down anyone who tries to pass. Deal with them for good."
+objective_text = "Defeat the mercenaries blocking the east road."
+reward_gold = 0
+reward_exp = 40
+reward_stat_points = 0
+reward_item_ids = Array[String]([])
+reward_artifact_id = ""
+reward_guild_progress = 0
+repeatable = false
+objective_enemy_id = ""
+objective_kill_count = 0

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "flankers_signet"
+display_name = "Flanker's Signet"
+description = "A battered signet ring taken off the mercenary crew's tank. A balanced boost to Defense, Speed and Intelligence."
+rarity = 2
+icon_color = Color(0.5, 0.45, 0.35, 1)
+effect_id = "flankers_signet"
+effect_values = {
+"defense_bonus": 2,
+"speed_bonus": 2,
+"intelligence_bonus": 4
+}
+stacking_allowed = false
+class_restrictions = Array[String]([])
+random_drop_eligible = false

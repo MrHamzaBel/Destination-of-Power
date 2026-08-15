@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ItemDefinition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = "elixir_of_vitality"
+display_name = "Elixir of Vitality"
+description = "A warm golden elixir, thick and glowing faintly. A single dose permanently strengthens your maximum Health. There is exactly one bottle - use it wisely, and only outside of battle."
+category = 2
+rarity = 4
+icon_color = Color(0.85, 0.7, 0.2, 1)
+equip_slot = ""
+is_ranged = false
+stat_modifiers = null
+heal_amount = 0
+resource_amount = 0
+combat_usable = false
+grants_stat_bonus_type = "hp"
+grants_stat_bonus_amount = 3
+value = 150
+droppable = true

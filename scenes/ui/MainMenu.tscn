@@ -100,37 +100,37 @@ custom_minimum_size = Vector2(0, 16)
 [node name="ContinueButton" type="Button" parent="CenterContainer/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 50)
 focus_mode = 2
 text = "▶  Continue Run"
 
 [node name="NewGameButton" type="Button" parent="CenterContainer/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 50)
 focus_mode = 2
-text = "▶  New Game"
+text = "✦  New Game"
 
 [node name="CharacterCreationButton" type="Button" parent="CenterContainer/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 50)
 focus_mode = 2
-text = "▶  Character Creation"
+text = "★  Character Creation"
 
 [node name="SettingsButton" type="Button" parent="CenterContainer/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 50)
 focus_mode = 2
-text = "▶  Settings"
+text = "⚙  Settings"
 
 [node name="QuitButton" type="Button" parent="CenterContainer/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 50)
 focus_mode = 2
-text = "▶  Quit"
+text = "✕  Quit"
 
 [node name="Spacer2" type="Control" parent="CenterContainer/Panel/VBox"]
 layout_mode = 2

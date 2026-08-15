@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bmarketnerax01"]
+[gd_scene load_steps=17 format=3 uid="uid://bmarketnerax01"]
 
 [ext_resource type="Script" path="res://scripts/world/Market.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/entities/PlayerCharacter.tscn" id="2_player"]
@@ -20,6 +20,15 @@ size = Vector2(160, 20)
 
 [sub_resource type="RectangleShape2D" id="GapShapeV"]
 size = Vector2(20, 140)
+
+[sub_resource type="RectangleShape2D" id="WallShapeVFull"]
+size = Vector2(20, 720)
+
+[sub_resource type="RectangleShape2D" id="WallShapeHTiny"]
+size = Vector2(25, 20)
+
+[sub_resource type="RectangleShape2D" id="GapShapeHSmall"]
+size = Vector2(100, 20)
 
 [sub_resource type="RectangleShape2D" id="HouseShape"]
 size = Vector2(70, 60)
@@ -74,17 +83,29 @@ polygon = PackedVector2Array(-75, -10, 75, -10, 75, 10, -75, 10)
 [node name="Shape" type="CollisionShape2D" parent="WallBottomLeft"]
 shape = SubResource("WallShapeHSeg")
 
-[node name="WallBottomRight" type="StaticBody2D" parent="."]
+[node name="WallBottomRightA" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(155, 350)
+position = Vector2(92.5, 350)
 
-[node name="Visual" type="Polygon2D" parent="WallBottomRight"]
+[node name="Visual" type="Polygon2D" parent="WallBottomRightA"]
 color = Color(0.16, 0.13, 0.1, 1)
-polygon = PackedVector2Array(-75, -10, 75, -10, 75, 10, -75, 10)
+polygon = PackedVector2Array(-12.5, -10, 12.5, -10, 12.5, 10, -12.5, 10)
 
-[node name="Shape" type="CollisionShape2D" parent="WallBottomRight"]
-shape = SubResource("WallShapeHSeg")
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRightA"]
+shape = SubResource("WallShapeHTiny")
+
+[node name="WallBottomRightB" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 1
+position = Vector2(217.5, 350)
+
+[node name="Visual" type="Polygon2D" parent="WallBottomRightB"]
+color = Color(0.16, 0.13, 0.1, 1)
+polygon = PackedVector2Array(-12.5, -10, 12.5, -10, 12.5, 10, -12.5, 10)
+
+[node name="Shape" type="CollisionShape2D" parent="WallBottomRightB"]
+shape = SubResource("WallShapeHTiny")
 
 [node name="WallLeftTop" type="StaticBody2D" parent="."]
 collision_layer = 1
@@ -110,29 +131,17 @@ polygon = PackedVector2Array(-10, -145, 10, -145, 10, 145, -10, 145)
 [node name="Shape" type="CollisionShape2D" parent="WallLeftBottom"]
 shape = SubResource("WallShapeVSeg")
 
-[node name="WallRightTop" type="StaticBody2D" parent="."]
+[node name="WallRight" type="StaticBody2D" parent="."]
 collision_layer = 1
 collision_mask = 1
-position = Vector2(230, -215)
+position = Vector2(230, 0)
 
-[node name="Visual" type="Polygon2D" parent="WallRightTop"]
+[node name="Visual" type="Polygon2D" parent="WallRight"]
 color = Color(0.16, 0.13, 0.1, 1)
-polygon = PackedVector2Array(-10, -145, 10, -145, 10, 145, -10, 145)
+polygon = PackedVector2Array(-10, -360, 10, -360, 10, 360, -10, 360)
 
-[node name="Shape" type="CollisionShape2D" parent="WallRightTop"]
-shape = SubResource("WallShapeVSeg")
-
-[node name="WallRightBottom" type="StaticBody2D" parent="."]
-collision_layer = 1
-collision_mask = 1
-position = Vector2(230, 215)
-
-[node name="Visual" type="Polygon2D" parent="WallRightBottom"]
-color = Color(0.16, 0.13, 0.1, 1)
-polygon = PackedVector2Array(-10, -145, 10, -145, 10, 145, -10, 145)
-
-[node name="Shape" type="CollisionShape2D" parent="WallRightBottom"]
-shape = SubResource("WallShapeVSeg")
+[node name="Shape" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WallShapeVFull")
 
 [node name="House1" type="StaticBody2D" parent="."]
 collision_layer = 1
@@ -330,23 +339,23 @@ polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
 [node name="ExitToUpperWard" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0
-position = Vector2(230, 0)
+position = Vector2(155, 350)
 script = ExtResource("6_interactable")
 display_name = "Ward Stairs"
 kind = 2
 exit_target_scene = "res://scenes/world/NeraxUpperWard.tscn"
 
 [node name="Shape" type="CollisionShape2D" parent="ExitToUpperWard"]
-shape = SubResource("GapShapeV")
+shape = SubResource("GapShapeHSmall")
 
 [node name="ExitVisual" type="Polygon2D" parent="ExitToUpperWard"]
 color = Color(0.55, 0.45, 0.75, 0.5)
-polygon = PackedVector2Array(-10, -70, 10, -70, 10, 70, -10, 70)
+polygon = PackedVector2Array(-50, -10, 50, -10, 50, 10, -50, 10)
 
 [node name="ExitToPlaza" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0
-position = Vector2(0, -350)
+position = Vector2(0, 350)
 script = ExtResource("6_interactable")
 display_name = "Back to the Plaza"
 kind = 2
@@ -362,7 +371,7 @@ polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
 [node name="ExitToGate" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0
-position = Vector2(0, 350)
+position = Vector2(0, -350)
 script = ExtResource("6_interactable")
 display_name = "The Southern Gate"
 kind = 2
@@ -377,7 +386,7 @@ polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 unique_name_in_owner = true
-position = Vector2(0, -320)
+position = Vector2(0, 320)
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 position_smoothing_enabled = true

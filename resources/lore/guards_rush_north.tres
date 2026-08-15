@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="LoreScript" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/LoreScript.gd" id="1_lore"]
+
+[resource]
+script = ExtResource("1_lore")
+sections = Array[String](["The road north is packed shoulder to shoulder with soldiers, more than you've seen anywhere else in the city, all moving the same direction at a hard march.", "\"Move it! MOVE IT!\" An older guard, some kind of officer by the look of him, strides along the column barking at stragglers. \"Double-time, all of you - there's a situation at the Royal Castle and I want every last one of you through that gate before I finish this sentence!\"", "Nobody explains what the situation actually is. Nobody stops long enough to ask. You fall in at the edge of the column and let it carry you toward the market street ahead."])

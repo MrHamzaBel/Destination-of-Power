@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/QuestDefinition.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "snake_slaying"
+display_name = "Snake Slaying"
+description = "A massive snake killed a fellow adventuring party out in the forest and is moving closer to the city. The guild wants it stopped - bring a party, or at least ask the guards for backup."
+objective_text = "Track down and defeat the snake in the forest."
+reward_gold = 60
+reward_exp = 90
+reward_stat_points = 0
+reward_item_ids = Array[String]([])
+reward_artifact_id = ""
+reward_guild_progress = 10
+repeatable = false
+objective_enemy_id = "forest_snake"
+objective_kill_count = 1

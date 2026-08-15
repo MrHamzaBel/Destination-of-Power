@@ -19,10 +19,11 @@ enum Rarity { COMMON, UNCOMMON, RARE, EPIC, LEGENDARY }
 @export var heal_amount: int = 0 ## Consumable: flat health restored.
 @export var resource_amount: int = 0 ## Consumable: flat resource restored.
 @export var combat_usable: bool = true ## Consumable: false = only usable from the Inventory screen while exploring, not from CombatHUD's Items panel (e.g. the Butcher's meats - real food, not battle rations).
-@export var grants_all_stats_bonus: int = 0 ## Consumable: permanently adds this many points to every core stat (attack/defense/speed/intelligence, plus this many HP "points") when used - see RunManager.grant_all_stats_bonus(). 0 = no effect.
+@export var grants_stat_bonus_type: String = "" ## Consumable: one of "hp"/"attack"/"defense"/"speed"/"intelligence" - which stat grants_stat_bonus_amount is added to when used. "" = no effect.
+@export var grants_stat_bonus_amount: int = 0 ## Consumable: permanently adds this many points to grants_stat_bonus_type when used - see RunManager.grant_stat_bonus(). "hp" points are worth StatBlock.HP_STAT_MULTIPLIER raw health each, same convention as allocate_stat_point("hp").
 @export var value: int = 0 ## Gold value, used for shops/selling.
 @export var droppable: bool = true
-@export var sell_price: int = 0 ## If > 0, any TRADE-kind vendor buys this item on the spot for this much gold (see ExplorationArea._try_sell_to_vendor()). 0 = not generically sellable (the default for equipment/consumables the player needs to keep).
+@export var sell_price: int = 0 ## If > 0, any TRADE-kind vendor buys this item for this much gold from TraderScreen's Sell tab. 0 = not generically sellable (the default for equipment/consumables the player needs to keep).
 
 static func rarity_name(rarity: Rarity) -> String:
 	match rarity:

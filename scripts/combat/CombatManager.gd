@@ -101,16 +101,35 @@ func get_alive_allies() -> Array[CombatUnitState]:
 			result.append(a)
 	return result
 
+## Any living enemy with EnemyDefinition.taunts_all_attacks set - a "tank"
+## that forces every single-target action onto itself while alive. Returns
+## the first one found (multiple taunters at once isn't a case any current
+## enemy uses, but this stays well-defined either way).
+func _get_taunting_enemy() -> CombatUnitState:
+	for e in enemy_units:
+		if e.is_alive() and e.enemy_def != null and e.enemy_def.taunts_all_attacks:
+			return e
+	return null
+
 ## The enemy currently targeted by the player (and by allies, who focus the
 ## same target). Falls back to the first alive enemy if nothing is selected
-## or the selected enemy has since died.
+## or the selected enemy has since died. A taunting enemy overrides all of
+## that - see EnemyDefinition.taunts_all_attacks.
 func get_current_target() -> CombatUnitState:
+	var taunter := _get_taunting_enemy()
+	if taunter != null:
+		selected_enemy_target = taunter
+		return taunter
 	if selected_enemy_target != null and selected_enemy_target.is_alive():
 		return selected_enemy_target
 	selected_enemy_target = get_primary_enemy_target()
 	return selected_enemy_target
 
 func set_target(enemy: CombatUnitState) -> void:
+	var taunter := _get_taunting_enemy()
+	if taunter != null:
+		selected_enemy_target = taunter
+		return
 	if enemy != null and enemy.is_alive() and not enemy.is_player and not enemy.is_ally:
 		selected_enemy_target = enemy
 
@@ -280,15 +299,38 @@ func _rolls_dodge(attacker: CombatUnitState, defender: CombatUnitState) -> bool:
 	_log("%s is too quick - %s's attack whiffs completely!" % [defender.display_name, attacker.display_name])
 	return true
 
-## True (and logs the shatter) exactly once per combat if `defender` has a
-## shimmering shield that absorbs its very first hit - after that it behaves
-## like a normal defender for the rest of the fight.
+## True if `defender` blocks this hit completely - either a manually-cast
+## ward (CombatUnitState.shielded, re-appliable, no expiry of its own beyond
+## being consumed by the next hit - see EnemyDefinition.wards_allies_chance)
+## or the older one-time-per-combat EnemyDefinition.absorbs_first_hit shield.
+## Checked in that order since the manual ward has no "once per combat" limit
+## to fall back past.
 func _rolls_shield(attacker: CombatUnitState, defender: CombatUnitState) -> bool:
+	if defender.shielded:
+		defender.shielded = false
+		_log("%s's ward absorbs %s's attack completely!" % [defender.display_name, attacker.display_name])
+		return true
 	if defender.enemy_def == null or not defender.enemy_def.absorbs_first_hit or defender.has_absorbed_hit:
 		return false
 	defender.has_absorbed_hit = true
 	_log("%s's shimmering shield absorbs %s's attack completely, then shatters!" % [defender.display_name, attacker.display_name])
 	return true
+
+## East Checkpoint "Parry Counter" special: the instant a hit lands on an
+## enemy with EnemyDefinition.counters_damage_percent set, it reflects a
+## fraction of that damage straight back at whoever landed it (player or
+## ally) - always at least 1, uncapped by defense (a reaction, not a spell).
+func _apply_counter(defender: CombatUnitState, attacker: CombatUnitState, dealt: int) -> void:
+	if defender.enemy_def == null or defender.enemy_def.counters_damage_percent <= 0.0 or not attacker.is_alive():
+		return
+	var counter_damage := maxi(1, int(round(float(dealt) * defender.enemy_def.counters_damage_percent / 100.0)))
+	var counter_dealt := attacker.apply_damage(counter_damage)
+	_log("%s's counter strikes back at %s for %d damage!" % [defender.display_name, attacker.display_name, counter_dealt])
+	stats_changed.emit()
+	if attacker.is_player:
+		EventBus.player_took_damage.emit({"combat": self, "amount": counter_dealt})
+		_record_death_info(defender.display_name, defender.enemy_def.level, "a counterattack")
+	_check_health_low(attacker)
 
 ## Records the most recent hit the player took - not necessarily fatal, but
 ## if it turns out to be, this is exactly the info the defeat screen wants
@@ -337,10 +379,13 @@ func _perform_player_attack(power: float, uses_intelligence: bool, is_ranged: bo
 		(" Critical hit!" if is_crit else ""), str(context.get("log_extra", ""))
 	])
 	stats_changed.emit()
+	EventBus.player_dealt_damage.emit({"combat": self, "damage": dealt, "target": target})
 	if not target.is_alive():
 		_on_enemy_defeated(target)
 	else:
 		_check_enrage(target)
+		_check_piercing_eyes(target)
+		_apply_counter(target, player_unit, dealt)
 	_check_health_low(target)
 	_finish_action()
 
@@ -472,6 +517,20 @@ func _advance_round_action() -> void:
 
 	current_unit = acting_unit
 	current_unit.clear_turn_effects()
+
+	# Stun (e.g. the Snake's Piercing Eyes): the turn still "happens" - poison
+	# above already ticked - but the action itself is skipped entirely, no
+	# input prompt for the player and no AI action for an ally/enemy.
+	if acting_unit.stun_turns_remaining > 0:
+		acting_unit.stun_turns_remaining -= 1
+		awaiting_player_input = false
+		turn_changed.emit(current_unit)
+		_log("%s is stunned and can't act!" % acting_unit.display_name)
+		stats_changed.emit()
+		round_stage += 1
+		_advance_round_action()
+		return
+
 	# Set this before emitting so anything reacting to turn_changed/turn_started
 	# (including code that immediately calls player_basic_attack() etc.) sees
 	# the correct state instead of racing the signal.
@@ -521,6 +580,7 @@ func _apply_poison_tick(unit: CombatUnitState) -> void:
 			_on_enemy_defeated(unit)
 	else:
 		_check_enrage(unit)
+		_check_piercing_eyes(unit)
 		_check_health_low(unit)
 
 ## Allies are always AI-controlled: they focus whatever enemy the player has
@@ -546,6 +606,8 @@ func _ally_take_single_action(ally: CombatUnitState) -> void:
 		_on_enemy_defeated(target)
 	else:
 		_check_enrage(target)
+		_check_piercing_eyes(target)
+		_apply_counter(target, ally, dealt)
 	_check_health_low(target)
 	_finish_action()
 
@@ -584,6 +646,14 @@ func _enemy_take_single_action(enemy: CombatUnitState) -> void:
 		_finish_action()
 		return
 
+	# Support special: on a fixed schedule (every Nth of its own actions), heals
+	# its most-injured living ally instead of attacking - a guaranteed beat, not
+	# a chance roll, so it reads as a predictable rhythm to play around.
+	if def != null and def.heals_allies_every_turns > 0 and enemy.actions_taken % def.heals_allies_every_turns == 0:
+		_perform_ally_heal(enemy, def)
+		_finish_action()
+		return
+
 	var party := _get_alive_party_members()
 	if party.is_empty():
 		_finish_action()
@@ -599,6 +669,33 @@ func _enemy_take_single_action(enemy: CombatUnitState) -> void:
 	# Miniboss special: a low-damage spell with a chance to halve the target's Speed for a few rounds.
 	if def != null and def.ice_spell_chance > 0.0 and _rng.randf() < def.ice_spell_chance:
 		_perform_ice_spell(enemy, target, def)
+		_finish_action()
+		return
+
+	# Mage special: a bolt of fire dealing bonus damage - no status effect,
+	# the straightforward offensive option alongside ice's slow and poison's DOT.
+	if def != null and def.fire_spell_chance > 0.0 and _rng.randf() < def.fire_spell_chance:
+		_perform_fire_spell(enemy, target, def)
+		_finish_action()
+		return
+
+	# Gambler special: fully random damage each cast, from a total whiff up to
+	# a big hit - unlike every other spell here, there's no fixed base amount.
+	if def != null and def.gambler_blast_chance > 0.0 and _rng.randf() < def.gambler_blast_chance:
+		_perform_gambler_blast(enemy, target, def)
+		_finish_action()
+		return
+
+	# Defender special: casts a re-appliable shield on one living ally instead
+	# of attacking - see CombatUnitState.shielded / _rolls_shield().
+	if def != null and def.wards_allies_chance > 0.0 and _rng.randf() < def.wards_allies_chance:
+		_perform_ward_cast(enemy, def)
+		_finish_action()
+		return
+
+	# Boss special: hits every living player-side combatant at once.
+	if def != null and def.aoe_slam_chance > 0.0 and _rng.randf() < def.aoe_slam_chance:
+		_perform_aoe_slam(enemy, def)
 		_finish_action()
 		return
 
@@ -625,6 +722,17 @@ func _enemy_take_single_action(enemy: CombatUnitState) -> void:
 			EventBus.player_took_damage.emit({"combat": self, "amount": dealt})
 			_record_death_info(enemy.display_name, enemy.enemy_def.level if enemy.enemy_def != null else 1, "a basic attack")
 		_check_health_low(target)
+		# Lucky Shot special: a flat chance for the same basic attack to strike
+		# again immediately, for a fraction of the first hit's damage.
+		if def != null and def.lucky_shot_chance > 0.0 and target.is_alive() and _rng.randf() < def.lucky_shot_chance:
+			var bonus_damage := maxi(1, int(round(float(dealt) * def.lucky_shot_bonus_percent / 100.0)))
+			var bonus_dealt := target.apply_damage(bonus_damage)
+			_log("%s's lucky shot strikes again for %d damage!" % [enemy.display_name, bonus_dealt])
+			stats_changed.emit()
+			if target.is_player:
+				EventBus.player_took_damage.emit({"combat": self, "amount": bonus_dealt})
+				_record_death_info(enemy.display_name, def.level, "a lucky shot")
+			_check_health_low(target)
 		if not target.is_alive() and not target.is_player:
 			_log("%s has fallen!" % target.display_name)
 	_finish_action()
@@ -699,6 +807,20 @@ func _perform_ice_spell(attacker: CombatUnitState, target: CombatUnitState, def:
 		_record_death_info(attacker.display_name, def.level, "an ice spell")
 	_check_health_low(target)
 
+## Bonus direct damage, no status effect - the straightforward offensive
+## option next to ice's slow and poison's residual damage, for a mage that
+## rotates between all three.
+func _perform_fire_spell(attacker: CombatUnitState, target: CombatUnitState, def: EnemyDefinition) -> void:
+	var multiplier := _resolve_damage_multiplier(attacker, target)
+	var raw_damage := int(round(float(attacker.attack) * (1.0 + def.fire_damage_bonus_percent / 100.0) * multiplier))
+	var dealt := target.apply_damage(raw_damage)
+	_log("%s hurls a bolt of flame at %s for %d damage!" % [attacker.display_name, target.display_name, dealt])
+	stats_changed.emit()
+	if target.is_player:
+		EventBus.player_took_damage.emit({"combat": self, "amount": dealt})
+		_record_death_info(attacker.display_name, def.level, "a bolt of flame")
+	_check_health_low(target)
+
 ## Assassin special: buffs its own Speed for several rounds instead of
 ## attacking this turn - the exact same mechanism as the ice spell's freeze
 ## (CombatUnitState.apply_speed_debuff()), just with a multiplier above 1.0
@@ -706,6 +828,101 @@ func _perform_ice_spell(attacker: CombatUnitState, target: CombatUnitState, def:
 func _perform_haste_spell(caster: CombatUnitState, def: EnemyDefinition) -> void:
 	caster.apply_speed_debuff(def.haste_multiplier, def.haste_duration_rounds)
 	_log("%s murmurs a quickening word and blurs with sudden speed!" % caster.display_name)
+	stats_changed.emit()
+
+## Support special: heals whichever living ally (itself included) is missing
+## the most health, on a fixed schedule (EnemyDefinition.heals_allies_every_turns)
+## rather than a chance roll - a predictable rhythm to play around instead of
+## a random one.
+func _perform_ally_heal(healer: CombatUnitState, def: EnemyDefinition) -> void:
+	var best: CombatUnitState = null
+	var best_missing := 0
+	for e in enemy_units:
+		if not e.is_alive():
+			continue
+		var missing := e.max_health - e.current_health
+		if missing > best_missing:
+			best_missing = missing
+			best = e
+	if best == null:
+		_log("%s looks for someone to heal, but everyone's already at full health." % healer.display_name)
+		return
+	var heal_amount := int(round(float(best.max_health) * def.heal_allies_percent))
+	best.current_health = mini(best.max_health, best.current_health + heal_amount)
+	_log("%s channels a healing spell into %s, restoring %d health!" % [healer.display_name, best.display_name, heal_amount])
+	stats_changed.emit()
+
+## Gambler special: fully random damage from a total whiff (0) up to twice
+## the caster's Intelligence - a genuine miss is possible here, unlike a
+## normal attack (CombatUnitState.apply_damage() floors every other hit at 1),
+## so a 0 roll bypasses apply_damage() entirely instead of being rounded up.
+func _perform_gambler_blast(attacker: CombatUnitState, target: CombatUnitState, def: EnemyDefinition) -> void:
+	var raw_damage := _rng.randi_range(0, 2 * attacker.intelligence)
+	if raw_damage <= 0:
+		_log("%s's wild blast goes wide, fizzling out completely!" % attacker.display_name)
+		return
+	var multiplier := _resolve_damage_multiplier(attacker, target)
+	var dealt := target.apply_damage(int(round(float(raw_damage) * multiplier)))
+	_log("%s gambles on a wild blast, striking %s for %d damage!" % [attacker.display_name, target.display_name, dealt])
+	stats_changed.emit()
+	if target.is_player:
+		EventBus.player_took_damage.emit({"combat": self, "amount": dealt})
+		_record_death_info(attacker.display_name, def.level, "a wild blast")
+	_check_health_low(target)
+
+## Defender special: casts a re-appliable shield (CombatUnitState.shielded) on
+## one living ally that doesn't already have one - prefers an unshielded ally
+## over itself only because there's always at least one candidate to check
+## (itself), so this never wastes a turn once any ally is still alive.
+func _perform_ward_cast(caster: CombatUnitState, def: EnemyDefinition) -> void:
+	var candidates: Array[CombatUnitState] = []
+	for e in enemy_units:
+		if e.is_alive() and not e.shielded:
+			candidates.append(e)
+	if candidates.is_empty():
+		_log("%s has nothing left to ward." % caster.display_name)
+		return
+	var target: CombatUnitState = candidates[_rng.randi_range(0, candidates.size() - 1)]
+	target.shielded = true
+	_log("%s weaves a warding spell around %s, ready to block the next attack!" % [caster.display_name, target.display_name])
+	stats_changed.emit()
+
+## Boss special: hits every living player-side combatant (player and any
+## allies) at once, each resolved against its own defense independently.
+func _perform_aoe_slam(attacker: CombatUnitState, def: EnemyDefinition) -> void:
+	var party := _get_alive_party_members()
+	if party.is_empty():
+		return
+	_log("%s slams the ground, and the shockwave catches everyone!" % attacker.display_name)
+	for member in party:
+		var multiplier := _resolve_damage_multiplier(attacker, member)
+		var raw_damage := int(round(float(attacker.attack) * def.aoe_slam_damage_multiplier * multiplier))
+		var dealt := member.apply_damage(raw_damage)
+		_log("%s takes %d damage from the slam." % [member.display_name, dealt])
+		if member.is_player:
+			EventBus.player_took_damage.emit({"combat": self, "amount": dealt})
+			_record_death_info(attacker.display_name, def.level, "an AOE slam")
+		_check_health_low(member)
+	stats_changed.emit()
+
+## Boss special: a one-time party-wide stun once health drops to/below
+## EnemyDefinition.stuns_at_health_percent - same one-time-guard shape as
+## _check_enrage(), checked at the same call sites. Every living player-side
+## combatant gets CombatUnitState.stun_turns_remaining = 1, consumed the next
+## time _advance_round_action() reaches their turn (see there for how a
+## stunned turn still "happens" - poison still ticks - but skips the action).
+func _check_piercing_eyes(unit: CombatUnitState) -> void:
+	if unit.is_player or unit.is_ally or unit.enemy_def == null or not unit.is_alive():
+		return
+	var def := unit.enemy_def
+	if def.stuns_at_health_percent <= 0.0 or unit.has_used_piercing_eyes:
+		return
+	if float(unit.current_health) / float(unit.max_health) > def.stuns_at_health_percent:
+		return
+	unit.has_used_piercing_eyes = true
+	_log("%s's eyes flash with a piercing light - your whole party is stunned!" % unit.display_name)
+	for member in _get_alive_party_members():
+		member.stun_turns_remaining = 1
 	stats_changed.emit()
 
 ## Boss special: a one-time self-heal plus fresh reinforcements once this
@@ -847,6 +1064,15 @@ func _finish_combat(victory: bool, fled: bool = false) -> void:
 	if RunManager.run != null:
 		RunManager.run.current_health = player_unit.current_health
 		RunManager.run.current_resource = player_unit.current_resource
+		# Record which recruited allies (if any) died this fight - lets whichever
+		# scene recruited them (e.g. the Flankers) react afterward without
+		# CombatManager needing to know anything about that scene itself.
+		if not ally_units.is_empty():
+			var casualties: Array[String] = []
+			for a in ally_units:
+				if not a.is_alive() and a.ally_def != null:
+					casualties.append(a.ally_def.id)
+			RunManager.run.last_combat_ally_casualty_ids = casualties
 	var context := {"combat": self, "victory": victory, "fled": fled}
 	EventBus.combat_ended.emit(context)
 	if victory and not fled:

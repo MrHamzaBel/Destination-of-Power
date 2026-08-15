@@ -18,8 +18,8 @@ extends Control
 @onready var log_scroll: ScrollContainer = %LogScroll
 
 const TURN_ORDER_LOOKAHEAD: int = 7
-const TURN_ORDER_CURRENT_SIZE: int = 52
-const TURN_ORDER_FUTURE_SIZE: int = 36
+const TURN_ORDER_CURRENT_SIZE: int = 64
+const TURN_ORDER_FUTURE_SIZE: int = 46
 
 @onready var action_row: HBoxContainer = %ActionRow
 @onready var attack_button: Button = %AttackButton
@@ -87,6 +87,7 @@ func _refresh_enemy_target_list() -> void:
 	for child in enemy_target_list.get_children():
 		child.queue_free()
 	var current_target := _combat.get_current_target()
+	var taunting := current_target != null and current_target.enemy_def != null and current_target.enemy_def.taunts_all_attacks
 	for enemy in _combat.get_alive_enemies():
 		var is_selected := enemy == current_target
 		var btn := Button.new()
@@ -95,7 +96,11 @@ func _refresh_enemy_target_list() -> void:
 		btn.toggle_mode = true
 		btn.button_pressed = is_selected
 		btn.text = "%s%s   %d/%d HP" % ["> " if is_selected else "", enemy.display_name, enemy.current_health, enemy.max_health]
-		btn.tooltip_text = "Target this enemy."
+		if taunting and not is_selected:
+			btn.disabled = true
+			btn.tooltip_text = "%s is forcing your attacks onto itself." % current_target.display_name
+		else:
+			btn.tooltip_text = "Target this enemy."
 		btn.pressed.connect(func():
 			_combat.set_target(enemy)
 			_refresh_enemy_target_list()
@@ -174,10 +179,15 @@ func _build_turn_icon(unit: CombatUnitState, is_current: bool) -> Control:
 	style.set_corner_radius_all(size)
 	if is_current:
 		style.border_color = Color(1.0, 0.9, 0.5, 1)
-		style.set_border_width_all(3)
+		style.set_border_width_all(4)
+		style.shadow_color = Color(1.0, 0.9, 0.5, 0.45)
+		style.shadow_size = 8
 	else:
-		style.border_color = Color(0, 0, 0, 0.35)
-		style.set_border_width_all(1)
+		style.border_color = Color(0, 0, 0, 0.4)
+		style.set_border_width_all(2)
+		style.shadow_color = Color(0, 0, 0, 0.3)
+		style.shadow_size = 3
+		style.shadow_offset = Vector2(0, 2)
 	root.add_theme_stylebox_override("panel", style)
 
 	var tex := _turn_icon_texture(unit)
@@ -193,8 +203,11 @@ func _build_turn_icon(unit: CombatUnitState, is_current: bool) -> Control:
 		label.text = unit.display_name.substr(0, 1).to_upper()
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		label.add_theme_font_size_override("font_size", 22 if is_current else 15)
+		label.add_theme_font_size_override("font_size", 28 if is_current else 19)
 		label.add_theme_color_override("font_color", Color.WHITE)
+		label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
+		label.add_theme_constant_override("shadow_offset_x", 1)
+		label.add_theme_constant_override("shadow_offset_y", 1)
 		root.add_child(label)
 
 	return root
@@ -260,11 +273,11 @@ func _build_ability_card(ability: AbilityDefinition) -> Control:
 	card.add_child(hbox)
 
 	var icon := PanelContainer.new()
-	icon.custom_minimum_size = Vector2(6, 0)
+	icon.custom_minimum_size = Vector2(8, 0)
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var icon_style := StyleBoxFlat.new()
 	icon_style.bg_color = accent if affordable else Color(0.4, 0.38, 0.42, 1)
-	icon_style.set_corner_radius_all(3)
+	icon_style.set_corner_radius_all(4)
 	icon.add_theme_stylebox_override("panel", icon_style)
 	hbox.add_child(icon)
 

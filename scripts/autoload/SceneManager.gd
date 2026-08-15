@@ -34,6 +34,12 @@ const BUTCHER_SHOP: String = "res://scenes/world/ButcherShop.tscn"
 const ALCHEMIST_SHOP: String = "res://scenes/world/AlchemistShop.tscn"
 const CLOTHING_SHOP: String = "res://scenes/world/ClothingShop.tscn"
 const RELIC_SHOP: String = "res://scenes/world/RelicShop.tscn"
+const GUARDS_RUSH_CUTSCENE: String = "res://scenes/world/GuardsRushCutscene.tscn"
+const CENTRAL_WALL_SMOKE_CUTSCENE: String = "res://scenes/world/CentralWallSmokeCutscene.tscn"
+const CENTRAL_NERAX_WARD: String = "res://scenes/world/CentralNeraxWard.tscn"
+const MERCENARY_CAMP: String = "res://scenes/world/MercenaryCamp.tscn"
+const EAST_CHECKPOINT: String = "res://scenes/world/EastCheckpoint.tscn"
+const EASTERN_ROAD: String = "res://scenes/world/EasternRoad.tscn"
 
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect

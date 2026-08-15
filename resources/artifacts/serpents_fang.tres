@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtifactDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/ArtifactDefinition.gd" id="1_art"]
+
+[resource]
+script = ExtResource("1_art")
+id = "serpents_fang"
+display_name = "Serpent's Fang"
+description = "A long, curved fang pulled from the forest snake. Every attack you land heals you for a fraction of the damage dealt."
+rarity = 3
+icon_color = Color(0.35, 0.55, 0.25, 1)
+effect_id = "serpents_fang"
+effect_values = {
+"lifesteal_percent": 0.1
+}
+stacking_allowed = false
+class_restrictions = Array[String]([])
+random_drop_eligible = false

@@ -36,6 +36,9 @@ var charge_progress: int = 0 ## Counts toward EnemyDefinition.charges_before_att
 var has_enraged: bool = false ## One-time guard for EnemyDefinition's enrage-at-low-health phase.
 var has_absorbed_hit: bool = false ## One-time guard for EnemyDefinition.absorbs_first_hit.
 var heal_sealed: bool = false ## True once EnemyDefinition.seals_healing_when_alone has triggered - blocks every healing source for the rest of combat (see CombatManager).
+var shielded: bool = false ## Manually re-appliable version of has_absorbed_hit - set by EnemyDefinition.wards_allies_chance's cast, cleared the moment it actually blocks a hit (see CombatManager._rolls_shield()). No expiry of its own; stays until consumed.
+var stun_turns_remaining: int = 0 ## While > 0, this unit's turn still occurs (poison still ticks) but its action is skipped entirely - see CombatManager._advance_round_action().
+var has_used_piercing_eyes: bool = false ## One-time guard for EnemyDefinition.stuns_at_health_percent.
 
 func is_alive() -> bool:
 	return current_health > 0

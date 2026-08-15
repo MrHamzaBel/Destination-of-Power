@@ -291,8 +291,7 @@ collision_mask = 0
 position = Vector2(0, -250)
 script = ExtResource("6_interactable")
 display_name = "Road North"
-kind = 0
-message = "Column after column of soldiers march north up the avenue, banners furled, boots in step. \"Everyone off the road!\" an officer barks. \"Called up to the royal castle, all of them - Crown's orders. Nobody's getting through until they clear out.\""
+kind = 2
 
 [node name="Shape" type="CollisionShape2D" parent="RoadNorthInteract"]
 shape = SubResource("GapShapeH")
@@ -317,20 +316,20 @@ shape = SubResource("GapShapeV")
 color = Color(0.3, 0.3, 0.35, 0.5)
 polygon = PackedVector2Array(-10, -50, 10, -50, 10, 50, -10, 50)
 
-[node name="ExitToShops" type="Area2D" parent="."]
+[node name="MerchantRowInteract" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 0
 position = Vector2(250, 0)
 script = ExtResource("6_interactable")
-display_name = "Shopping Street"
-kind = 2
-exit_target_scene = "res://scenes/world/InnerNeraxShops.tscn"
+display_name = "Merchant Row"
+kind = 0
+message = "A row of shuttered stalls curves off to the east, awnings rolled up and locked tight. Whatever used to trade here, it isn't open to outsiders yet."
 
-[node name="Shape" type="CollisionShape2D" parent="ExitToShops"]
+[node name="Shape" type="CollisionShape2D" parent="MerchantRowInteract"]
 shape = SubResource("GapShapeV")
 
-[node name="ExitVisual" type="Polygon2D" parent="ExitToShops"]
-color = Color(0.85, 0.65, 0.25, 0.5)
+[node name="MerchantRowVisual" type="Polygon2D" parent="MerchantRowInteract"]
+color = Color(0.3, 0.3, 0.35, 0.5)
 polygon = PackedVector2Array(-10, -50, 10, -50, 10, 50, -10, 50)
 
 [node name="Player" parent="." instance=ExtResource("2_player")]

@@ -9,11 +9,15 @@ extends Node2D
 ## scene-specific setup (e.g. an intro notification). No other duplication
 ## is needed - a new area is a new .tscn plus a tiny script like BackAlley.gd.
 
+const TRADER_SCREEN_SCENE: PackedScene = preload("res://scenes/ui/TraderScreen.tscn")
+
 @onready var player: PlayerCharacter = %Player
 @onready var hud: ExplorationHUD = %HUD
 @onready var pause_menu: PauseMenu = %PauseMenu
 @onready var inventory_screen: InventoryScreen = %InventoryScreen
 @onready var dialogue_popup: DialogueChoicePopup = get_node_or_null("%DialoguePopup") ## Optional - only scenes with a DIALOGUE interactable need one.
+
+var trader_screen: TraderScreen ## Instantiated at runtime below rather than added to every scene's .tscn - one shared trader UI, reused by every vendor in the game.
 
 func _ready() -> void:
 	_apply_arrival_spawn()
@@ -30,6 +34,11 @@ func _ready() -> void:
 	inventory_screen.visible = false
 	pause_menu.inventory_requested.connect(_open_inventory)
 	inventory_screen.closed.connect(_close_inventory)
+
+	trader_screen = TRADER_SCREEN_SCENE.instantiate()
+	trader_screen.process_mode = Node.PROCESS_MODE_ALWAYS
+	trader_screen.closed.connect(_close_trader_screen)
+	hud.get_parent().add_child(trader_screen)
 
 	_connect_interactables()
 	_connect_rushing_enemies()
@@ -167,110 +176,36 @@ func _on_toll_choice(choice_index: int, interactable: Interactable) -> void:
 	var target := interactable.exit_target_scene if interactable.exit_target_scene != "" else SceneManager.ENCOUNTER_SCREEN
 	SceneManager.goto_scene(target)
 
-## Never buys on the spot: shows a Yes/No confirm first (same
-## DialogueChoicePopup every other prompt uses) so browsing a vendor and
-## walking away costs nothing.
+## Opens the shared TraderScreen (Buy tab for the vendor's own stock item,
+## Sell tab listing everything sellable in the player's pack) instead of the
+## old instant-sell/buy-popup combo, which sold the first sellable item in
+## the player's pack the moment you interacted - no visibility into what was
+## being sold, no way to pick, and buying was never even offered if you had
+## anything to sell that turn.
 func _handle_trade(interactable: Interactable) -> void:
 	if RunManager.run == null:
 		return
-	if _try_sell_to_vendor(interactable):
+	if trader_screen == null:
+		push_warning("ExplorationArea: %s is a TRADE interactable but the trader screen isn't available." % interactable.display_name)
 		return
-	var item_def := ItemRegistry.get_item(interactable.trade_item_id)
-	if item_def == null:
-		return
-	if dialogue_popup == null:
-		push_warning("ExplorationArea: %s is a TRADE interactable but this scene has no DialoguePopup." % interactable.display_name)
-		return
-	if interactable.purchase_flag_id != "" and bool(RunManager.run.story_flags.get(interactable.purchase_flag_id, false)):
-		hud.show_notification("\"Already sold, I'm afraid,\" they say. \"That one was one of a kind.\"")
-		return
+	trader_screen.open(self, interactable)
+	get_tree().paused = true
 
-	var price := _compute_trade_price(interactable)
-	dialogue_popup.show_prompt(
-		"%s - %d gold. Buy it?" % [item_def.display_name, price],
-		"Buy", "Not now", ""
-	)
-	dialogue_popup.choice_made.connect(_on_trade_confirmed.bind(interactable, price), CONNECT_ONE_SHOT)
+func _close_trader_screen() -> void:
+	trader_screen.visible = false
+	get_tree().paused = false
+	hud.refresh_stats()
 
 ## The Lounge's rank-discount applies the same way regardless of when it's
-## read, so the confirm prompt and the actual purchase always show/charge
-## the identical number.
-func _compute_trade_price(interactable: Interactable) -> int:
+## read, so TraderScreen's displayed price and the actual purchase always
+## show/charge the identical number.
+func compute_trade_price(interactable: Interactable) -> int:
 	var price := interactable.trade_price
 	if interactable.lounge_pricing:
 		var rank_def := RunManager.get_guild_rank_def()
 		if rank_def != null:
 			price = int(round(float(price) * (1.0 - rank_def.tax_discount_percent / 100.0)))
 	return price
-
-func _on_trade_confirmed(choice_index: int, interactable: Interactable, price: int) -> void:
-	if choice_index != 0 or RunManager.run == null:
-		return
-	var item_def := ItemRegistry.get_item(interactable.trade_item_id)
-	if item_def == null:
-		return
-
-	if RunManager.run.currency < price:
-		hud.show_notification("Not enough gold - %s costs %d gold." % [item_def.display_name, price])
-		return
-
-	RunManager.run.currency -= price
-	RunManager.run.add_item(interactable.trade_item_id, 1)
-	if interactable.purchase_flag_id != "":
-		RunManager.run.story_flags[interactable.purchase_flag_id] = true
-	RunManager.save_current_run()
-	hud.refresh_stats()
-	var notice := "Bought %s for %d gold. (%d gold left)" % [item_def.display_name, price, RunManager.run.currency]
-	if interactable.trade_flavor_text != "":
-		notice += " " + interactable.trade_flavor_text
-	hud.show_notification(notice)
-
-## Any TRADE-kind vendor doubles as a generic buyer: every droppable,
-## non-equipped item in the player's pack is sellable somewhere, for a base
-## price (ItemDefinition.sell_price if explicitly set - e.g. a trophy like
-## the bear skin - otherwise its plain ItemDefinition.value). A vendor can
-## also name specific items it pays a premium for via
-## Interactable.sell_bonus_item_ids/sell_bonus_multiplier (e.g. the
-## Underground Trader paying extra for curios) - if the player is carrying
-## one of those, it's sold first; otherwise whatever's sellable is sold in
-## inventory order, same as before. Equipped gear is never touched, so
-## interacting with a vendor can never quietly sell your only weapon.
-func _try_sell_to_vendor(interactable: Interactable) -> bool:
-	var equipped_ids: Array = RunManager.run.equipped.values()
-	var fallback_id := ""
-	var fallback_def: ItemDefinition = null
-	var fallback_price := 0
-	for stack in RunManager.run.inventory:
-		var item_id: String = stack.get("item_id", "")
-		if equipped_ids.has(item_id):
-			continue
-		var item_def := ItemRegistry.get_item(item_id)
-		if item_def == null or not item_def.droppable:
-			continue
-		var base_price := item_def.sell_price if item_def.sell_price > 0 else item_def.value
-		if base_price <= 0:
-			continue
-		# A vendor's specialty item, if the player has one, always sells first.
-		if interactable.sell_bonus_item_ids.has(item_id):
-			return _sell_item_to_vendor(interactable, item_id, item_def, base_price)
-		if fallback_id == "":
-			fallback_id = item_id
-			fallback_def = item_def
-			fallback_price = base_price
-	if fallback_id != "":
-		return _sell_item_to_vendor(interactable, fallback_id, fallback_def, fallback_price)
-	return false
-
-func _sell_item_to_vendor(interactable: Interactable, item_id: String, item_def: ItemDefinition, base_price: int) -> bool:
-	var price := base_price
-	if interactable.sell_bonus_item_ids.has(item_id):
-		price = int(round(float(base_price) * interactable.sell_bonus_multiplier))
-	RunManager.run.remove_item(item_id, 1)
-	RunManager.run.currency += price
-	RunManager.save_current_run()
-	hud.refresh_stats()
-	hud.show_notification("Sold %s for %d gold. (%d gold now)" % [item_def.display_name, price, RunManager.run.currency])
-	return true
 
 ## Shows the yes/no/decline popup for a DIALOGUE interactable. If quest_id is
 ## set and already active/completed, a status line is shown instead of
@@ -392,13 +327,15 @@ func start_combat(enemy_ids: Array[String], return_scene: String = "", advances_
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause_menu"):
-		if inventory_screen.visible:
+		if trader_screen.visible:
+			_close_trader_screen()
+		elif inventory_screen.visible:
 			_close_inventory()
 		else:
 			pause_menu.toggle()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("inventory_toggle"):
-		if not pause_menu.visible:
+		if not pause_menu.visible and not trader_screen.visible:
 			if inventory_screen.visible:
 				_close_inventory()
 			else:

@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/EnemyDefinition.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/data/StatBlock.gd" id="2_stats"]
+
+[sub_resource type="Resource" id="SubResource_1"]
+script = ExtResource("2_stats")
+max_health = 90
+max_resource = 0
+attack = 8
+intelligence = 3
+defense = 12
+speed = 3
+
+[resource]
+script = ExtResource("1_enemy")
+id = "flanker_tank"
+display_name = "Flanker Bruiser"
+stats = SubResource("SubResource_1")
+abilities = Array[String]([])
+loot_table = [{
+"item_id": "minor_healing_potion",
+"chance": 0.2
+}]
+behavior_type = 0
+level = 5
+xp_reward = 22
+currency_reward = 10
+body_color = Color(0.4, 0.36, 0.3, 1)
+shape_points = PackedVector2Array(-12, -22, 12, -22, 16, -3, 13, 20, -13, 20, -16, -3)
+intro_quote = "\"Should've just paid us,\" the bruiser says, hefting his shield. \"Try and get past me first.\""
+taunts_all_attacks = true
+guaranteed_artifact_id = "flankers_signet"
+on_defeat_story_flag_id = "flankers_defeated"

@@ -18,6 +18,13 @@ func on_turn_started(_context: Dictionary, _def: ArtifactDefinition, _stacks: in
 func on_player_attacked(_context: Dictionary, _def: ArtifactDefinition, _stacks: int) -> void:
 	pass
 
+## Unlike on_player_attacked (pre-mitigation, for modifying the hit), this
+## fires after the final damage is actually applied - context carries the
+## real "damage" dealt and the "target" it landed on. For effects that react
+## to a completed hit instead of changing it (e.g. lifesteal).
+func on_player_dealt_damage(_context: Dictionary, _def: ArtifactDefinition, _stacks: int) -> void:
+	pass
+
 func on_player_took_damage(_context: Dictionary, _def: ArtifactDefinition, _stacks: int) -> void:
 	pass
 
